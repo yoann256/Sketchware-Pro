@@ -50,6 +50,7 @@ public class StylesActivity extends AppCompatActivity {
     private PropertyInputItem.AttributesAdapter attributesAdapter;
     private ArrayList<StyleModel> stylesList;
     private boolean isComingFromSrcCodeEditor = true;
+    private StylesEditorManager stylesEditorManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +62,8 @@ public class StylesActivity extends AppCompatActivity {
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         binding.toolbar.setNavigationOnClickListener(v -> onBackPressed());
         binding.addNewStyle.setOnClickListener(view -> showAddStyleDialog());
+
+        stylesEditorManager = new StylesEditorManager(this, stylesList);
 
         binding.recyclerView.setLayoutManager(new LinearLayoutManager(this));
         binding.recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -88,7 +91,7 @@ public class StylesActivity extends AppCompatActivity {
         if (isComingFromSrcCodeEditor) {
             stylesList = new ArrayList<>();
             try {
-                stylesList = parseStylesFile(FileUtil.readFile(getIntent().getStringExtra("content")));
+                stylesList = stylesEditorManager.parseStylesFile(FileUtil.readFile(getIntent().getStringExtra("content")));
             } catch (Exception e) {
                 SketchwareUtil.toastError(e.getMessage());
             }
@@ -101,7 +104,7 @@ public class StylesActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         Gson gson = new Gson();
-        if (!gson.toJson(stylesList).equals(gson.toJson(parseStylesFile(FileUtil.readFile(getIntent().getStringExtra("content")))))) {
+        if (!gson.toJson(stylesList).equals(gson.toJson(stylesEditorManager.parseStylesFile(FileUtil.readFile(getIntent().getStringExtra("content")))))) {
             new MaterialAlertDialogBuilder(this)
                     .setTitle("Warning")
                     .setMessage("You have unsaved changes. Are you sure you want to exit?")
@@ -221,7 +224,7 @@ public class StylesActivity extends AppCompatActivity {
                 new PropertyInputItem.AttributesAdapter.ItemClickListener() {
                     @Override
                     public void onItemClick(Map<String, String> attributes, String attr) {
-                        showAttributeDialog(position, attr);
+                        showAttributeDialog(style, attr);
                     }
 
                     @Override
@@ -250,15 +253,14 @@ public class StylesActivity extends AppCompatActivity {
         attributesAdapter.submitList(keys);
 
         binding.add.setOnClickListener(
-                v -> showAttributeDialog(position, ""));
+                v -> showAttributeDialog(style, ""));
         binding.sourceCode.setVisibility(View.VISIBLE);
         binding.sourceCode.setOnClickListener(
-                v -> showAttributesEditorDialog(position));
+                v -> showAttributesEditorDialog(style));
     }
 
-    private void showAttributeDialog(int position, String attr) {
+    private void showAttributeDialog(StyleModel style, String attr) {
         boolean isEditing = !attr.isEmpty();
-        StyleModel style = stylesList.get(position);
 
         aB dialog = new aB(this);
         StyleEditorAddAttrBinding binding = StyleEditorAddAttrBinding.inflate(getLayoutInflater());
@@ -291,19 +293,17 @@ public class StylesActivity extends AppCompatActivity {
         dialog.show();
     }
 
-    public void showAttributesEditorDialog(int position) {
-        StyleModel style = stylesList.get(position);
+    public void showAttributesEditorDialog(StyleModel style) {
         aB dialog = new aB(this);
         PropertyPopupInputTextBinding binding = PropertyPopupInputTextBinding.inflate(getLayoutInflater());
 
-        binding.edInput.setText(getAttributesCode(style));
+        binding.edInput.setText(stylesEditorManager.getAttributesCode(style));
 
         dialog.b("Edit all " + style.getStyleName() + " attributes");
         dialog.b(Helper.getResString(R.string.common_word_save), v1 -> {
             try {
-                Map<String, String> attributes = convertAttributesToMap(binding.edInput.getText().toString());
+                Map<String, String> attributes = stylesEditorManager.convertAttributesToMap(binding.edInput.getText().toString());
                 style.setAttributes(attributes);
-                style.setAttributes(convertAttributesToMap(binding.edInput.getText().toString()));
                 attributesAdapter.submitList(new ArrayList<>(attributes.keySet()));
             } catch (Exception e) {
                 SketchwareUtil.toastError("Failed to parse attributes. Please check the format");
@@ -314,116 +314,9 @@ public class StylesActivity extends AppCompatActivity {
         dialog.show();
     }
 
-    private String getAttributesCode(StyleModel style) {
-        StringBuilder attributesCode = new StringBuilder();
-
-        for (Map.Entry<String, String> entry : style.getAttributes().entrySet()) {
-            attributesCode
-                    .append("<item name=\"")
-                    .append(entry.getKey())
-                    .append("\">")
-                    .append(entry.getValue())
-                    .append("</item>\n");
-        }
-
-        return attributesCode.toString().trim();
-    }
-
-    private Map<String, String> convertAttributesToMap(String attributesCode) {
-        Map<String, String> attributesMap = new HashMap<>();
-
-
-        String[] lines = attributesCode.split("\n");
-        for (String line : lines) {
-            if (line.startsWith("<item name=\"") && line.endsWith("</item>")) {
-                int nameStart = line.indexOf("\"") + 1;
-                int nameEnd = line.indexOf("\"", nameStart);
-                String name = line.substring(nameStart, nameEnd);
-
-                int valueStart = line.indexOf(">", nameEnd) + 1;
-                int valueEnd = line.lastIndexOf("</item>");
-                String value = line.substring(valueStart, valueEnd).trim();
-
-                attributesMap.put(name, value);
-            }
-        }
-
-        return attributesMap;
-    }
-
-
     private void saveStylesFile() {
-        FileUtil.writeFile(getIntent().getStringExtra("content"), convertStylesToXML());
+        FileUtil.writeFile(getIntent().getStringExtra("content"), stylesEditorManager.convertStylesToXML());
         SketchwareUtil.toast(Helper.getResString(R.string.common_word_saved));
-    }
-
-    private String convertStylesToXML() {
-        StringBuilder xmlContent = new StringBuilder();
-
-        xmlContent.append("<resources>\n");
-
-        for (StyleModel style : stylesList) {
-            xmlContent.append("    <style name=\"").append(style.getStyleName()).append("\"");
-
-            if (style.getParent() != null && !style.getParent().isEmpty()) {
-                xmlContent.append(" parent=\"").append(style.getParent()).append("\"");
-            }
-
-            xmlContent.append(">\n");
-
-            Map<String, String> attributes = style.getAttributes();
-            for (String attrName : attributes.keySet()) {
-                String attrValue = attributes.get(attrName);
-                xmlContent.append("        <item name=\"").append(attrName).append("\">").append(attrValue).append("</item>\n");
-            }
-
-            xmlContent.append("    </style>\n\n");
-        }
-
-        xmlContent.append("</resources>");
-
-        return xmlContent.toString();
-    }
-
-    private ArrayList<StyleModel> parseStylesFile(String content) {
-        ArrayList<StyleModel> styles = new ArrayList<>();
-        try {
-
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder builder = factory.newDocumentBuilder();
-            InputSource inputSource = new InputSource(new StringReader(content));
-            Document document = builder.parse(inputSource);
-            document.getDocumentElement().normalize();
-
-            NodeList nodeList = document.getElementsByTagName("style");
-            for (int i = 0; i < nodeList.getLength(); i++) {
-                Node node = nodeList.item(i);
-                if (node.getNodeType() == Node.ELEMENT_NODE) {
-                    Element element = (Element) node;
-
-                    String styleName = element.getAttribute("name");
-
-                    String parent = element.hasAttribute("parent") ? element.getAttribute("parent") : null;
-
-                    HashMap<String, String> attributes = new HashMap<>();
-                    NodeList childNodes = element.getChildNodes();
-                    for (int j = 0; j < childNodes.getLength(); j++) {
-                        Node childNode = childNodes.item(j);
-                        if (childNode.getNodeType() == Node.ELEMENT_NODE) {
-                            Element childElement = (Element) childNode;
-                            String attrName = childElement.getAttribute("name");
-                            String attrValue = childElement.getTextContent().trim();
-                            attributes.put(attrName, attrValue);
-                        }
-                    }
-
-                    styles.add(new StyleModel(styleName, parent, attributes));
-                }
-            }
-
-        } catch (Exception ignored) {}
-
-        return styles;
     }
 
 }
