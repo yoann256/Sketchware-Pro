@@ -45,6 +45,7 @@ import pro.sketchware.databinding.DialogCreateNewFileLayoutBinding;
 import pro.sketchware.databinding.DialogInputLayoutBinding;
 import pro.sketchware.databinding.ManageFileBinding;
 import pro.sketchware.databinding.ManageJavaItemHsBinding;
+import pro.sketchware.styles.StylesActivity;
 import pro.sketchware.utility.FilePathUtil;
 import pro.sketchware.utility.FileResConfig;
 import pro.sketchware.utility.FileUtil;
@@ -343,7 +344,14 @@ public class ManageResourceActivity extends BaseAppCompatActivity {
             intent.putExtra("title", Uri.parse(frc.listFileResource.get(position)).getLastPathSegment());
             intent.putExtra("content", frc.listFileResource.get(position));
             startActivity(intent);
-        }else if (frc.listFileResource.get(position).endsWith("xml")) {
+        } else if (frc.listFileResource.get(position).endsWith("styles.xml")) {
+            Intent intent = new Intent();
+            intent.setClass(getApplicationContext(), StylesActivity.class);
+            intent.putExtra("title", Uri.parse(frc.listFileResource.get(position)).getLastPathSegment());
+            intent.putExtra("content", frc.listFileResource.get(position));
+            intent.putExtra("xml", "");
+            startActivity(intent);
+        } else if (frc.listFileResource.get(position).endsWith("xml")) {
             Intent intent = new Intent();
             if (ConfigActivity.isLegacyCeEnabled()) {
                 intent.setClass(getApplicationContext(), SrcCodeEditorLegacy.class);

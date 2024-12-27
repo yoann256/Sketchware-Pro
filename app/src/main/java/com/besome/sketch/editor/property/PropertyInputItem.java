@@ -810,7 +810,7 @@ public class PropertyInputItem extends RelativeLayout implements View.OnClickLis
         return attributes;
     }
 
-    private class AttributesAdapter extends ListAdapter<String, AttributesAdapter.ViewHolder> {
+    public static class AttributesAdapter extends ListAdapter<String, AttributesAdapter.ViewHolder> {
 
         private static final DiffUtil.ItemCallback<String> DIFF_CALLBACK =
                 new DiffUtil.ItemCallback<>() {
@@ -881,7 +881,7 @@ public class PropertyInputItem extends RelativeLayout implements View.OnClickLis
             }
         }
 
-        private interface ItemClickListener {
+        public interface ItemClickListener {
 
             void onItemClick(Map<String, String> attributes, String item);
 
