@@ -2,7 +2,10 @@ package pro.sketchware.styles;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
+import android.widget.ArrayAdapter;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -14,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.besome.sketch.editor.property.PropertyInputItem;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.textfield.MaterialAutoCompleteTextView;
 import com.google.gson.Gson;
 
 import a.a.a.aB;
@@ -44,6 +48,7 @@ public class StylesActivity extends AppCompatActivity {
     private ArrayList<StyleModel> stylesList;
     private boolean isComingFromSrcCodeEditor = true;
     private StylesEditorManager stylesEditorManager;
+    private final AttributeSuggestions attributeSuggestions = new AttributeSuggestions();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -257,6 +262,7 @@ public class StylesActivity extends AppCompatActivity {
 
         aB dialog = new aB(this);
         StyleEditorAddAttrBinding binding = StyleEditorAddAttrBinding.inflate(getLayoutInflater());
+        setupAutoComplete(binding.styleName, binding.styleParent);
 
         if (isEditing) {
             binding.styleName.setText(attr);
@@ -310,6 +316,37 @@ public class StylesActivity extends AppCompatActivity {
     private void saveStylesFile() {
         FileUtil.writeFile(getIntent().getStringExtra("content"), stylesEditorManager.convertStylesToXML());
         SketchwareUtil.toast(Helper.getResString(R.string.common_word_saved));
+    }
+
+    private void setupAutoComplete(MaterialAutoCompleteTextView attrView, MaterialAutoCompleteTextView valueView) {
+        String[] attributes = attributeSuggestions.ATTRIBUTE_TYPES.keySet().toArray(new String[0]);
+        List<String> initialValues = attributeSuggestions.getSuggestions(AttributeSuggestions.SuggestionType.DEFAULT);
+
+        ArrayAdapter<String> attrAdapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, attributes);
+        attrView.setAdapter(attrAdapter);
+
+        ArrayAdapter<String> valueAdapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, initialValues);
+        valueView.setAdapter(valueAdapter);
+
+        attrView.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                String attribute = s.toString().trim().toLowerCase();
+
+                List<String> suggestions = attributeSuggestions.getSuggestions(attribute);
+
+                if (suggestions != null && !suggestions.isEmpty()) {
+                    ArrayAdapter<String> newValueAdapter = new ArrayAdapter<>(StylesActivity.this, android.R.layout.simple_dropdown_item_1line, suggestions);
+                    valueView.setAdapter(newValueAdapter);
+                }
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
     }
 
 }
