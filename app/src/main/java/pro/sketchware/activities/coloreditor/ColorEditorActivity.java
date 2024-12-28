@@ -1,5 +1,7 @@
 package pro.sketchware.activities.coloreditor;
 
+import static pro.sketchware.SketchApplication.getContext;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -166,7 +168,7 @@ public class ColorEditorActivity extends AppCompatActivity {
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         binding.toolbar.setNavigationOnClickListener(_v -> onBackPressed());
 
-        parseColorsXML(FileUtil.readFile(contentPath));
+        parseColorsXML(colorList, FileUtil.readFile(contentPath));
         binding.recyclerviewColors.setLayoutManager(new LinearLayoutManager(this));
 
         adapter = new ColorsAdapter(colorList, this);
@@ -179,7 +181,7 @@ public class ColorEditorActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         if (isGoingToEditor) {
-            parseColorsXML(FileUtil.readFile(contentPath));
+            parseColorsXML(colorList, FileUtil.readFile(contentPath));
             adapter.notifyDataSetChanged();
         }
         isGoingToEditor = false;
@@ -249,7 +251,7 @@ public class ColorEditorActivity extends AppCompatActivity {
         dialog.show();
     }
 
-    private void parseColorsXML(String colorXml) {
+    public static void parseColorsXML(ArrayList<ColorItem> colorList, String colorXml) {
         try {
             colorList.clear();
             XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
@@ -273,7 +275,7 @@ public class ColorEditorActivity extends AppCompatActivity {
                         break;
                     case XmlPullParser.END_TAG:
                         if ("color".equals(tagName)) {
-                            if ((colorName != null) && PropertiesUtil.isHexColor(getColorValue(getApplicationContext(), colorValue, 4))) {
+                            if ((colorName != null) && PropertiesUtil.isHexColor(getColorValue(getContext(), colorValue, 4))) {
                                 colorList.add(new ColorItem(colorName, colorValue));
                             }
                         }

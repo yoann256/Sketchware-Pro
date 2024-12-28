@@ -1,86 +1,100 @@
 package pro.sketchware.styles;
 
+import static com.besome.sketch.design.DesignActivity.sc_id;
+import static mod.bobur.StringEditorActivity.convertXmlToListMap;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.stream.Collectors;
+
+import a.a.a.wq;
+
+import pro.sketchware.activities.coloreditor.ColorEditorActivity;
+import pro.sketchware.activities.coloreditor.models.ColorItem;
+import pro.sketchware.utility.FileUtil;
 
 public class AttributeSuggestions {
 
     public final HashMap<String, SuggestionType> ATTRIBUTE_TYPES = new HashMap<>();
-    public final HashMap<String, SuggestionType> ATTRIBUTE_SUGGESTIONS = new HashMap<>();
+    public final ArrayList<String> ATTRIBUTE_SUGGESTIONS = new ArrayList<>();
     private final HashMap<SuggestionType, List<String>> SUGGESTIONS = new HashMap<>();
 
     public enum SuggestionType {
-        BOOLEAN, DIMENSION, COLOR, TEXT, NUMBER, DRAWABLE, FONT, GRAVITY, DEFAULT
+        BOOLEAN, DIMENSION, COLOR, TEXT, NUMBER, NUMBER_0_1, DRAWABLE, FONT
     }
 
     public AttributeSuggestions() {
-        ATTRIBUTE_SUGGESTIONS.put("android:textColor", SuggestionType.COLOR);
-        ATTRIBUTE_SUGGESTIONS.put("android:textSize", SuggestionType.DIMENSION);
-        ATTRIBUTE_SUGGESTIONS.put("android:fontFamily", SuggestionType.FONT);
-        ATTRIBUTE_SUGGESTIONS.put("android:textAllCaps", SuggestionType.BOOLEAN);
-        ATTRIBUTE_SUGGESTIONS.put("android:textAppearance", SuggestionType.DRAWABLE);
-        ATTRIBUTE_SUGGESTIONS.put("android:background", SuggestionType.DRAWABLE);
-        ATTRIBUTE_SUGGESTIONS.put("android:hint", SuggestionType.TEXT);
-        ATTRIBUTE_SUGGESTIONS.put("android:lineSpacingExtra", SuggestionType.DIMENSION);
-        ATTRIBUTE_SUGGESTIONS.put("android:letterSpacing", SuggestionType.DIMENSION);
-        ATTRIBUTE_SUGGESTIONS.put("android:colorPrimary", SuggestionType.COLOR);
-        ATTRIBUTE_SUGGESTIONS.put("android:colorAccent", SuggestionType.COLOR);
-        ATTRIBUTE_SUGGESTIONS.put("android:colorControlNormal", SuggestionType.COLOR);
-        ATTRIBUTE_SUGGESTIONS.put("android:colorControlActivated", SuggestionType.COLOR);
-        ATTRIBUTE_SUGGESTIONS.put("android:colorControlHighlight", SuggestionType.COLOR);
-        ATTRIBUTE_SUGGESTIONS.put("android:statusBarColor", SuggestionType.COLOR);
-        ATTRIBUTE_SUGGESTIONS.put("android:navigationBarColor", SuggestionType.COLOR);
-        ATTRIBUTE_SUGGESTIONS.put("android:windowBackground", SuggestionType.DRAWABLE);
-        ATTRIBUTE_SUGGESTIONS.put("android:showAsAction", SuggestionType.TEXT);
-        ATTRIBUTE_SUGGESTIONS.put("android:alpha", SuggestionType.NUMBER);
-        ATTRIBUTE_SUGGESTIONS.put("android:elevation", SuggestionType.DIMENSION);
-        ATTRIBUTE_SUGGESTIONS.put("android:layout_gravity", SuggestionType.GRAVITY);
+
+        ATTRIBUTE_SUGGESTIONS.add("android:text");
+        ATTRIBUTE_SUGGESTIONS.add("android:hint");
+        ATTRIBUTE_SUGGESTIONS.add("android:showAsAction");
+
+        ATTRIBUTE_SUGGESTIONS.add("android:textAllCaps");
+
+        ATTRIBUTE_SUGGESTIONS.add("android:alpha");
+
+        ATTRIBUTE_SUGGESTIONS.add("android:textColor");
+        ATTRIBUTE_SUGGESTIONS.add("android:statusBarColor");
+        ATTRIBUTE_SUGGESTIONS.add("android:navigationBarColor");
+
+        ATTRIBUTE_SUGGESTIONS.add("android:textSize");
+        ATTRIBUTE_SUGGESTIONS.add("android:lineSpacingExtra");
+        ATTRIBUTE_SUGGESTIONS.add("android:elevation");
+        ATTRIBUTE_SUGGESTIONS.add("android:letterSpacing");
+
+        ATTRIBUTE_SUGGESTIONS.add("android:fontFamily");
+
+        ATTRIBUTE_SUGGESTIONS.add("android:background");
+        ATTRIBUTE_SUGGESTIONS.add("android:windowBackground");
 
         // Adding broader keys for general types
+        ATTRIBUTE_TYPES.put("text", SuggestionType.TEXT);
+        ATTRIBUTE_TYPES.put("hint", SuggestionType.TEXT);
+
+        ATTRIBUTE_TYPES.put("indeterminateOnly", SuggestionType.BOOLEAN);
+        ATTRIBUTE_TYPES.put("enabled", SuggestionType.BOOLEAN);
+        ATTRIBUTE_TYPES.put("checked", SuggestionType.BOOLEAN);
+        ATTRIBUTE_TYPES.put("focusable", SuggestionType.BOOLEAN);
+        ATTRIBUTE_TYPES.put("visibility", SuggestionType.BOOLEAN);
+
+        ATTRIBUTE_TYPES.put("alpha", SuggestionType.NUMBER_0_1);
+        ATTRIBUTE_TYPES.put("scale", SuggestionType.NUMBER_0_1);
+        ATTRIBUTE_TYPES.put("translation", SuggestionType.NUMBER_0_1);
+
+        ATTRIBUTE_TYPES.put("lines", SuggestionType.NUMBER);
+
+        ATTRIBUTE_TYPES.put("fontFamily", SuggestionType.FONT);
+
         ATTRIBUTE_TYPES.put("size", SuggestionType.DIMENSION);
         ATTRIBUTE_TYPES.put("height", SuggestionType.DIMENSION);
         ATTRIBUTE_TYPES.put("width", SuggestionType.DIMENSION);
-        ATTRIBUTE_TYPES.put("color", SuggestionType.COLOR);
-        ATTRIBUTE_TYPES.put("drawable", SuggestionType.DRAWABLE);
-        ATTRIBUTE_TYPES.put("gravity", SuggestionType.GRAVITY);
         ATTRIBUTE_TYPES.put("padding", SuggestionType.DIMENSION);
         ATTRIBUTE_TYPES.put("margin", SuggestionType.DIMENSION);
-        ATTRIBUTE_TYPES.put("lines", SuggestionType.NUMBER);
+
+        ATTRIBUTE_TYPES.put("color", SuggestionType.COLOR);
+        ATTRIBUTE_TYPES.put("drawable", SuggestionType.DRAWABLE);
+        ATTRIBUTE_TYPES.put("background", SuggestionType.DRAWABLE);
 
         // Initializing the suggestions for each type
         SUGGESTIONS.put(SuggestionType.TEXT, generateTextsSuggestions());
         SUGGESTIONS.put(SuggestionType.BOOLEAN, Arrays.asList("true", "false"));
         SUGGESTIONS.put(SuggestionType.DIMENSION, generateDimensionSuggestions());
-        SUGGESTIONS.put(SuggestionType.COLOR, Arrays.asList("#FFFFFF", "#000000", "#FF0000", "#00FF00", "#0000FF"));
-        SUGGESTIONS.put(SuggestionType.NUMBER, generateNumberSuggestions());
+        SUGGESTIONS.put(SuggestionType.COLOR, generateColorsSuggestions());
+        SUGGESTIONS.put(SuggestionType.NUMBER, generateNumberSuggestions(1, 10));
+        SUGGESTIONS.put(SuggestionType.NUMBER_0_1, generateNumberSuggestions(0.1F, 1));
         SUGGESTIONS.put(SuggestionType.DRAWABLE, generateDrawableSuggestions());
         SUGGESTIONS.put(SuggestionType.FONT, Arrays.asList("sans-serif", "serif", "monospace"));
-        SUGGESTIONS.put(SuggestionType.GRAVITY, Arrays.asList("center", "left", "right", "top", "bottom"));
-        SUGGESTIONS.put(SuggestionType.DEFAULT, Arrays.asList("5dp", "10dp", "15dp", "#FFFFFF", "#FF0000"));
-    }
-
-    public SuggestionType getSuggestionType(String attribute) {
-        for (String attr : ATTRIBUTE_TYPES.keySet()) {
-            if (attribute.contains(attr)) {
-                return ATTRIBUTE_TYPES.get(attr);
-            }
-        }
-        return SuggestionType.DEFAULT;
-    }
-
-    public List<String> getSuggestions(SuggestionType type) {
-        return SUGGESTIONS.get(type);
     }
 
     public List<String> getSuggestions(String attr) {
-        SuggestionType type = getSuggestionType(attr);
-        return SUGGESTIONS.get(type);
-    }
-
-    private List<String> generateTextsSuggestions() {
-        // TODO: get XMLStrings list
+        for (String currentAttr : ATTRIBUTE_TYPES.keySet()) {
+            if (attr.contains(currentAttr.toLowerCase())) {
+                return SUGGESTIONS.get(ATTRIBUTE_TYPES.get(currentAttr));
+            }
+        }
         return new ArrayList<>();
     }
 
@@ -92,17 +106,55 @@ public class AttributeSuggestions {
         return suggestions;
     }
 
-    private List<String> generateNumberSuggestions() {
-        int start = 0;
-        int end = 10;
+    private List<String> generateNumberSuggestions(float step, float max) {
         List<String> suggestions = new ArrayList<>();
-        for (int i = start; i <= end; i++) {
-            suggestions.add(String.valueOf(i));
+        for (float i = step; i <= max; i+= step) {
+            if (i == Math.floor(i)) {
+                suggestions.add(String.format(Locale.US, "%.0f", i));
+            } else {
+                suggestions.add(String.format(Locale.US, "%.1f", i));
+            }
         }
         return suggestions;
     }
 
+    private List<String> generateTextsSuggestions() {
+        if (sc_id == null) {
+            return new ArrayList<>();
+        }
+        String filePath = wq.b(sc_id) + "/files/resource/values/strings.xml";
+
+        ArrayList<HashMap<String, Object>> StringsListMap = new ArrayList<>();
+
+        convertXmlToListMap(FileUtil.readFileIfExist(filePath), StringsListMap);
+
+        return StringsListMap.stream()
+                .map(stringMap -> "@string/" + stringMap.get("key"))
+                .collect(Collectors.toList());
+    }
+
+    private List<String> generateColorsSuggestions() {
+        if (sc_id == null) {
+            return new ArrayList<>();
+        }
+        String filePath = wq.b(sc_id) + "/files/resource/values/colors.xml";
+
+        ArrayList<ColorItem> colorList = new ArrayList<>();
+
+        ColorEditorActivity.parseColorsXML(colorList, FileUtil.readFileIfExist(filePath));
+
+        return colorList.stream().map(colorItem -> "@color/" + colorItem.getColorName()).collect(Collectors.toList());
+
+    }
+
     private List<String> generateDrawableSuggestions() {
-        return Arrays.asList("@drawable/sample_image", "@drawable/ic_launcher", "@drawable/custom_background");
+        if (sc_id == null) {
+            return new ArrayList<>();
+        }
+        String path = wq.b(sc_id) + "/files/resource/drawable/";
+        return FileUtil.listFiles(path, ".xml")
+                .stream()
+                .map(file -> "@drawable/" + file.substring(path.length()))
+                .collect(Collectors.toList());
     }
 }
