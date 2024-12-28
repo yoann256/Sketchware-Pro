@@ -319,7 +319,7 @@ public class StylesActivity extends AppCompatActivity {
     }
 
     private void setupAutoComplete(MaterialAutoCompleteTextView attrView, MaterialAutoCompleteTextView valueView) {
-        String[] attributes = attributeSuggestions.ATTRIBUTE_TYPES.keySet().toArray(new String[0]);
+        String[] attributes = attributeSuggestions.ATTRIBUTE_SUGGESTIONS.keySet().toArray(new String[0]);
         List<String> initialValues = attributeSuggestions.getSuggestions(AttributeSuggestions.SuggestionType.DEFAULT);
 
         ArrayAdapter<String> attrAdapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, attributes);
