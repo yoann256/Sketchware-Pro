@@ -304,6 +304,8 @@
 
         <activity android:name="pro.sketchware.styles.StylesActivity" />
 
+        <activity android:name="pro.sketchware.xml.resources.editors.ResourcesEditorsActivity" />
+
         <activity
             android:name=".activities.appcompat.ManageAppCompatActivity"
             android:configChanges="orientation|screenSize" />

@@ -50,6 +50,7 @@ import pro.sketchware.utility.FilePathUtil;
 import pro.sketchware.utility.FileResConfig;
 import pro.sketchware.utility.FileUtil;
 import pro.sketchware.utility.SketchwareUtil;
+import pro.sketchware.xml.resources.editors.ResourcesEditorsActivity;
 
 @SuppressLint("SetTextI18n")
 public class ManageResourceActivity extends BaseAppCompatActivity {
@@ -331,27 +332,15 @@ public class ManageResourceActivity extends BaseAppCompatActivity {
     }
 
     private void goEdit(int position) {
-        if (frc.listFileResource.get(position).endsWith("strings.xml")) {
+        String filePath = frc.listFileResource.get(position);
+        if (filePath.endsWith("strings.xml") || filePath.endsWith("colors.xml") || filePath.endsWith("styles.xml")) {
             Intent intent = new Intent();
-            intent.setClass(getApplicationContext(), StringEditorActivity.class);
+            intent.setClass(getApplicationContext(), ResourcesEditorsActivity.class);
             intent.putExtra("title", Uri.parse(frc.listFileResource.get(position)).getLastPathSegment());
             intent.putExtra("content", frc.listFileResource.get(position));
             intent.putExtra("xml", "");
             startActivity(intent);
-        } else if (frc.listFileResource.get(position).endsWith("colors.xml")) {
-            Intent intent = new Intent();
-            intent.setClass(getApplicationContext(), ColorEditorActivity.class);
-            intent.putExtra("title", Uri.parse(frc.listFileResource.get(position)).getLastPathSegment());
-            intent.putExtra("content", frc.listFileResource.get(position));
-            startActivity(intent);
-        } else if (frc.listFileResource.get(position).endsWith("styles.xml")) {
-            Intent intent = new Intent();
-            intent.setClass(getApplicationContext(), StylesActivity.class);
-            intent.putExtra("title", Uri.parse(frc.listFileResource.get(position)).getLastPathSegment());
-            intent.putExtra("content", frc.listFileResource.get(position));
-            intent.putExtra("xml", "");
-            startActivity(intent);
-        } else if (frc.listFileResource.get(position).endsWith("xml")) {
+        } else if (filePath.endsWith("xml")) {
             Intent intent = new Intent();
             if (ConfigActivity.isLegacyCeEnabled()) {
                 intent.setClass(getApplicationContext(), SrcCodeEditorLegacy.class);
