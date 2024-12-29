@@ -1,4 +1,4 @@
-package pro.sketchware.activities.coloreditor.models;
+package pro.sketchware.xml.resources.editors.models;
 
 public class ColorItem {
     private String colorName;

@@ -298,8 +298,6 @@
         <activity android:name="pro.sketchware.activities.main.fragments.projects_store.ProjectPreviewActivity"
             android:configChanges="orientation|screenSize" />
 
-        <activity android:name="pro.sketchware.activities.coloreditor.ColorEditorActivity" />
-        
         <activity android:name="pro.sketchware.activities.settings.SettingsActivity" />
 
         <activity android:name="pro.sketchware.styles.StylesActivity" />

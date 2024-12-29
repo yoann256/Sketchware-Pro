@@ -55,6 +55,7 @@ public class StringEditor extends Fragment {
     private StringEditorBinding binding;
     private StringsAdapter adapter;
     private boolean isComingFromSrcCodeEditor = true;
+    public boolean isInitialized = false;
     public String filePath;
 
     @Nullable
@@ -72,6 +73,7 @@ public class StringEditor extends Fragment {
         filePath = ((ResourcesEditorsActivity) requireActivity()).stringsFilePath;
 
         binding.recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+        isInitialized = true;
 
     }
 

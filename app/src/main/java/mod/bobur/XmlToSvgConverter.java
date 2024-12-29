@@ -21,8 +21,8 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import pro.sketchware.SketchApplication;
-import pro.sketchware.activities.coloreditor.ColorEditorActivity;
 import pro.sketchware.utility.FileUtil;
+import pro.sketchware.xml.resources.editors.fragments.ColorEditor;
 
 /**
  * This class is converts XML vector drawables to SVG (Only vector drawables are supported)
@@ -159,7 +159,7 @@ public class XmlToSvgConverter {
         svg.append("<path d=\"").append(pathData).append("\" ");
 
         if (!fillColor.isEmpty()) {
-            svg.append("fill=\"").append(ColorEditorActivity.getColorValue(SketchApplication.getContext(), fillColor, 4)).append("\" ");
+            svg.append("fill=\"").append(ColorEditor.getColorValue(SketchApplication.getContext(), fillColor, 4)).append("\" ");
             if (!fillAlpha.isEmpty()) {
                 svg.append("fill-opacity=\"").append(fillAlpha).append("\" ");
             }
@@ -168,7 +168,7 @@ public class XmlToSvgConverter {
         }
 
         if (!strokeColor.isEmpty()) {
-            svg.append("stroke=\"").append(ColorEditorActivity.getColorValue(SketchApplication.getContext(), strokeColor, 4)).append("\" ");
+            svg.append("stroke=\"").append(ColorEditor.getColorValue(SketchApplication.getContext(), strokeColor, 4)).append("\" ");
             if (!strokeWidth.isEmpty()) {
                 svg.append("stroke-width=\"").append(parseDimension(strokeWidth)).append("\" ");
             }
@@ -228,12 +228,12 @@ public class XmlToSvgConverter {
                 return "#FFFFFF";
             }
         }
-        ColorEditorActivity.contentPath = filePath;
+        ColorEditor.contentPath = filePath;
         if (!tint.isEmpty()) {
-            return ColorEditorActivity.getColorValue(SketchApplication.getContext(), tint, 4);
+            return ColorEditor.getColorValue(SketchApplication.getContext(), tint, 4);
         } else {
             String fillColor = vectorElement.getAttribute("android:fillColor");
-            return ColorEditorActivity.getColorValue(SketchApplication.getContext(), fillColor, 4);
+            return ColorEditor.getColorValue(SketchApplication.getContext(), fillColor, 4);
         }
     }
     public static void setImageVectorFromFile(ImageView imageView, String filePath) throws Exception {

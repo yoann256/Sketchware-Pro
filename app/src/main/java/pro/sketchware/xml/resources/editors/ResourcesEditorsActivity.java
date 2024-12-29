@@ -11,6 +11,7 @@ import a.a.a.wq;
 
 import pro.sketchware.databinding.ResourcesEditorsActivityBinding;
 import pro.sketchware.xml.resources.editors.adapters.EditorsAdapter;
+import pro.sketchware.xml.resources.editors.fragments.ColorEditor;
 import pro.sketchware.xml.resources.editors.fragments.StringEditor;
 
 public class ResourcesEditorsActivity extends AppCompatActivity {
@@ -18,8 +19,10 @@ public class ResourcesEditorsActivity extends AppCompatActivity {
     private ResourcesEditorsActivityBinding binding;
     public String sc_id;
     public String stringsFilePath;
+    public String colorsFilePath;
 
     public final StringEditor stringEditor = new StringEditor();
+    public final ColorEditor colorsEditor = new ColorEditor();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,7 +34,9 @@ public class ResourcesEditorsActivity extends AppCompatActivity {
         setSupportActionBar(binding.topAppBar);
 
         sc_id = getIntent().getStringExtra("sc_id");
-        stringsFilePath = wq.b(sc_id) + "/files/resource/values/strings.xml";
+        String projectResourcesDirectory = wq.b(sc_id)+ "/files/resource/values/" ;
+        stringsFilePath = projectResourcesDirectory + "strings.xml";
+        colorsFilePath = projectResourcesDirectory + "colors.xml";
 
         setupViewPager();
 
@@ -51,15 +56,19 @@ public class ResourcesEditorsActivity extends AppCompatActivity {
         }).attach();
 
         binding.fab.setOnClickListener(view -> {
-            if (binding.viewPager.getCurrentItem() == 0) {
+            int currentItem = binding.viewPager.getCurrentItem();
+            if (currentItem == 0) {
                 stringEditor.addStringDialog();
+            } else if (currentItem == 1) {
+                colorsEditor.showColorEditDialog(null, -1);
             }
         });
     }
 
     @Override
     public void onBackPressed() {
-        if (stringEditor.checkForUnsavedChanges()) {
+        if ((stringEditor.checkForUnsavedChanges() && stringEditor.isInitialized)
+                || (colorsEditor.checkForUnsavedChanges() && colorsEditor.isInitialized)) {
             new MaterialAlertDialogBuilder(this)
                     .setTitle("Warning")
                     .setMessage("You have unsaved changes. Are you sure you want to exit?")
@@ -76,8 +85,10 @@ public class ResourcesEditorsActivity extends AppCompatActivity {
 
     @Override
     public void onResume() {
-        if (binding.viewPager.getCurrentItem() == 0 && stringEditor.filePath != null) {
+        if (binding.viewPager.getCurrentItem() == 0 && stringEditor.isInitialized) {
             stringEditor.updateStringsList();
+        } else if (binding.viewPager.getCurrentItem() == 1 && colorsEditor.isInitialized) {
+            colorsEditor.updateColorsList();
         }
         super.onResume();
     }

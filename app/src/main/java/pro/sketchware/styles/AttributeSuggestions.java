@@ -2,6 +2,7 @@ package pro.sketchware.styles;
 
 import static com.besome.sketch.design.DesignActivity.sc_id;
 
+import static pro.sketchware.xml.resources.editors.fragments.ColorEditor.parseColorsXML;
 import static pro.sketchware.xml.resources.editors.fragments.StringEditor.convertXmlToListMap;
 
 import java.util.ArrayList;
@@ -13,8 +14,7 @@ import java.util.stream.Collectors;
 
 import a.a.a.wq;
 
-import pro.sketchware.activities.coloreditor.ColorEditorActivity;
-import pro.sketchware.activities.coloreditor.models.ColorItem;
+import pro.sketchware.xml.resources.editors.models.ColorItem;
 import pro.sketchware.utility.FileUtil;
 
 public class AttributeSuggestions {
@@ -142,7 +142,7 @@ public class AttributeSuggestions {
 
         ArrayList<ColorItem> colorList = new ArrayList<>();
 
-        ColorEditorActivity.parseColorsXML(colorList, FileUtil.readFileIfExist(filePath));
+        parseColorsXML(colorList, FileUtil.readFileIfExist(filePath));
 
         return colorList.stream().map(colorItem -> "@color/" + colorItem.getColorName()).collect(Collectors.toList());
 

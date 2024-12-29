@@ -5,7 +5,6 @@ import androidx.fragment.app.Fragment;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 
 import pro.sketchware.xml.resources.editors.ResourcesEditorsActivity;
-import pro.sketchware.xml.resources.editors.fragments.ColorEditor;
 import pro.sketchware.xml.resources.editors.fragments.StylesEditor;
 
 public class EditorsAdapter extends FragmentStateAdapter {
@@ -22,7 +21,7 @@ public class EditorsAdapter extends FragmentStateAdapter {
     public Fragment createFragment(int position) {
         return switch (position) {
             case 0 -> activity.stringEditor;
-            case 1 -> new ColorEditor();
+            case 1 -> activity.colorsEditor;
             case 2 -> new StylesEditor();
             default -> throw new IllegalArgumentException("Invalid position");
         };
