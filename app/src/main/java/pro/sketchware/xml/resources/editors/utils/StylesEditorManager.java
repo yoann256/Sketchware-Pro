@@ -1,6 +1,4 @@
-package pro.sketchware.styles;
-
-import android.app.Activity;
+package pro.sketchware.xml.resources.editors.utils;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -16,15 +14,9 @@ import java.util.Map;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import pro.sketchware.xml.resources.editors.models.StyleModel;
+
 public class StylesEditorManager {
-
-    private final Activity activity;
-    private final ArrayList<StyleModel> stylesList;
-
-    public StylesEditorManager(StylesActivity activity, ArrayList<StyleModel> stylesList) {
-        this.activity = activity;
-        this.stylesList = stylesList;
-    }
 
     public String getAttributesCode(StyleModel style) {
         StringBuilder attributesCode = new StringBuilder();
@@ -63,7 +55,7 @@ public class StylesEditorManager {
         return attributesMap;
     }
 
-    public String convertStylesToXML() {
+    public String convertStylesToXML(ArrayList<StyleModel> stylesList) {
         StringBuilder xmlContent = new StringBuilder();
 
         xmlContent.append("<resources>\n");

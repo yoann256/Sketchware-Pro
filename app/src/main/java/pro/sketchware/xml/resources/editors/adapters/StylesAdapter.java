@@ -1,4 +1,4 @@
-package pro.sketchware.styles;
+package pro.sketchware.xml.resources.editors.adapters;
 
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
@@ -6,6 +6,8 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import pro.sketchware.databinding.ItemStyleBinding;
+import pro.sketchware.xml.resources.editors.models.StyleModel;
+import pro.sketchware.xml.resources.editors.fragments.StylesEditor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,9 +16,9 @@ public class StylesAdapter extends RecyclerView.Adapter<StylesAdapter.StyleViewH
 
     private final List<StyleModel> stylesList;
     private final List<StyleModel> originalList;
-    private final StylesActivity activity;
+    private final StylesEditor activity;
 
-    public StylesAdapter(ArrayList<StyleModel> stylesList, StylesActivity activity) {
+    public StylesAdapter(ArrayList<StyleModel> stylesList, StylesEditor activity) {
         this.stylesList = stylesList;
         this.originalList = new ArrayList<>(stylesList);
         this.activity = activity;

@@ -1,4 +1,4 @@
-package pro.sketchware.styles;
+package pro.sketchware.xml.resources.editors.utils;
 
 import static com.besome.sketch.design.DesignActivity.sc_id;
 

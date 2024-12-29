@@ -22,7 +22,7 @@ public class EditorsAdapter extends FragmentStateAdapter {
         return switch (position) {
             case 0 -> activity.stringEditor;
             case 1 -> activity.colorsEditor;
-            case 2 -> new StylesEditor();
+            case 2 -> activity.stylesEditor;
             default -> throw new IllegalArgumentException("Invalid position");
         };
     }

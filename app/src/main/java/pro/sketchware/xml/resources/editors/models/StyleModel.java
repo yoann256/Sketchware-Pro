@@ -1,4 +1,4 @@
-package pro.sketchware.styles;
+package pro.sketchware.xml.resources.editors.models;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -50,12 +50,6 @@ public class StyleModel {
             attributes = new HashMap<>();
         }
         attributes.put(attrName, attrValue);
-    }
-
-    public void removeAttribute(String attrName) {
-        if (attributes != null) {
-            attributes.remove(attrName);
-        }
     }
 
     public String getAttribute(String attrName) {
