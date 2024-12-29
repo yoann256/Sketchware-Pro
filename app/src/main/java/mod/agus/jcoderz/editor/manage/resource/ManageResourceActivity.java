@@ -32,7 +32,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import mod.bobur.StringEditorActivity;
 import mod.bobur.XmlToSvgConverter;
 import mod.hey.studios.code.SrcCodeEditor;
 import mod.hey.studios.code.SrcCodeEditorLegacy;
@@ -336,9 +335,7 @@ public class ManageResourceActivity extends BaseAppCompatActivity {
         if (filePath.endsWith("strings.xml") || filePath.endsWith("colors.xml") || filePath.endsWith("styles.xml")) {
             Intent intent = new Intent();
             intent.setClass(getApplicationContext(), ResourcesEditorsActivity.class);
-            intent.putExtra("title", Uri.parse(frc.listFileResource.get(position)).getLastPathSegment());
-            intent.putExtra("content", frc.listFileResource.get(position));
-            intent.putExtra("xml", "");
+            intent.putExtra("sc_id", numProj);
             startActivity(intent);
         } else if (filePath.endsWith("xml")) {
             Intent intent = new Intent();

@@ -2,10 +2,9 @@ package pro.sketchware.menu;
 
 import static android.text.TextUtils.isEmpty;
 
-import static mod.bobur.StringEditorActivity.convertXmlToListMap;
-import static mod.bobur.StringEditorActivity.isXmlStringsContains;
-
 import static pro.sketchware.utility.SketchwareUtil.getDip;
+import static pro.sketchware.xml.resources.editors.fragments.StringEditor.convertXmlToListMap;
+import static pro.sketchware.xml.resources.editors.fragments.StringEditor.isXmlStringsContains;
 
 import android.annotation.SuppressLint;
 import android.text.Editable;

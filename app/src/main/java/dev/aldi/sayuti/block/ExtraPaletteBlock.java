@@ -1,7 +1,7 @@
 package dev.aldi.sayuti.block;
 
-import static mod.bobur.StringEditorActivity.convertXmlToListMap;
-import static mod.bobur.StringEditorActivity.isXmlStringsContains;
+import static pro.sketchware.xml.resources.editors.fragments.StringEditor.convertXmlToListMap;
+import static pro.sketchware.xml.resources.editors.fragments.StringEditor.isXmlStringsContains;
 
 import android.util.Pair;
 

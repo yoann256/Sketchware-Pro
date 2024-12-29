@@ -310,9 +310,6 @@
             android:name=".activities.appcompat.ManageAppCompatActivity"
             android:configChanges="orientation|screenSize" />
 
-        <activity android:name="mod.bobur.StringEditorActivity"
-            android:windowSoftInputMode="stateHidden|adjustPan"/>
-
         <activity
             android:name=".activities.editor.command.ManageXMLCommandActivity"
             android:configChanges="orientation|screenSize" />

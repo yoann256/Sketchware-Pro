@@ -2,21 +2,24 @@ package pro.sketchware.xml.resources.editors;
 
 import android.os.Bundle;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
-import androidx.viewpager2.adapter.FragmentStateAdapter;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.tabs.TabLayoutMediator;
 
+import a.a.a.wq;
+
 import pro.sketchware.databinding.ResourcesEditorsActivityBinding;
-import pro.sketchware.xml.resources.editors.fragments.ColorEditor;
+import pro.sketchware.xml.resources.editors.adapters.EditorsAdapter;
 import pro.sketchware.xml.resources.editors.fragments.StringEditor;
-import pro.sketchware.xml.resources.editors.fragments.StylesEditor;
 
 public class ResourcesEditorsActivity extends AppCompatActivity {
 
     private ResourcesEditorsActivityBinding binding;
+    public String sc_id;
+    public String stringsFilePath;
+
+    public final StringEditor stringEditor = new StringEditor();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,6 +29,9 @@ public class ResourcesEditorsActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         setSupportActionBar(binding.topAppBar);
+
+        sc_id = getIntent().getStringExtra("sc_id");
+        stringsFilePath = wq.b(sc_id) + "/files/resource/values/strings.xml";
 
         setupViewPager();
 
@@ -45,35 +51,40 @@ public class ResourcesEditorsActivity extends AppCompatActivity {
         }).attach();
 
         binding.fab.setOnClickListener(view -> {
-
+            if (binding.viewPager.getCurrentItem() == 0) {
+                stringEditor.addStringDialog();
+            }
         });
     }
 
+    @Override
+    public void onBackPressed() {
+        if (stringEditor.checkForUnsavedChanges()) {
+            new MaterialAlertDialogBuilder(this)
+                    .setTitle("Warning")
+                    .setMessage("You have unsaved changes. Are you sure you want to exit?")
+                    .setPositiveButton("Exit", (dialog, which) -> super.onBackPressed())
+                    .setNegativeButton("Cancel", null)
+                    .create()
+                    .show();
+            return;
+        }
+
+        setResult(RESULT_OK);
+        finish();
+    }
+
+    @Override
+    public void onResume() {
+        if (binding.viewPager.getCurrentItem() == 0 && stringEditor.filePath != null) {
+            stringEditor.updateStringsList();
+        }
+        super.onResume();
+    }
+
     private void setupViewPager() {
-        ViewPagerAdapter adapter = new ViewPagerAdapter(this);
+        EditorsAdapter adapter = new EditorsAdapter(this);
         binding.viewPager.setAdapter(adapter);
     }
 
-    private static class ViewPagerAdapter extends FragmentStateAdapter {
-
-        public ViewPagerAdapter(@NonNull AppCompatActivity fragmentActivity) {
-            super(fragmentActivity);
-        }
-
-        @NonNull
-        @Override
-        public Fragment createFragment(int position) {
-            return switch (position) {
-                case 0 -> new StringEditor();
-                case 1 -> new ColorEditor();
-                case 2 -> new StylesEditor();
-                default -> throw new IllegalArgumentException("Invalid position");
-            };
-        }
-
-        @Override
-        public int getItemCount() {
-            return 3;
-        }
-    }
 }

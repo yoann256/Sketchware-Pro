@@ -1,10 +1,10 @@
 package com.besome.sketch.editor;
 
-import static mod.bobur.StringEditorActivity.convertListMapToXml;
-import static mod.bobur.StringEditorActivity.convertXmlToListMap;
-import static mod.bobur.StringEditorActivity.isXmlStringsContains;
 import static pro.sketchware.utility.SketchwareUtil.getDip;
 import static pro.sketchware.widgets.WidgetsCreatorManager.clearErrorOnTextChanged;
+import static pro.sketchware.xml.resources.editors.fragments.StringEditor.convertListMapToXml;
+import static pro.sketchware.xml.resources.editors.fragments.StringEditor.convertXmlToListMap;
+import static pro.sketchware.xml.resources.editors.fragments.StringEditor.isXmlStringsContains;
 
 import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
@@ -123,7 +123,6 @@ import io.github.rosemoe.sora.widget.CodeEditor;
 import io.github.rosemoe.sora.widget.component.Magnifier;
 import io.github.rosemoe.sora.widget.schemes.EditorColorScheme;
 import io.github.rosemoe.sora.widget.schemes.SchemeDarcula;
-import mod.bobur.StringEditorActivity;
 import mod.bobur.XmlToSvgConverter;
 import mod.hey.studios.editor.view.IdGenerator;
 import mod.hey.studios.moreblock.ReturnMoreblockManager;
@@ -144,6 +143,7 @@ import pro.sketchware.utility.FilePathUtil;
 import pro.sketchware.utility.FileUtil;
 import pro.sketchware.utility.SketchwareUtil;
 import pro.sketchware.utility.SvgUtils;
+import pro.sketchware.xml.resources.editors.ResourcesEditorsActivity;
 
 @SuppressLint({"ClickableViewAccessibility", "RtlHardcoded", "SetTextI18n", "DefaultLocale"})
 public class LogicEditorActivity extends BaseAppCompatActivity implements View.OnClickListener, Vs, View.OnTouchListener, MoreblockImporterDialog.CallBack {
@@ -557,10 +557,8 @@ public class LogicEditorActivity extends BaseAppCompatActivity implements View.O
 
     public void openStringEditor() {
         Intent intent = new Intent();
-        intent.setClass(getApplicationContext(), StringEditorActivity.class);
-        intent.putExtra("title", "strings.xml");
-        intent.putExtra("content", new FilePathUtil().getPathResource(B) + "/values/strings.xml");
-        intent.putExtra("xml", "");
+        intent.setClass(getApplicationContext(), ResourcesEditorsActivity.class);
+        intent.putExtra("sc_id", B);
         openStringEditor.launch(intent);
     }
 

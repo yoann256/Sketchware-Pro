@@ -1,7 +1,7 @@
 package com.besome.sketch.editor.view;
 
-import static mod.bobur.StringEditorActivity.convertXmlToListMap;
-import static mod.bobur.StringEditorActivity.isXmlStringsContains;
+import static pro.sketchware.xml.resources.editors.fragments.StringEditor.convertXmlToListMap;
+import static pro.sketchware.xml.resources.editors.fragments.StringEditor.isXmlStringsContains;
 
 import android.content.Context;
 import android.graphics.Bitmap;

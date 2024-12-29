@@ -1,7 +1,8 @@
 package pro.sketchware.styles;
 
 import static com.besome.sketch.design.DesignActivity.sc_id;
-import static mod.bobur.StringEditorActivity.convertXmlToListMap;
+
+import static pro.sketchware.xml.resources.editors.fragments.StringEditor.convertXmlToListMap;
 
 import java.util.ArrayList;
 import java.util.Arrays;
