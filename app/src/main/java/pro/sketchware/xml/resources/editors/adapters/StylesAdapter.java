@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import pro.sketchware.databinding.ItemStyleBinding;
+import pro.sketchware.databinding.PalletCustomviewBinding;
 import pro.sketchware.xml.resources.editors.fragments.ThemesEditor;
 import pro.sketchware.xml.resources.editors.models.StyleModel;
 import pro.sketchware.xml.resources.editors.fragments.StylesEditor;
@@ -29,7 +30,7 @@ public class StylesAdapter extends RecyclerView.Adapter<StylesAdapter.StyleViewH
     @NonNull
     @Override
     public StyleViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        ItemStyleBinding binding = ItemStyleBinding.inflate(
+        PalletCustomviewBinding binding = PalletCustomviewBinding.inflate(
                 LayoutInflater.from(parent.getContext()), parent, false);
         return new StyleViewHolder(binding);
     }
@@ -59,22 +60,22 @@ public class StylesAdapter extends RecyclerView.Adapter<StylesAdapter.StyleViewH
 
     public class StyleViewHolder extends RecyclerView.ViewHolder {
 
-        private final ItemStyleBinding binding;
+        private final PalletCustomviewBinding binding;
 
-        public StyleViewHolder(ItemStyleBinding binding) {
+        public StyleViewHolder(PalletCustomviewBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
         }
 
         public void bind(StyleModel style) {
-            binding.styleName.setText(style.getStyleName());
+            binding.title.setText(style.getStyleName());
             if (style.getParent().isEmpty()) {
-                binding.styleParent.setText("No Parent");
+                binding.sub.setText("No Parent");
             } else {
-                binding.styleParent.setText(style.getParent());
+                binding.sub.setText(style.getParent());
             }
 
-            binding.getRoot().setOnClickListener(view ->{
+            binding.backgroundCard.setOnClickListener(view ->{
                 if (fragment instanceof StylesEditor stylesEditor) {
                     stylesEditor.showStyleAttributesDialog(getAbsoluteAdapterPosition());
                 } else if (fragment instanceof ThemesEditor themesEditor) {

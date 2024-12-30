@@ -24,6 +24,7 @@ import a.a.a.eC;
 import a.a.a.jC;
 import mod.hey.studios.util.Helper;
 import pro.sketchware.R;
+import pro.sketchware.databinding.PalletCustomviewBinding;
 import pro.sketchware.databinding.StringEditorItemBinding;
 import pro.sketchware.databinding.ViewStringEditorAddBinding;
 import pro.sketchware.utility.SketchwareUtil;
@@ -45,8 +46,8 @@ public class StringsAdapter extends RecyclerView.Adapter<StringsAdapter.ViewHold
     @Override
     public StringsAdapter.ViewHolder onCreateViewHolder(
             @NonNull ViewGroup parent, int viewType) {
-        StringEditorItemBinding itemBinding =
-                StringEditorItemBinding.inflate(
+        PalletCustomviewBinding itemBinding =
+                PalletCustomviewBinding.inflate(
                         LayoutInflater.from(parent.getContext()), parent, false);
         return new StringsAdapter.ViewHolder(itemBinding);
     }
@@ -56,10 +57,10 @@ public class StringsAdapter extends RecyclerView.Adapter<StringsAdapter.ViewHold
         HashMap<String, Object> item = filteredData.get(position);
         String key = (String) item.get("key");
         String text = (String) item.get("text");
-        holder.binding.textInputLayout.setHint(key);
-        holder.binding.editText.setText(text);
+        holder.binding.title.setHint(key);
+        holder.binding.sub.setText(text);
 
-        holder.binding.editText.setOnClickListener(
+        holder.binding.backgroundCard.setOnClickListener(
                 v -> {
                     int adapterPosition = holder.getAbsoluteAdapterPosition();
                     HashMap<String, Object> currentItem = filteredData.get(adapterPosition);
@@ -122,9 +123,9 @@ public class StringsAdapter extends RecyclerView.Adapter<StringsAdapter.ViewHold
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        StringEditorItemBinding binding;
+        PalletCustomviewBinding binding;
 
-        public ViewHolder(StringEditorItemBinding binding) {
+        public ViewHolder(PalletCustomviewBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
         }
