@@ -22,11 +22,15 @@ import pro.sketchware.activities.resources.editors.fragments.ThemesEditor;
 public class ResourcesEditorActivity extends AppCompatActivity {
 
     private ResourcesEditorsActivityBinding binding;
+
     public String sc_id;
+    public String variant;
     public String stringsFilePath;
     public String colorsFilePath;
     public String stylesFilePath;
     public String themesFilePath;
+
+    public boolean isDefaultVariant;
 
     public final StringsEditor stringsEditor = new StringsEditor();
     public final ColorsEditor colorsEditor = new ColorsEditor();
@@ -43,7 +47,15 @@ public class ResourcesEditorActivity extends AppCompatActivity {
         setSupportActionBar(binding.topAppBar);
 
         sc_id = getIntent().getStringExtra("sc_id");
-        String projectResourcesDirectory = wq.b(sc_id)+ "/files/resource/values/" ;
+        variant = getIntent().getStringExtra("variant");
+
+        String projectResourcesDirectory =
+                String.format(
+                        "%s/files/resource/values%s/",
+                        wq.b(sc_id),
+                        variant
+                );
+
         stringsFilePath = projectResourcesDirectory + "strings.xml";
         colorsFilePath = projectResourcesDirectory + "colors.xml";
         stylesFilePath = projectResourcesDirectory + "styles.xml";
@@ -54,16 +66,16 @@ public class ResourcesEditorActivity extends AppCompatActivity {
         new TabLayoutMediator(binding.tabLayout, binding.viewPager, (tab, position) -> {
             switch (position) {
                 case 0:
-                    tab.setText("strings.xml");
+                    tab.setText("strings" + variant + ".xml");
                     break;
                 case 1:
-                    tab.setText("colors.xml");
+                    tab.setText("colors" + variant + ".xml");
                     break;
                 case 2:
-                    tab.setText("styles.xml");
+                    tab.setText("styles" + variant + ".xml");
                     break;
                 case 3:
-                    tab.setText("themes.xml");
+                    tab.setText("themes" + variant + ".xml");
                     break;
             }
         }).attach();

@@ -31,6 +31,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import mod.bobur.XmlToSvgConverter;
 import mod.hey.studios.code.SrcCodeEditor;
@@ -334,6 +336,7 @@ public class ManageResourceActivity extends BaseAppCompatActivity {
             Intent intent = new Intent();
             intent.setClass(getApplicationContext(), ResourcesEditorActivity.class);
             intent.putExtra("sc_id", numProj);
+            intent.putExtra("variant", extractVariant(frc.listFileResource.get(position)));
             startActivity(intent);
         } else if (filePath.endsWith("xml")) {
             Intent intent = new Intent();
@@ -353,6 +356,18 @@ public class ManageResourceActivity extends BaseAppCompatActivity {
             SketchwareUtil.toast("Only XML files can be edited");
         }
     }
+
+    public String extractVariant(String fullPath) {
+        String regex = "values(-\\w+)";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(fullPath);
+
+        if (matcher.find()) {
+            return matcher.group(1);
+        }
+        return "";
+    }
+
 
     private void goEdit2(int position) {
         if (frc.listFileResource.get(position).endsWith("xml")) {
