@@ -18,6 +18,7 @@ import pro.sketchware.activities.resources.editors.fragments.ColorsEditor;
 import pro.sketchware.activities.resources.editors.fragments.StringsEditor;
 import pro.sketchware.activities.resources.editors.fragments.StylesEditor;
 import pro.sketchware.activities.resources.editors.fragments.ThemesEditor;
+import pro.sketchware.utility.SketchwareUtil;
 
 public class ResourcesEditorActivity extends AppCompatActivity {
 
@@ -29,8 +30,6 @@ public class ResourcesEditorActivity extends AppCompatActivity {
     public String colorsFilePath;
     public String stylesFilePath;
     public String themesFilePath;
-
-    public boolean isDefaultVariant;
 
     public final StringsEditor stringsEditor = new StringsEditor();
     public final ColorsEditor colorsEditor = new ColorsEditor();
@@ -179,6 +178,7 @@ public class ResourcesEditorActivity extends AppCompatActivity {
             colorsEditor.saveColorsFile();
             stylesEditor.saveStylesFile();
             themesEditor.saveThemesFile();
+            SketchwareUtil.toast("Save completed");
         } else if (id != R.id.action_search) {
             int currentItem = binding.viewPager.getCurrentItem();
             if (currentItem == 0) {
