@@ -37,7 +37,7 @@ import pro.sketchware.SketchApplication;
 import pro.sketchware.databinding.ColorEditorAddBinding;
 import pro.sketchware.databinding.ResourcesEditorFragmentBinding;
 import pro.sketchware.xml.resources.editors.adapters.ColorsAdapter;
-import pro.sketchware.xml.resources.editors.models.ColorItem;
+import pro.sketchware.xml.resources.editors.models.ColorModel;
 import pro.sketchware.utility.PropertiesUtil;
 import pro.sketchware.utility.FileUtil;
 import pro.sketchware.utility.SketchwareUtil;
@@ -47,7 +47,7 @@ import pro.sketchware.xml.resources.editors.ResourcesEditorActivity;
 public class ColorsEditor extends Fragment {
 
     public static String contentPath;
-    private final ArrayList<ColorItem> colorList = new ArrayList<>();
+    private final ArrayList<ColorModel> colorList = new ArrayList<>();
     private boolean isGoingToEditor;
     public boolean isInitialized = false;
     private ResourcesEditorFragmentBinding binding;
@@ -113,7 +113,7 @@ public class ColorsEditor extends Fragment {
         return null;
     }
 
-    public static String convertListToXml(ArrayList<ColorItem> colorList) {
+    public static String convertListToXml(ArrayList<ColorModel> colorList) {
         try {
             XmlSerializer xmlSerializer = Xml.newSerializer();
             StringWriter stringWriter = new StringWriter();
@@ -124,10 +124,10 @@ public class ColorsEditor extends Fragment {
             xmlSerializer.startTag(null, "resources");
             xmlSerializer.text("\n");
 
-            for (ColorItem colorItem : colorList) {
+            for (ColorModel colorModel : colorList) {
                 xmlSerializer.startTag(null, "color");
-                xmlSerializer.attribute(null, "name", colorItem.getColorName());
-                xmlSerializer.text(colorItem.getColorValue());
+                xmlSerializer.attribute(null, "name", colorModel.getColorName());
+                xmlSerializer.text(colorModel.getColorValue());
                 xmlSerializer.endTag(null, "color");
                 xmlSerializer.text("\n");
             }
@@ -190,7 +190,7 @@ public class ColorsEditor extends Fragment {
         startActivity(intent);
     }
 
-    public static void parseColorsXML(ArrayList<ColorItem> colorList, String colorXml) {
+    public static void parseColorsXML(ArrayList<ColorModel> colorList, String colorXml) {
         try {
             colorList.clear();
             XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
@@ -215,7 +215,7 @@ public class ColorsEditor extends Fragment {
                     case XmlPullParser.END_TAG:
                         if ("color".equals(tagName)) {
                             if ((colorName != null) && PropertiesUtil.isHexColor(getColorValue(SketchApplication.getContext(), colorValue, 4))) {
-                                colorList.add(new ColorItem(colorName, colorValue));
+                                colorList.add(new ColorModel(colorName, colorValue));
                             }
                         }
                         break;
@@ -241,23 +241,23 @@ public class ColorsEditor extends Fragment {
         dialog.show();
     }
 
-    public void showColorEditDialog(ColorItem colorItem, int position) {
+    public void showColorEditDialog(ColorModel colorModel, int position) {
         aB dialog = new aB(activity);
         ColorEditorAddBinding dialogBinding = ColorEditorAddBinding.inflate(getLayoutInflater());
         new XB(activity, dialogBinding.colorValueInputLayout, dialogBinding.colorPreview);
 
-        if (colorItem != null) {
-            dialogBinding.colorKeyInput.setText(colorItem.getColorName());
-            dialogBinding.colorPreview.setBackgroundColor(PropertiesUtil.parseColor(getColorValue(activity.getApplicationContext(), colorItem.getColorValue(), 3)));
+        if (colorModel != null) {
+            dialogBinding.colorKeyInput.setText(colorModel.getColorName());
+            dialogBinding.colorPreview.setBackgroundColor(PropertiesUtil.parseColor(getColorValue(activity.getApplicationContext(), colorModel.getColorValue(), 3)));
 
-            if (colorItem.getColorValue().startsWith("@")) {
-                dialogBinding.colorValueInput.setText(colorItem.getColorValue().replace("@", ""));
+            if (colorModel.getColorValue().startsWith("@")) {
+                dialogBinding.colorValueInput.setText(colorModel.getColorValue().replace("@", ""));
                 dialogBinding.hash.setText("@");
                 dialogBinding.colorValueInput.setEnabled(false);
                 dialogBinding.hash.setEnabled(false);
                 dialogBinding.colorValueInputLayout.setError(null);
             } else {
-                dialogBinding.colorValueInput.setText(colorItem.getColorValue().replace("#", ""));
+                dialogBinding.colorValueInput.setText(colorModel.getColorValue().replace("#", ""));
                 dialogBinding.hash.setText("#");
 
             }
@@ -285,13 +285,13 @@ public class ColorsEditor extends Fragment {
                 return;
             }
 
-            if (colorItem != null) {
-                colorItem.setColorName(key);
+            if (colorModel != null) {
+                colorModel.setColorName(key);
 
                 if (dialogBinding.hash.getText().equals("@")) {
-                    colorItem.setColorValue("@" + value);
+                    colorModel.setColorValue("@" + value);
                 } else {
-                    colorItem.setColorValue("#" + value);
+                    colorModel.setColorValue("#" + value);
                 }
 
                 adapter.notifyItemChanged(position);
@@ -320,7 +320,7 @@ public class ColorsEditor extends Fragment {
             colorpicker.showAtLocation(v, Gravity.CENTER, 0, 0);
         });
 
-        if (colorItem != null) {
+        if (colorModel != null) {
             dialog.configureDefaultButton("Delete", v1 -> {
                 colorList.remove(position);
                 adapter.notifyItemRemoved(position);
@@ -335,7 +335,7 @@ public class ColorsEditor extends Fragment {
     }
 
     private void addColor(String name, String value) {
-        ColorItem newItem = new ColorItem(name, "#" + value);
+        ColorModel newItem = new ColorModel(name, "#" + value);
         for (int i = 0; i < colorList.size(); i++) {
             if (colorList.get(i).getColorName().equals(name)) {
                 colorList.set(i, newItem);

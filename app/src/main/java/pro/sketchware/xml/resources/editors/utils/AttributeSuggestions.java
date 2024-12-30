@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 
 import a.a.a.wq;
 
-import pro.sketchware.xml.resources.editors.models.ColorItem;
+import pro.sketchware.xml.resources.editors.models.ColorModel;
 import pro.sketchware.utility.FileUtil;
 
 public class AttributeSuggestions {
@@ -140,11 +140,11 @@ public class AttributeSuggestions {
         }
         String filePath = wq.b(sc_id) + "/files/resource/values/colors.xml";
 
-        ArrayList<ColorItem> colorList = new ArrayList<>();
+        ArrayList<ColorModel> colorList = new ArrayList<>();
 
         parseColorsXML(colorList, FileUtil.readFileIfExist(filePath));
 
-        return colorList.stream().map(colorItem -> "@color/" + colorItem.getColorName()).collect(Collectors.toList());
+        return colorList.stream().map(colorModel -> "@color/" + colorModel.getColorName()).collect(Collectors.toList());
 
     }
 

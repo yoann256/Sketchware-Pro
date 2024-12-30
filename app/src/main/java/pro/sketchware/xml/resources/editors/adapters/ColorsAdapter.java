@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 
-import pro.sketchware.xml.resources.editors.models.ColorItem;
+import pro.sketchware.xml.resources.editors.models.ColorModel;
 import pro.sketchware.databinding.PalletCustomviewBinding;
 import pro.sketchware.utility.PropertiesUtil;
 import pro.sketchware.xml.resources.editors.ResourcesEditorActivity;
@@ -17,11 +17,11 @@ import pro.sketchware.xml.resources.editors.fragments.ColorsEditor;
 
 public class ColorsAdapter extends RecyclerView.Adapter<ColorsAdapter.ViewHolder> {
 
-    private final ArrayList<ColorItem> originalData;
-    private ArrayList<ColorItem> filteredData;
+    private final ArrayList<ColorModel> originalData;
+    private ArrayList<ColorModel> filteredData;
     private final ResourcesEditorActivity activity;
 
-    public ColorsAdapter(ArrayList<ColorItem> filteredData, ResourcesEditorActivity activity) {
+    public ColorsAdapter(ArrayList<ColorModel> filteredData, ResourcesEditorActivity activity) {
         this.originalData = filteredData;
         this.filteredData = new ArrayList<>(filteredData);
         this.activity = activity;
@@ -36,9 +36,9 @@ public class ColorsAdapter extends RecyclerView.Adapter<ColorsAdapter.ViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        ColorItem colorItem = filteredData.get(position);
-        String colorName = colorItem.getColorName();
-        String colorValue = colorItem.getColorValue();
+        ColorModel colorModel = filteredData.get(position);
+        String colorName = colorModel.getColorName();
+        String colorValue = colorModel.getColorValue();
         String valueHex = ColorsEditor.getColorValue(activity.getApplicationContext(), colorValue, 4);
 
         holder.itemBinding.title.setHint(colorName);
@@ -48,7 +48,7 @@ public class ColorsAdapter extends RecyclerView.Adapter<ColorsAdapter.ViewHolder
             holder.itemBinding.color.setBackgroundColor(PropertiesUtil.parseColor(valueHex));
         }
 
-        holder.itemBinding.backgroundCard.setOnClickListener(v -> activity.colorsEditor.showColorEditDialog(colorItem, position));
+        holder.itemBinding.backgroundCard.setOnClickListener(v -> activity.colorsEditor.showColorEditDialog(colorModel, position));
         holder.itemBinding.backgroundCard.setOnLongClickListener(v -> {
             activity.colorsEditor.showDeleteDialog(position);
             return true;
