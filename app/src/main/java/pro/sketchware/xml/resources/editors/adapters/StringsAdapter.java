@@ -25,7 +25,6 @@ import a.a.a.jC;
 import mod.hey.studios.util.Helper;
 import pro.sketchware.R;
 import pro.sketchware.databinding.PalletCustomviewBinding;
-import pro.sketchware.databinding.StringEditorItemBinding;
 import pro.sketchware.databinding.ViewStringEditorAddBinding;
 import pro.sketchware.utility.SketchwareUtil;
 import pro.sketchware.xml.resources.editors.ResourcesEditorsActivity;

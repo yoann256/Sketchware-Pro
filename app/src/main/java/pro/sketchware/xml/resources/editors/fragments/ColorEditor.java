@@ -15,7 +15,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserFactory;
@@ -47,8 +46,6 @@ import pro.sketchware.xml.resources.editors.ResourcesEditorsActivity;
 
 public class ColorEditor extends Fragment {
 
-    private static final int MENU_SAVE = 0;
-    private static final int MENU_OPEN_IN_EDITOR = 1;
     public static String contentPath;
     private final ArrayList<ColorItem> colorList = new ArrayList<>();
     private boolean isGoingToEditor;

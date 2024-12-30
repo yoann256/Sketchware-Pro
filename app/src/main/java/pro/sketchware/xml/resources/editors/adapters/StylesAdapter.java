@@ -6,7 +6,6 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
-import pro.sketchware.databinding.ItemStyleBinding;
 import pro.sketchware.databinding.PalletCustomviewBinding;
 import pro.sketchware.xml.resources.editors.fragments.ThemesEditor;
 import pro.sketchware.xml.resources.editors.models.StyleModel;

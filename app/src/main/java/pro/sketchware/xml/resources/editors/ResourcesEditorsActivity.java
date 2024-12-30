@@ -13,7 +13,6 @@ import a.a.a.wq;
 
 import pro.sketchware.R;
 import pro.sketchware.databinding.ResourcesEditorsActivityBinding;
-import pro.sketchware.utility.XmlUtil;
 import pro.sketchware.xml.resources.editors.adapters.EditorsAdapter;
 import pro.sketchware.xml.resources.editors.fragments.ColorEditor;
 import pro.sketchware.xml.resources.editors.fragments.StringEditor;

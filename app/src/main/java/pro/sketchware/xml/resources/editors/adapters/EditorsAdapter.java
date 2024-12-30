@@ -5,7 +5,6 @@ import androidx.fragment.app.Fragment;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 
 import pro.sketchware.xml.resources.editors.ResourcesEditorsActivity;
-import pro.sketchware.xml.resources.editors.fragments.StylesEditor;
 
 public class EditorsAdapter extends FragmentStateAdapter {
 
