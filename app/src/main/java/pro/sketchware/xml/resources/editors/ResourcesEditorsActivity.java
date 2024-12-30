@@ -118,12 +118,14 @@ public class ResourcesEditorsActivity extends AppCompatActivity {
             searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
                 @Override
                 public boolean onQueryTextChange(String newText) {
+                    newText = newText.toLowerCase().trim();
                     int currentItem = binding.viewPager.getCurrentItem();
                     if (currentItem == 0) {
                         stringEditor.adapter.filter(newText);
-                        // TODO: add filter feat for colorsAdapter
+                    } else if (currentItem == 1) {
+                        colorsEditor.adapter.filter(newText);
                     } else if (currentItem == 2) {
-                        stylesEditor.adapter.filter(newText);
+                    stylesEditor.adapter.filter(newText);
                     }
                     return false;
                 }

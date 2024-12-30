@@ -143,8 +143,8 @@ public class StringsAdapter extends RecyclerView.Adapter<StringsAdapter.ViewHold
             for (HashMap<String, Object> item : originalData) {
                 String key = (String) item.get("key");
                 String text = (String) item.get("text");
-                if ((key != null && key.toLowerCase().contains(query.toLowerCase()))
-                        || (text != null && text.toLowerCase().contains(query.toLowerCase()))) {
+                if ((key != null && key.toLowerCase().contains(query))
+                        || (text != null && text.toLowerCase().contains(query))) {
                     filteredData.add(item);
                 }
             }

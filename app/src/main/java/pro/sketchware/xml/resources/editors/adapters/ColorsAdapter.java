@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 import pro.sketchware.xml.resources.editors.models.ColorItem;
 import pro.sketchware.databinding.PalletCustomviewBinding;
@@ -16,11 +17,13 @@ import pro.sketchware.xml.resources.editors.fragments.ColorEditor;
 
 public class ColorsAdapter extends RecyclerView.Adapter<ColorsAdapter.ViewHolder> {
 
-    private final ArrayList<ColorItem> data;
+    private final ArrayList<ColorItem> originalData;
+    private ArrayList<ColorItem> filteredData;
     private final ResourcesEditorsActivity activity;
 
-    public ColorsAdapter(ArrayList<ColorItem> data, ResourcesEditorsActivity activity) {
-        this.data = data;
+    public ColorsAdapter(ArrayList<ColorItem> filteredData, ResourcesEditorsActivity activity) {
+        this.originalData = filteredData;
+        this.filteredData = new ArrayList<>(filteredData);
         this.activity = activity;
     }
 
@@ -33,11 +36,10 @@ public class ColorsAdapter extends RecyclerView.Adapter<ColorsAdapter.ViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        ColorItem colorItem = data.get(position);
+        ColorItem colorItem = filteredData.get(position);
         String colorName = colorItem.getColorName();
         String colorValue = colorItem.getColorValue();
         String valueHex = ColorEditor.getColorValue(activity.getApplicationContext(), colorValue, 4);
-
 
         holder.itemBinding.title.setHint(colorName);
         holder.itemBinding.sub.setText(colorValue);
@@ -55,7 +57,20 @@ public class ColorsAdapter extends RecyclerView.Adapter<ColorsAdapter.ViewHolder
 
     @Override
     public int getItemCount() {
-        return data.size();
+        return filteredData.size();
+    }
+
+    public void filter(String newText) {
+        if (newText == null || newText.isEmpty()) {
+            filteredData = new ArrayList<>(originalData); // Reset to original data
+        } else {
+            String filterText = newText.toLowerCase().trim();
+            filteredData = originalData.stream()
+                    .filter(item -> item.getColorName().toLowerCase().contains(filterText) ||
+                            item.getColorValue().toLowerCase().contains(filterText))
+                    .collect(Collectors.toCollection(ArrayList::new));
+        }
+        notifyDataSetChanged();
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
