@@ -154,7 +154,7 @@ public class ColorsEditor extends Fragment {
 
     public void updateColorsList() {
         if (isGoingToEditor) {
-            parseColorsXML(colorList, FileUtil.readFile(contentPath));
+            parseColorsXML(colorList, FileUtil.readFileIfExist(contentPath));
             adapter.notifyDataSetChanged();
         }
         isGoingToEditor = false;
@@ -167,7 +167,7 @@ public class ColorsEditor extends Fragment {
 
         colorpicker = new Zx(activity, 0xFFFFFFFF, false, false);
 
-        parseColorsXML(colorList, FileUtil.readFile(contentPath));
+        parseColorsXML(colorList, FileUtil.readFileIfExist(contentPath));
 
         adapter = new ColorsAdapter(colorList, (ResourcesEditorActivity) activity);
         binding.recyclerView.setAdapter(adapter);
@@ -175,7 +175,7 @@ public class ColorsEditor extends Fragment {
     }
 
     public boolean checkForUnsavedChanges() {
-        String originalXml = FileUtil.readFile(contentPath);
+        String originalXml = FileUtil.readFileIfExist(contentPath);
         String newXml = convertListToXml(colorList);
         return !Objects.equals(XmlUtil.replaceXml(newXml), XmlUtil.replaceXml(originalXml));
     }

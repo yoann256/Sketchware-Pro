@@ -71,7 +71,7 @@ public class StringsEditor extends Fragment {
 
     public void updateStringsList() {
         if (isComingFromSrcCodeEditor) {
-            convertXmlToListMap(FileUtil.readFile(filePath), listmap);
+            convertXmlToListMap(FileUtil.readFileIfExist(filePath), listmap);
             adapter = new StringsAdapter(((ResourcesEditorActivity) requireActivity()), listmap);
             binding.recyclerView.setAdapter(adapter);
         }
@@ -80,7 +80,7 @@ public class StringsEditor extends Fragment {
 
     public boolean checkForUnsavedChanges() {
         ArrayList<HashMap<String, Object>> cache = new ArrayList<>();
-        convertXmlToListMap(FileUtil.readFile(filePath), cache);
+        convertXmlToListMap(FileUtil.readFileIfExist(filePath), cache);
         String cacheString = new Gson().toJson(cache);
         String cacheListmap = new Gson().toJson(listmap);
         return !cacheListmap.equals(cacheString) && !listmap.isEmpty();
@@ -88,7 +88,7 @@ public class StringsEditor extends Fragment {
 
     public void handleOnOptionsItemSelected(@IdRes int id) {
         if (id == R.id.action_get_default) {
-            convertXmlToListMap(FileUtil.readFile(getDefaultStringPath(Objects.requireNonNull(filePath))), listmap);
+            convertXmlToListMap(FileUtil.readFileIfExist(getDefaultStringPath(Objects.requireNonNull(filePath))), listmap);
             adapter.notifyDataSetChanged();
         } else if (id == R.id.action_open_editor) {
             XmlUtil.saveXml(filePath, convertListMapToXml(listmap));

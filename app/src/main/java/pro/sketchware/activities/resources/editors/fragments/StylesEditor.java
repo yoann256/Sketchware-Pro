@@ -71,7 +71,7 @@ public class StylesEditor extends Fragment {
         if (isComingFromSrcCodeEditor) {
             stylesList = new ArrayList<>();
             try {
-                stylesList = stylesEditorManager.parseStylesFile(FileUtil.readFile(filePath));
+                stylesList = stylesEditorManager.parseStylesFile(FileUtil.readFileIfExist(filePath));
             } catch (Exception e) {
                 SketchwareUtil.toastError(e.getMessage());
             }
@@ -89,7 +89,7 @@ public class StylesEditor extends Fragment {
 
     public boolean checkForUnsavedChanges() {
         Gson gson = new Gson();
-        return !gson.toJson(stylesList).equals(gson.toJson(stylesEditorManager.parseStylesFile(FileUtil.readFile(filePath))));
+        return !gson.toJson(stylesList).equals(gson.toJson(stylesEditorManager.parseStylesFile(FileUtil.readFileIfExist(filePath))));
     }
 
     public void showAddStyleDialog() {

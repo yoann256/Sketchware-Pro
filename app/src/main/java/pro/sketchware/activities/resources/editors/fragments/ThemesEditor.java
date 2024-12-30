@@ -71,7 +71,7 @@ public class ThemesEditor extends Fragment {
         if (isComingFromSrcCodeEditor) {
             themesList = new ArrayList<>();
             try {
-                themesList = themesEditorManager.parseStylesFile(FileUtil.readFile(filePath));
+                themesList = themesEditorManager.parseStylesFile(FileUtil.readFileIfExist(filePath));
             } catch (Exception e) {
                 SketchwareUtil.toastError(e.getMessage());
             }
@@ -89,7 +89,7 @@ public class ThemesEditor extends Fragment {
 
     public boolean checkForUnsavedChanges() {
         Gson gson = new Gson();
-        return !gson.toJson(themesList).equals(gson.toJson(themesEditorManager.parseStylesFile(FileUtil.readFile(filePath))));
+        return !gson.toJson(themesList).equals(gson.toJson(themesEditorManager.parseStylesFile(FileUtil.readFileIfExist(filePath))));
     }
 
     public void showAddThemeDialog() {
