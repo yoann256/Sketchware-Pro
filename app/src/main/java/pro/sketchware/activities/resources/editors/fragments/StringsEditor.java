@@ -79,6 +79,9 @@ public class StringsEditor extends Fragment {
     }
 
     public boolean checkForUnsavedChanges() {
+        if (!FileUtil.isExistFile(filePath)) {
+            return false;
+        }
         ArrayList<HashMap<String, Object>> cache = new ArrayList<>();
         convertXmlToListMap(FileUtil.readFileIfExist(filePath), cache);
         String cacheString = new Gson().toJson(cache);

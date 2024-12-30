@@ -175,6 +175,9 @@ public class ColorsEditor extends Fragment {
     }
 
     public boolean checkForUnsavedChanges() {
+        if (!FileUtil.isExistFile(contentPath)) {
+            return false;
+        }
         String originalXml = FileUtil.readFileIfExist(contentPath);
         String newXml = convertListToXml(colorList);
         return !Objects.equals(XmlUtil.replaceXml(newXml), XmlUtil.replaceXml(originalXml));
