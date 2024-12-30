@@ -13,7 +13,7 @@ import pro.sketchware.xml.resources.editors.models.ColorItem;
 import pro.sketchware.databinding.PalletCustomviewBinding;
 import pro.sketchware.utility.PropertiesUtil;
 import pro.sketchware.xml.resources.editors.ResourcesEditorActivity;
-import pro.sketchware.xml.resources.editors.fragments.ColorEditor;
+import pro.sketchware.xml.resources.editors.fragments.ColorsEditor;
 
 public class ColorsAdapter extends RecyclerView.Adapter<ColorsAdapter.ViewHolder> {
 
@@ -39,7 +39,7 @@ public class ColorsAdapter extends RecyclerView.Adapter<ColorsAdapter.ViewHolder
         ColorItem colorItem = filteredData.get(position);
         String colorName = colorItem.getColorName();
         String colorValue = colorItem.getColorValue();
-        String valueHex = ColorEditor.getColorValue(activity.getApplicationContext(), colorValue, 4);
+        String valueHex = ColorsEditor.getColorValue(activity.getApplicationContext(), colorValue, 4);
 
         holder.itemBinding.title.setHint(colorName);
         holder.itemBinding.sub.setText(colorValue);

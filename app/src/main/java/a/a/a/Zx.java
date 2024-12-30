@@ -1,6 +1,6 @@
 package a.a.a;
 
-import static pro.sketchware.xml.resources.editors.fragments.ColorEditor.getColorValue;
+import static pro.sketchware.xml.resources.editors.fragments.ColorsEditor.getColorValue;
 
 import android.app.Activity;
 import android.graphics.Color;

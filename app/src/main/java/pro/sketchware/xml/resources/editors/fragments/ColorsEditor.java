@@ -44,7 +44,7 @@ import pro.sketchware.utility.SketchwareUtil;
 import pro.sketchware.utility.XmlUtil;
 import pro.sketchware.xml.resources.editors.ResourcesEditorActivity;
 
-public class ColorEditor extends Fragment {
+public class ColorsEditor extends Fragment {
 
     public static String contentPath;
     private final ArrayList<ColorItem> colorList = new ArrayList<>();
@@ -349,7 +349,7 @@ public class ColorEditor extends Fragment {
 
     public void saveColorsFile() {
         if (isInitialized) {
-            XmlUtil.saveXml(contentPath, ColorEditor.convertListToXml(colorList));
+            XmlUtil.saveXml(contentPath, ColorsEditor.convertListToXml(colorList));
         }
     }
 }

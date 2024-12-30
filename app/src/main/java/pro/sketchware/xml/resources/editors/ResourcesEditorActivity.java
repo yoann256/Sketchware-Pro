@@ -14,7 +14,7 @@ import a.a.a.wq;
 import pro.sketchware.R;
 import pro.sketchware.databinding.ResourcesEditorsActivityBinding;
 import pro.sketchware.xml.resources.editors.adapters.EditorsAdapter;
-import pro.sketchware.xml.resources.editors.fragments.ColorEditor;
+import pro.sketchware.xml.resources.editors.fragments.ColorsEditor;
 import pro.sketchware.xml.resources.editors.fragments.StringEditor;
 import pro.sketchware.xml.resources.editors.fragments.StylesEditor;
 import pro.sketchware.xml.resources.editors.fragments.ThemesEditor;
@@ -29,7 +29,7 @@ public class ResourcesEditorActivity extends AppCompatActivity {
     public String themesFilePath;
 
     public final StringEditor stringEditor = new StringEditor();
-    public final ColorEditor colorsEditor = new ColorEditor();
+    public final ColorsEditor colorsEditor = new ColorsEditor();
     public final StylesEditor stylesEditor = new StylesEditor();
     public final ThemesEditor themesEditor = new ThemesEditor();
 
