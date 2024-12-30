@@ -154,7 +154,7 @@ public class ResourcesEditorsActivity extends AppCompatActivity {
             XmlUtil.saveXml(stringsFilePath, StringEditor.convertListMapToXml(stringEditor.listmap));
             XmlUtil.saveXml(colorsFilePath, ColorEditor.convertListToXml(colorsEditor.colorList));
             stylesEditor.saveStylesFile();
-        } else {
+        } else if (id == R.id.action_search) {
             int currentItem = binding.viewPager.getCurrentItem();
             if (currentItem == 0) {
                 stringEditor.handleOnOptionsItemSelected(id);
