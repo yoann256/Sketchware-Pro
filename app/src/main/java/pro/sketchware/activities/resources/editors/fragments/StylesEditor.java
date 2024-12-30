@@ -1,4 +1,4 @@
-package pro.sketchware.xml.resources.editors.fragments;
+package pro.sketchware.activities.resources.editors.fragments;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -28,33 +28,33 @@ import mod.hey.studios.util.Helper;
 import mod.hilal.saif.activities.tools.ConfigActivity;
 
 import pro.sketchware.R;
+import pro.sketchware.activities.resources.editors.ResourcesEditorActivity;
+import pro.sketchware.activities.resources.editors.utils.AttributeSuggestions;
 import pro.sketchware.databinding.PropertyPopupInputTextBinding;
 import pro.sketchware.databinding.PropertyPopupParentAttrBinding;
 import pro.sketchware.databinding.ResourcesEditorFragmentBinding;
 import pro.sketchware.databinding.StyleEditorAddAttrBinding;
 import pro.sketchware.databinding.StyleEditorAddBinding;
-import pro.sketchware.xml.resources.editors.utils.AttributeSuggestions;
-import pro.sketchware.xml.resources.editors.models.StyleModel;
-import pro.sketchware.xml.resources.editors.adapters.StylesAdapter;
-import pro.sketchware.xml.resources.editors.utils.StylesEditorManager;
+import pro.sketchware.activities.resources.editors.models.StyleModel;
+import pro.sketchware.activities.resources.editors.adapters.StylesAdapter;
+import pro.sketchware.activities.resources.editors.utils.StylesEditorManager;
 import pro.sketchware.utility.FileUtil;
 import pro.sketchware.utility.SketchwareUtil;
-import pro.sketchware.xml.resources.editors.ResourcesEditorActivity;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-public class ThemesEditor extends Fragment {
+public class StylesEditor extends Fragment {
 
     private ResourcesEditorFragmentBinding binding;
     public StylesAdapter adapter;
     private PropertyInputItem.AttributesAdapter attributesAdapter;
-    private ArrayList<StyleModel> themesList;
+    private ArrayList<StyleModel> stylesList;
     private boolean isComingFromSrcCodeEditor = true;
     public boolean isInitialized = false;
-    private StylesEditorManager themesEditorManager;
+    private StylesEditorManager stylesEditorManager;
     private final AttributeSuggestions attributeSuggestions = new AttributeSuggestions();
     private String filePath;
 
@@ -63,77 +63,77 @@ public class ThemesEditor extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = ResourcesEditorFragmentBinding.inflate(inflater, container, false);
         initialize();
-        updateThemesList();
+        updateStylesList();
         return binding.getRoot();
     }
 
-    public void updateThemesList() {
+    public void updateStylesList() {
         if (isComingFromSrcCodeEditor) {
-            themesList = new ArrayList<>();
+            stylesList = new ArrayList<>();
             try {
-                themesList = themesEditorManager.parseStylesFile(FileUtil.readFile(filePath));
+                stylesList = stylesEditorManager.parseStylesFile(FileUtil.readFile(filePath));
             } catch (Exception e) {
                 SketchwareUtil.toastError(e.getMessage());
             }
-            adapter = new StylesAdapter(themesList, this);
+            adapter = new StylesAdapter(stylesList, this);
             binding.recyclerView.setAdapter(adapter);
         }
         isComingFromSrcCodeEditor = false;
     }
 
     private void initialize() {
-        filePath = ((ResourcesEditorActivity) requireActivity()).themesFilePath;
-        themesEditorManager = new StylesEditorManager();
+        filePath = ((ResourcesEditorActivity) requireActivity()).stylesFilePath;
+        stylesEditorManager = new StylesEditorManager();
         isInitialized =  true;
     }
 
     public boolean checkForUnsavedChanges() {
         Gson gson = new Gson();
-        return !gson.toJson(themesList).equals(gson.toJson(themesEditorManager.parseStylesFile(FileUtil.readFile(filePath))));
+        return !gson.toJson(stylesList).equals(gson.toJson(stylesEditorManager.parseStylesFile(FileUtil.readFile(filePath))));
     }
 
-    public void showAddThemeDialog() {
+    public void showAddStyleDialog() {
         aB dialog = new aB(requireActivity());
         StyleEditorAddBinding binding = StyleEditorAddBinding.inflate(getLayoutInflater());
-        dialog.b("Create new theme");
+        dialog.b("Create new style");
         dialog.b("Create", v1 -> {
-            String themeName = Objects.requireNonNull(binding.styleName.getText()).toString();
+            String styleName = Objects.requireNonNull(binding.styleName.getText()).toString();
             String parent = Objects.requireNonNull(binding.styleParent.getText()).toString();
 
-            if (themeName.isEmpty()) {
-                SketchwareUtil.toastError("Theme name Input is Empty");
+            if (styleName.isEmpty()) {
+                SketchwareUtil.toastError("Style name Input is Empty");
                 return;
             }
 
-            StyleModel theme = new StyleModel(themeName, parent);
-            themesList.add(theme);
-            adapter.notifyItemInserted(themesList.size() - 1);
+            StyleModel style = new StyleModel(styleName, parent);
+            stylesList.add(style);
+            adapter.notifyItemInserted(stylesList.size() - 1);
         });
         dialog.a(getString(R.string.cancel), Helper.getDialogDismissListener(dialog));
         dialog.a(binding.getRoot());
         dialog.show();
     }
 
-    public void showEditThemeDialog(int position) {
-        StyleModel theme = themesList.get(position);
+    public void showEditStyleDialog(int position) {
+        StyleModel style = stylesList.get(position);
         aB dialog = new aB(requireActivity());
         StyleEditorAddBinding binding = StyleEditorAddBinding.inflate(getLayoutInflater());
 
-        binding.styleName.setText(theme.getStyleName());
-        binding.styleParent.setText(theme.getParent());
+        binding.styleName.setText(style.getStyleName());
+        binding.styleParent.setText(style.getParent());
 
-        dialog.b("Edit : " + theme.getStyleName());
+        dialog.b("Edit : " + style.getStyleName());
         dialog.b("Edit", v1 -> {
-            String themeName = Objects.requireNonNull(binding.styleName.getText()).toString();
+            String styleName = Objects.requireNonNull(binding.styleName.getText()).toString();
             String parent = Objects.requireNonNull(binding.styleParent.getText()).toString();
 
-            if (themeName.isEmpty()) {
-                SketchwareUtil.toastError("Theme name Input is Empty");
+            if (styleName.isEmpty()) {
+                SketchwareUtil.toastError("Style name Input is Empty");
                 return;
             }
 
-            theme.setStyleName(themeName);
-            theme.setParent(parent);
+            style.setStyleName(styleName);
+            style.setParent(parent);
 
             adapter.notifyItemChanged(position);
         });
@@ -141,9 +141,9 @@ public class ThemesEditor extends Fragment {
         dialog.configureDefaultButton(Helper.getResString(R.string.common_word_delete), view -> {
             new MaterialAlertDialogBuilder(requireContext())
                     .setTitle("Warning")
-                    .setMessage("Are you sure you want to delete " + theme.getStyleName() + "?")
+                    .setMessage("Are you sure you want to delete " + style.getStyleName() + "?")
                     .setPositiveButton(R.string.common_word_yes, (d, w) -> {
-                        themesList.remove(position);
+                        stylesList.remove(position);
                         adapter.notifyItemRemoved(position);
                         dialog.dismiss();
                     })
@@ -156,21 +156,21 @@ public class ThemesEditor extends Fragment {
         dialog.show();
     }
 
-    public void showThemeAttributesDialog(int position) {
-        StyleModel theme = themesList.get(position);
+    public void showStyleAttributesDialog(int position) {
+        StyleModel style = stylesList.get(position);
         BottomSheetDialog dialog = new BottomSheetDialog(requireContext());
         var binding = PropertyPopupParentAttrBinding.inflate(getLayoutInflater());
         dialog.setContentView(binding.getRoot());
         dialog.show();
 
-        binding.title.setText(theme.getStyleName() + " attributes");
+        binding.title.setText(style.getStyleName() + " attributes");
 
         attributesAdapter = new PropertyInputItem.AttributesAdapter();
         attributesAdapter.setOnItemClickListener(
                 new PropertyInputItem.AttributesAdapter.ItemClickListener() {
                     @Override
                     public void onItemClick(Map<String, String> attributes, String attr) {
-                        showAttributeDialog(theme, attr);
+                        showAttributeDialog(style, attr);
                     }
 
                     @Override
@@ -180,7 +180,7 @@ public class ThemesEditor extends Fragment {
                                 .setMessage("Are you sure you want to delete " + attr + "?")
                                 .setPositiveButton(R.string.common_word_yes, (d, w) -> {
                                     attributes.remove(attr);
-                                    theme.setAttributes(attributes);
+                                    style.setAttributes(attributes);
                                     attributesAdapter.submitList(new ArrayList<>(attributes.keySet()));
                                 })
                                 .setNegativeButton("Cancel", null)
@@ -193,19 +193,19 @@ public class ThemesEditor extends Fragment {
                 new DividerItemDecoration(
                         binding.recyclerView.getContext(), LinearLayoutManager.VERTICAL);
         binding.recyclerView.addItemDecoration(dividerItemDecoration);
-        var attributes = theme.getAttributes();
+        var attributes = style.getAttributes();
         attributesAdapter.setAttributes(attributes);
         List<String> keys = new ArrayList<>(attributes.keySet());
         attributesAdapter.submitList(keys);
 
         binding.add.setOnClickListener(
-                v -> showAttributeDialog(theme, ""));
+                v -> showAttributeDialog(style, ""));
         binding.sourceCode.setVisibility(View.VISIBLE);
         binding.sourceCode.setOnClickListener(
-                v -> showAttributesEditorDialog(theme));
+                v -> showAttributesEditorDialog(style));
     }
 
-    private void showAttributeDialog(StyleModel theme, String attr) {
+    private void showAttributeDialog(StyleModel style, String attr) {
         boolean isEditing = !attr.isEmpty();
 
         aB dialog = new aB(requireActivity());
@@ -214,7 +214,7 @@ public class ThemesEditor extends Fragment {
 
         if (isEditing) {
             binding.styleName.setText(attr);
-            binding.styleParent.setText(theme.getAttribute(attr));
+            binding.styleParent.setText(style.getAttribute(attr));
         }
 
         dialog.b(isEditing ? "Edit : " + attr : "Create new attribute");
@@ -228,10 +228,10 @@ public class ThemesEditor extends Fragment {
                 return;
             }
 
-            if (!attribute.equals(attr)) theme.getAttributes().remove(attr);
+            if (!attribute.equals(attr)) style.getAttributes().remove(attr);
 
-            theme.addAttribute(attribute, value);
-            attributesAdapter.submitList(new ArrayList<>(theme.getAttributes().keySet()));
+            style.addAttribute(attribute, value);
+            attributesAdapter.submitList(new ArrayList<>(style.getAttributes().keySet()));
             attributesAdapter.notifyDataSetChanged();
         });
 
@@ -240,17 +240,17 @@ public class ThemesEditor extends Fragment {
         dialog.show();
     }
 
-    public void showAttributesEditorDialog(StyleModel theme) {
+    public void showAttributesEditorDialog(StyleModel style) {
         aB dialog = new aB(requireActivity());
         PropertyPopupInputTextBinding binding = PropertyPopupInputTextBinding.inflate(getLayoutInflater());
 
-        binding.edInput.setText(themesEditorManager.getAttributesCode(theme));
+        binding.edInput.setText(stylesEditorManager.getAttributesCode(style));
 
-        dialog.b("Edit all " + theme.getStyleName() + " attributes");
+        dialog.b("Edit all " + style.getStyleName() + " attributes");
         dialog.b(Helper.getResString(R.string.common_word_save), v1 -> {
             try {
-                Map<String, String> attributes = themesEditorManager.convertAttributesToMap(binding.edInput.getText().toString());
-                theme.setAttributes(attributes);
+                Map<String, String> attributes = stylesEditorManager.convertAttributesToMap(binding.edInput.getText().toString());
+                style.setAttributes(attributes);
                 attributesAdapter.submitList(new ArrayList<>(attributes.keySet()));
             } catch (Exception e) {
                 SketchwareUtil.toastError("Failed to parse attributes. Please check the format");
@@ -261,9 +261,9 @@ public class ThemesEditor extends Fragment {
         dialog.show();
     }
 
-    public void saveThemesFile() {
+    public void saveStylesFile() {
         if (isInitialized) {
-            FileUtil.writeFile(filePath, themesEditorManager.convertStylesToXML(themesList));
+            FileUtil.writeFile(filePath, stylesEditorManager.convertStylesToXML(stylesList));
         }
     }
 
@@ -299,10 +299,10 @@ public class ThemesEditor extends Fragment {
 
     public void handleOnOptionsItemSelected() {
         isComingFromSrcCodeEditor = true;
-        saveThemesFile();
+        saveStylesFile();
         Intent intent = new Intent();
         intent.setClass(requireActivity(), ConfigActivity.isLegacyCeEnabled() ? SrcCodeEditorLegacy.class : SrcCodeEditor.class);
-        intent.putExtra("title", "themes.xml");
+        intent.putExtra("title", "styles.xml");
         intent.putExtra("content", filePath);
         startActivity(intent);
     }

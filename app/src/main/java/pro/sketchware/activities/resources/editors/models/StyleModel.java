@@ -1,4 +1,4 @@
-package pro.sketchware.xml.resources.editors.models;
+package pro.sketchware.activities.resources.editors.models;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -1,9 +1,9 @@
 package com.besome.sketch.editor;
 
 import static pro.sketchware.widgets.WidgetsCreatorManager.clearErrorOnTextChanged;
-import static pro.sketchware.xml.resources.editors.fragments.StringsEditor.convertListMapToXml;
-import static pro.sketchware.xml.resources.editors.fragments.StringsEditor.convertXmlToListMap;
-import static pro.sketchware.xml.resources.editors.fragments.StringsEditor.isXmlStringsContains;
+import static pro.sketchware.activities.resources.editors.fragments.StringsEditor.convertListMapToXml;
+import static pro.sketchware.activities.resources.editors.fragments.StringsEditor.convertXmlToListMap;
+import static pro.sketchware.activities.resources.editors.fragments.StringsEditor.isXmlStringsContains;
 
 import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
@@ -136,7 +136,7 @@ import pro.sketchware.utility.FilePathUtil;
 import pro.sketchware.utility.FileUtil;
 import pro.sketchware.utility.SketchwareUtil;
 import pro.sketchware.utility.SvgUtils;
-import pro.sketchware.xml.resources.editors.ResourcesEditorActivity;
+import pro.sketchware.activities.resources.editors.ResourcesEditorActivity;
 import pro.sketchware.activities.editor.view.CodeViewerActivity;
 
 @SuppressLint({"ClickableViewAccessibility", "RtlHardcoded", "SetTextI18n", "DefaultLocale"})

@@ -22,7 +22,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import pro.sketchware.SketchApplication;
 import pro.sketchware.utility.FileUtil;
-import pro.sketchware.xml.resources.editors.fragments.ColorsEditor;
+import pro.sketchware.activities.resources.editors.fragments.ColorsEditor;
 
 /**
  * This class is converts XML vector drawables to SVG (Only vector drawables are supported)

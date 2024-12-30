@@ -1,4 +1,4 @@
-package pro.sketchware.xml.resources.editors.adapters;
+package pro.sketchware.activities.resources.editors.adapters;
 
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
@@ -6,10 +6,10 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
+import pro.sketchware.activities.resources.editors.fragments.StylesEditor;
+import pro.sketchware.activities.resources.editors.fragments.ThemesEditor;
 import pro.sketchware.databinding.PalletCustomviewBinding;
-import pro.sketchware.xml.resources.editors.fragments.ThemesEditor;
-import pro.sketchware.xml.resources.editors.models.StyleModel;
-import pro.sketchware.xml.resources.editors.fragments.StylesEditor;
+import pro.sketchware.activities.resources.editors.models.StyleModel;
 
 import java.util.ArrayList;
 import java.util.List;

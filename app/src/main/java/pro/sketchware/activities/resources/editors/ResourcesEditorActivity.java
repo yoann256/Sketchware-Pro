@@ -1,4 +1,4 @@
-package pro.sketchware.xml.resources.editors;
+package pro.sketchware.activities.resources.editors;
 
 import android.os.Bundle;
 import android.view.MenuItem;
@@ -13,11 +13,11 @@ import a.a.a.wq;
 
 import pro.sketchware.R;
 import pro.sketchware.databinding.ResourcesEditorsActivityBinding;
-import pro.sketchware.xml.resources.editors.adapters.EditorsAdapter;
-import pro.sketchware.xml.resources.editors.fragments.ColorsEditor;
-import pro.sketchware.xml.resources.editors.fragments.StringsEditor;
-import pro.sketchware.xml.resources.editors.fragments.StylesEditor;
-import pro.sketchware.xml.resources.editors.fragments.ThemesEditor;
+import pro.sketchware.activities.resources.editors.adapters.EditorsAdapter;
+import pro.sketchware.activities.resources.editors.fragments.ColorsEditor;
+import pro.sketchware.activities.resources.editors.fragments.StringsEditor;
+import pro.sketchware.activities.resources.editors.fragments.StylesEditor;
+import pro.sketchware.activities.resources.editors.fragments.ThemesEditor;
 
 public class ResourcesEditorActivity extends AppCompatActivity {
 

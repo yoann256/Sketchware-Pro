@@ -1,4 +1,4 @@
-package pro.sketchware.xml.resources.editors.fragments;
+package pro.sketchware.activities.resources.editors.fragments;
 
 import android.app.Activity;
 import android.content.Context;
@@ -34,15 +34,15 @@ import mod.hey.studios.code.SrcCodeEditorLegacy;
 import mod.hilal.saif.activities.tools.ConfigActivity;
 import pro.sketchware.R;
 import pro.sketchware.SketchApplication;
+import pro.sketchware.activities.resources.editors.ResourcesEditorActivity;
 import pro.sketchware.databinding.ColorEditorAddBinding;
 import pro.sketchware.databinding.ResourcesEditorFragmentBinding;
-import pro.sketchware.xml.resources.editors.adapters.ColorsAdapter;
-import pro.sketchware.xml.resources.editors.models.ColorModel;
+import pro.sketchware.activities.resources.editors.adapters.ColorsAdapter;
+import pro.sketchware.activities.resources.editors.models.ColorModel;
 import pro.sketchware.utility.PropertiesUtil;
 import pro.sketchware.utility.FileUtil;
 import pro.sketchware.utility.SketchwareUtil;
 import pro.sketchware.utility.XmlUtil;
-import pro.sketchware.xml.resources.editors.ResourcesEditorActivity;
 
 public class ColorsEditor extends Fragment {
 

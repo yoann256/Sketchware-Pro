@@ -1,4 +1,4 @@
-package pro.sketchware.xml.resources.editors.fragments;
+package pro.sketchware.activities.resources.editors.fragments;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -36,13 +36,13 @@ import mod.hey.studios.code.SrcCodeEditor;
 import mod.hey.studios.code.SrcCodeEditorLegacy;
 import mod.hilal.saif.activities.tools.ConfigActivity;
 import pro.sketchware.R;
+import pro.sketchware.activities.resources.editors.ResourcesEditorActivity;
 import pro.sketchware.databinding.ResourcesEditorFragmentBinding;
 import pro.sketchware.databinding.ViewStringEditorAddBinding;
 import pro.sketchware.utility.FileUtil;
 import pro.sketchware.utility.SketchwareUtil;
 import pro.sketchware.utility.XmlUtil;
-import pro.sketchware.xml.resources.editors.ResourcesEditorActivity;
-import pro.sketchware.xml.resources.editors.adapters.StringsAdapter;
+import pro.sketchware.activities.resources.editors.adapters.StringsAdapter;
 
 public class StringsEditor extends Fragment {
 

@@ -3,8 +3,8 @@ package pro.sketchware.menu;
 import static android.text.TextUtils.isEmpty;
 
 import static pro.sketchware.utility.SketchwareUtil.getDip;
-import static pro.sketchware.xml.resources.editors.fragments.StringsEditor.convertXmlToListMap;
-import static pro.sketchware.xml.resources.editors.fragments.StringsEditor.isXmlStringsContains;
+import static pro.sketchware.activities.resources.editors.fragments.StringsEditor.convertXmlToListMap;
+import static pro.sketchware.activities.resources.editors.fragments.StringsEditor.isXmlStringsContains;
 
 import android.annotation.SuppressLint;
 import android.text.Editable;

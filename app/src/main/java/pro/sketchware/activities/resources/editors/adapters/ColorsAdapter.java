@@ -1,4 +1,4 @@
-package pro.sketchware.xml.resources.editors.adapters;
+package pro.sketchware.activities.resources.editors.adapters;
 
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
@@ -9,11 +9,11 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 
-import pro.sketchware.xml.resources.editors.models.ColorModel;
+import pro.sketchware.activities.resources.editors.ResourcesEditorActivity;
+import pro.sketchware.activities.resources.editors.fragments.ColorsEditor;
+import pro.sketchware.activities.resources.editors.models.ColorModel;
 import pro.sketchware.databinding.PalletCustomviewBinding;
 import pro.sketchware.utility.PropertiesUtil;
-import pro.sketchware.xml.resources.editors.ResourcesEditorActivity;
-import pro.sketchware.xml.resources.editors.fragments.ColorsEditor;
 
 public class ColorsAdapter extends RecyclerView.Adapter<ColorsAdapter.ViewHolder> {
 

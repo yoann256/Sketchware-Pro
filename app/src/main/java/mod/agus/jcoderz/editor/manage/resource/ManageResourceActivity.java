@@ -47,7 +47,7 @@ import pro.sketchware.utility.FilePathUtil;
 import pro.sketchware.utility.FileResConfig;
 import pro.sketchware.utility.FileUtil;
 import pro.sketchware.utility.SketchwareUtil;
-import pro.sketchware.xml.resources.editors.ResourcesEditorActivity;
+import pro.sketchware.activities.resources.editors.ResourcesEditorActivity;
 
 @SuppressLint("SetTextI18n")
 public class ManageResourceActivity extends BaseAppCompatActivity {

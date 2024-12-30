@@ -1,4 +1,4 @@
-package pro.sketchware.xml.resources.editors.utils;
+package pro.sketchware.activities.resources.editors.utils;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -14,7 +14,7 @@ import java.util.Map;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import pro.sketchware.xml.resources.editors.models.StyleModel;
+import pro.sketchware.activities.resources.editors.models.StyleModel;
 
 public class StylesEditorManager {
 
