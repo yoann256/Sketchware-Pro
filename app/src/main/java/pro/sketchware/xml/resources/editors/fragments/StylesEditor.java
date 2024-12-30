@@ -181,6 +181,20 @@ public class StylesEditor extends Fragment {
 
             adapter.notifyItemChanged(position);
         });
+        dialog.setDismissOnDefaultButtonClick(false);
+        dialog.configureDefaultButton(Helper.getResString(R.string.common_word_delete), view -> {
+            new MaterialAlertDialogBuilder(requireContext())
+                    .setTitle("Warning")
+                    .setMessage("Are you sure you want to delete " + style.getStyleName() + "?")
+                    .setPositiveButton(R.string.common_word_yes, (d, w) -> {
+                        stylesList.remove(position);
+                        adapter.notifyItemRemoved(position);
+                        dialog.dismiss();
+                    })
+                    .setNegativeButton("Cancel", null)
+                    .create()
+                    .show();
+        });
         dialog.a(getString(R.string.cancel), Helper.getDialogDismissListener(dialog));
         dialog.a(binding.getRoot());
         dialog.show();
