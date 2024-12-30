@@ -1,15 +1,19 @@
 package pro.sketchware.xml.resources.editors;
 
 import android.os.Bundle;
+import android.view.MenuItem;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.tabs.TabLayoutMediator;
 
 import a.a.a.wq;
 
+import pro.sketchware.R;
 import pro.sketchware.databinding.ResourcesEditorsActivityBinding;
+import pro.sketchware.utility.XmlUtil;
 import pro.sketchware.xml.resources.editors.adapters.EditorsAdapter;
 import pro.sketchware.xml.resources.editors.fragments.ColorEditor;
 import pro.sketchware.xml.resources.editors.fragments.StringEditor;
@@ -101,6 +105,64 @@ public class ResourcesEditorsActivity extends AppCompatActivity {
             stylesEditor.updateStylesList();
         }
         super.onResume();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(android.view.Menu menu) {
+        getMenuInflater().inflate(R.menu.resources_editor_menu, menu);
+
+        MenuItem searchItem = menu.findItem(R.id.action_search);
+        SearchView searchView = (SearchView) searchItem.getActionView();
+
+        if (searchView != null) {
+            searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                @Override
+                public boolean onQueryTextChange(String newText) {
+                    int currentItem = binding.viewPager.getCurrentItem();
+                    if (currentItem == 0) {
+                        stringEditor.adapter.filter(newText);
+                        // TODO: add filter feat for colorsAdapter
+                    } else if (currentItem == 2) {
+                        stylesEditor.adapter.filter(newText);
+                    }
+                    return false;
+                }
+
+                @Override
+                public boolean onQueryTextSubmit(String query) {
+                    return false;
+                }
+            });
+        }
+        MenuItem getDefaultItem = menu.findItem(R.id.action_get_default);
+        if (getDefaultItem != null) {
+            getDefaultItem.setVisible(
+                    !stringEditor.checkDefaultString(stringsFilePath)
+                    && binding.viewPager.getCurrentItem() != 0
+            );
+        }
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(android.view.MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.action_save) {
+            XmlUtil.saveXml(stringsFilePath, StringEditor.convertListMapToXml(stringEditor.listmap));
+            XmlUtil.saveXml(colorsFilePath, ColorEditor.convertListToXml(colorsEditor.colorList));
+            stylesEditor.saveStylesFile();
+        } else {
+            int currentItem = binding.viewPager.getCurrentItem();
+            if (currentItem == 0) {
+                stringEditor.handleOnOptionsItemSelected(id);
+            } else if (currentItem == 1) {
+                colorsEditor.handleOnOptionsItemSelected();
+            } else if (currentItem == 2) {
+                stylesEditor.handleOnOptionsItemSelected();
+            }
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     private void setupViewPager() {

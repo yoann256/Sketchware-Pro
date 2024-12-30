@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.SearchView;
@@ -51,9 +52,9 @@ import pro.sketchware.xml.resources.editors.adapters.StringsAdapter;
 
 public class StringEditor extends Fragment {
 
-    private final ArrayList<HashMap<String, Object>> listmap = new ArrayList<>();
+    public final ArrayList<HashMap<String, Object>> listmap = new ArrayList<>();
     private StringEditorBinding binding;
-    private StringsAdapter adapter;
+    public StringsAdapter adapter;
     private boolean isComingFromSrcCodeEditor = true;
     public boolean isInitialized = false;
     public String filePath;
@@ -62,7 +63,6 @@ public class StringEditor extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = StringEditorBinding.inflate(inflater, container, false);
-        setHasOptionsMenu(true);
         initialize();
         updateStringsList();
         return binding.getRoot();
@@ -94,46 +94,11 @@ public class StringEditor extends Fragment {
         return !cacheListmap.equals(cacheString) && !listmap.isEmpty();
     }
 
-    @Override
-    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        inflater.inflate(R.menu.string_editor_menu, menu);
-
-        MenuItem searchItem = menu.findItem(R.id.action_search);
-        SearchView searchView = (SearchView) searchItem.getActionView();
-
-        if (searchView != null) {
-            searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-                @Override
-                public boolean onQueryTextChange(String newText) {
-                    adapter.filter(newText);
-                    return false;
-                }
-
-                @Override
-                public boolean onQueryTextSubmit(String query) {
-                    return false;
-                }
-            });
-        }
-
-        MenuItem getDefaultItem = menu.findItem(R.id.action_get_default);
-        if (getDefaultItem != null) {
-            getDefaultItem.setVisible(!checkDefaultString(filePath));
-        }
-
-        super.onCreateOptionsMenu(menu, inflater);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(android.view.MenuItem item) {
-        int id = item.getItemId();
-        if (id == R.id.action_save) {
-            XmlUtil.saveXml(filePath, convertListMapToXml(listmap));
-        } else if (id == R.id.action_get_default) {
+    public void handleOnOptionsItemSelected(@IdRes int id) {
+        if (id == R.id.action_get_default) {
             convertXmlToListMap(FileUtil.readFile(getDefaultStringPath(Objects.requireNonNull(filePath))), listmap);
             adapter.notifyDataSetChanged();
         } else if (id == R.id.action_open_editor) {
-            isComingFromSrcCodeEditor = true;
             XmlUtil.saveXml(filePath, convertListMapToXml(listmap));
             Intent intent = new Intent();
             intent.setClass(requireActivity(), ConfigActivity.isLegacyCeEnabled() ? SrcCodeEditorLegacy.class : SrcCodeEditor.class);
@@ -141,7 +106,6 @@ public class StringEditor extends Fragment {
             intent.putExtra("content", filePath);
             requireActivity().startActivity(intent);
         }
-        return super.onOptionsItemSelected(item);
     }
 
     public static void convertXmlToListMap(final String xmlString, final ArrayList<HashMap<String, Object>> listmap) {

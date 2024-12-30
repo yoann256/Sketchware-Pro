@@ -5,14 +5,12 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
-import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -51,7 +49,7 @@ import java.util.Objects;
 public class StylesEditor extends Fragment {
 
     private StylesEditorBinding binding;
-    private StylesAdapter adapter;
+    public StylesAdapter adapter;
     private PropertyInputItem.AttributesAdapter attributesAdapter;
     private ArrayList<StyleModel> stylesList;
     private boolean isComingFromSrcCodeEditor = true;
@@ -64,7 +62,6 @@ public class StylesEditor extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = StylesEditorBinding.inflate(inflater, container, false);
-        setHasOptionsMenu(true);
         initialize();
         updateStylesList();
         return binding.getRoot();
@@ -85,7 +82,6 @@ public class StylesEditor extends Fragment {
     }
 
     private void initialize() {
-        setHasOptionsMenu(true);
         filePath = ((ResourcesEditorsActivity) requireActivity()).stylesFilePath;
         stylesEditorManager = new StylesEditorManager();
         isInitialized =  true;
@@ -94,46 +90,6 @@ public class StylesEditor extends Fragment {
     public boolean checkForUnsavedChanges() {
         Gson gson = new Gson();
         return !gson.toJson(stylesList).equals(gson.toJson(stylesEditorManager.parseStylesFile(FileUtil.readFile(filePath))));
-    }
-
-    @Override
-    public void onCreateOptionsMenu(@NonNull android.view.Menu menu, @NonNull MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.styles_editor_menu, menu);
-
-        SearchView searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
-
-        if (searchView != null) {
-            searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-                @Override
-                public boolean onQueryTextChange(String newText) {
-                    adapter.filter(newText.toLowerCase());
-                    return false;
-                }
-
-                @Override
-                public boolean onQueryTextSubmit(String query) {
-                    return false;
-                }
-            });
-        }
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(android.view.MenuItem item) {
-        int id = item.getItemId();
-        if (id == R.id.action_save) {
-            saveStylesFile();
-        } else if (id == R.id.action_open_editor) {
-            isComingFromSrcCodeEditor = true;
-            saveStylesFile();
-            Intent intent = new Intent();
-            intent.setClass(requireActivity(), ConfigActivity.isLegacyCeEnabled() ? SrcCodeEditorLegacy.class : SrcCodeEditor.class);
-            intent.putExtra("title", "styles.xml");
-            intent.putExtra("content", filePath);
-            startActivity(intent);
-        }
-        return super.onOptionsItemSelected(item);
     }
 
     public void showAddStyleDialog() {
@@ -305,9 +261,8 @@ public class StylesEditor extends Fragment {
         dialog.show();
     }
 
-    private void saveStylesFile() {
+    public void saveStylesFile() {
         FileUtil.writeFile(filePath, stylesEditorManager.convertStylesToXML(stylesList));
-        SketchwareUtil.toast(Helper.getResString(R.string.common_word_saved));
     }
 
     private void setupAutoComplete(MaterialAutoCompleteTextView attrView, MaterialAutoCompleteTextView valueView) {
@@ -340,4 +295,13 @@ public class StylesEditor extends Fragment {
         });
     }
 
+    public void handleOnOptionsItemSelected() {
+        isComingFromSrcCodeEditor = true;
+        saveStylesFile();
+        Intent intent = new Intent();
+        intent.setClass(requireActivity(), ConfigActivity.isLegacyCeEnabled() ? SrcCodeEditorLegacy.class : SrcCodeEditor.class);
+        intent.putExtra("title", "styles.xml");
+        intent.putExtra("content", filePath);
+        startActivity(intent);
+    }
 }

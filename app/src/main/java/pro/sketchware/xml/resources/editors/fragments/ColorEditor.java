@@ -7,9 +7,6 @@ import android.os.Bundle;
 import android.util.Xml;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
@@ -53,11 +50,11 @@ public class ColorEditor extends Fragment {
     private static final int MENU_SAVE = 0;
     private static final int MENU_OPEN_IN_EDITOR = 1;
     public static String contentPath;
-    private final ArrayList<ColorItem> colorList = new ArrayList<>();
+    public final ArrayList<ColorItem> colorList = new ArrayList<>();
     private boolean isGoingToEditor;
     public boolean isInitialized = false;
     private ColorEditorBinding binding;
-    private ColorsAdapter adapter;
+    public ColorsAdapter adapter;
     private Activity activity;
     private Zx colorpicker;
 
@@ -153,7 +150,6 @@ public class ColorEditor extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = ColorEditorBinding.inflate(inflater, container, false);
-        setHasOptionsMenu(true);
         initialize();
         updateColorsList();
         return binding.getRoot();
@@ -188,32 +184,14 @@ public class ColorEditor extends Fragment {
         return !Objects.equals(XmlUtil.replaceXml(newXml), XmlUtil.replaceXml(originalXml));
     }
 
-    @Override
-    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        menu.add(0, MENU_SAVE, 0, "Save")
-                .setIcon(R.drawable.ic_mtrl_save)
-                .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-        menu.add(0, MENU_OPEN_IN_EDITOR, 0, "Open in editor")
-                .setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
-
-        super.onCreateOptionsMenu(menu, inflater);
-    }
-    
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == MENU_SAVE) {
-            XmlUtil.saveXml(contentPath, convertListToXml(colorList));
-        } else if (id == MENU_OPEN_IN_EDITOR) {
-            XmlUtil.saveXml(contentPath, convertListToXml(colorList));
-            Intent intent = new Intent();
-            intent.setClass(activity, ConfigActivity.isLegacyCeEnabled() ? SrcCodeEditorLegacy.class : SrcCodeEditor.class);
-            intent.putExtra("title", "colors.xml");
-            intent.putExtra("content", contentPath);
-            isGoingToEditor = true;
-            startActivity(intent);
-        }
-        return super.onOptionsItemSelected(item);
+    public void handleOnOptionsItemSelected() {
+        XmlUtil.saveXml(contentPath, convertListToXml(colorList));
+        Intent intent = new Intent();
+        intent.setClass(activity, ConfigActivity.isLegacyCeEnabled() ? SrcCodeEditorLegacy.class : SrcCodeEditor.class);
+        intent.putExtra("title", "colors.xml");
+        intent.putExtra("content", contentPath);
+        isGoingToEditor = true;
+        startActivity(intent);
     }
 
     public static void parseColorsXML(ArrayList<ColorItem> colorList, String colorXml) {
