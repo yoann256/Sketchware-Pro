@@ -139,7 +139,7 @@ public class StylesEditor extends Fragment {
     public void showAddStyleDialog() {
         aB dialog = new aB(requireActivity());
         StyleEditorAddBinding binding = StyleEditorAddBinding.inflate(getLayoutInflater());
-        dialog.b("Create new string");
+        dialog.b("Create new style");
         dialog.b("Create", v1 -> {
             String styleName = Objects.requireNonNull(binding.styleName.getText()).toString();
             String parent = Objects.requireNonNull(binding.styleParent.getText()).toString();
@@ -261,7 +261,7 @@ public class StylesEditor extends Fragment {
             binding.styleParent.setText(style.getAttribute(attr));
         }
 
-        dialog.b(isEditing ? "Edit : " + style.getAttribute(attr) : "Create new attribute");
+        dialog.b(isEditing ? "Edit : " + attr : "Create new attribute");
 
         dialog.b(Helper.getResString(R.string.common_word_save), v1 -> {
             String attribute = Objects.requireNonNull(binding.styleName.getText()).toString();
