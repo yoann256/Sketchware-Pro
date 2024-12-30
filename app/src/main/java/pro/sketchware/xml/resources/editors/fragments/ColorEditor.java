@@ -35,10 +35,10 @@ import mod.hey.studios.code.SrcCodeEditorLegacy;
 import mod.hilal.saif.activities.tools.ConfigActivity;
 import pro.sketchware.R;
 import pro.sketchware.SketchApplication;
+import pro.sketchware.databinding.ColorEditorAddBinding;
+import pro.sketchware.databinding.ResourcesEditorFragmentBinding;
 import pro.sketchware.xml.resources.editors.adapters.ColorsAdapter;
 import pro.sketchware.xml.resources.editors.models.ColorItem;
-import pro.sketchware.databinding.ColorEditorBinding;
-import pro.sketchware.databinding.ColorEditorAddBinding;
 import pro.sketchware.utility.PropertiesUtil;
 import pro.sketchware.utility.FileUtil;
 import pro.sketchware.utility.SketchwareUtil;
@@ -53,7 +53,7 @@ public class ColorEditor extends Fragment {
     public final ArrayList<ColorItem> colorList = new ArrayList<>();
     private boolean isGoingToEditor;
     public boolean isInitialized = false;
-    private ColorEditorBinding binding;
+    private ResourcesEditorFragmentBinding binding;
     public ColorsAdapter adapter;
     private Activity activity;
     private Zx colorpicker;
@@ -149,7 +149,7 @@ public class ColorEditor extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        binding = ColorEditorBinding.inflate(inflater, container, false);
+        binding = ResourcesEditorFragmentBinding.inflate(inflater, container, false);
         initialize();
         updateColorsList();
         return binding.getRoot();
@@ -171,10 +171,9 @@ public class ColorEditor extends Fragment {
         colorpicker = new Zx(activity, 0xFFFFFFFF, false, false);
 
         parseColorsXML(colorList, FileUtil.readFile(contentPath));
-        binding.recyclerviewColors.setLayoutManager(new LinearLayoutManager(requireContext()));
 
         adapter = new ColorsAdapter(colorList, (ResourcesEditorsActivity) activity);
-        binding.recyclerviewColors.setAdapter(adapter);
+        binding.recyclerView.setAdapter(adapter);
         isInitialized = true;
     }
 

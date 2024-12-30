@@ -42,7 +42,7 @@ import mod.hey.studios.code.SrcCodeEditor;
 import mod.hey.studios.code.SrcCodeEditorLegacy;
 import mod.hilal.saif.activities.tools.ConfigActivity;
 import pro.sketchware.R;
-import pro.sketchware.databinding.StringEditorBinding;
+import pro.sketchware.databinding.ResourcesEditorFragmentBinding;
 import pro.sketchware.databinding.ViewStringEditorAddBinding;
 import pro.sketchware.utility.FileUtil;
 import pro.sketchware.utility.SketchwareUtil;
@@ -53,7 +53,7 @@ import pro.sketchware.xml.resources.editors.adapters.StringsAdapter;
 public class StringEditor extends Fragment {
 
     public final ArrayList<HashMap<String, Object>> listmap = new ArrayList<>();
-    private StringEditorBinding binding;
+    private ResourcesEditorFragmentBinding binding;
     public StringsAdapter adapter;
     private boolean isComingFromSrcCodeEditor = true;
     public boolean isInitialized = false;
@@ -62,7 +62,7 @@ public class StringEditor extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        binding = StringEditorBinding.inflate(inflater, container, false);
+        binding = ResourcesEditorFragmentBinding.inflate(inflater, container, false);
         initialize();
         updateStringsList();
         return binding.getRoot();
@@ -71,8 +71,6 @@ public class StringEditor extends Fragment {
     private void initialize() {
 
         filePath = ((ResourcesEditorsActivity) requireActivity()).stringsFilePath;
-
-        binding.recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         isInitialized = true;
 
     }

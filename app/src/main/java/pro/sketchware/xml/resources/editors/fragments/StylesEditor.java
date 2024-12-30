@@ -30,9 +30,9 @@ import mod.hilal.saif.activities.tools.ConfigActivity;
 import pro.sketchware.R;
 import pro.sketchware.databinding.PropertyPopupInputTextBinding;
 import pro.sketchware.databinding.PropertyPopupParentAttrBinding;
+import pro.sketchware.databinding.ResourcesEditorFragmentBinding;
 import pro.sketchware.databinding.StyleEditorAddAttrBinding;
 import pro.sketchware.databinding.StyleEditorAddBinding;
-import pro.sketchware.databinding.StylesEditorBinding;
 import pro.sketchware.xml.resources.editors.utils.AttributeSuggestions;
 import pro.sketchware.xml.resources.editors.models.StyleModel;
 import pro.sketchware.xml.resources.editors.adapters.StylesAdapter;
@@ -48,7 +48,7 @@ import java.util.Objects;
 
 public class StylesEditor extends Fragment {
 
-    private StylesEditorBinding binding;
+    private ResourcesEditorFragmentBinding binding;
     public StylesAdapter adapter;
     private PropertyInputItem.AttributesAdapter attributesAdapter;
     private ArrayList<StyleModel> stylesList;
@@ -61,7 +61,7 @@ public class StylesEditor extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        binding = StylesEditorBinding.inflate(inflater, container, false);
+        binding = ResourcesEditorFragmentBinding.inflate(inflater, container, false);
         initialize();
         updateStylesList();
         return binding.getRoot();
