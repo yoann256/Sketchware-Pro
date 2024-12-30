@@ -12,16 +12,16 @@ import java.util.stream.Collectors;
 import pro.sketchware.xml.resources.editors.models.ColorItem;
 import pro.sketchware.databinding.PalletCustomviewBinding;
 import pro.sketchware.utility.PropertiesUtil;
-import pro.sketchware.xml.resources.editors.ResourcesEditorsActivity;
+import pro.sketchware.xml.resources.editors.ResourcesEditorActivity;
 import pro.sketchware.xml.resources.editors.fragments.ColorEditor;
 
 public class ColorsAdapter extends RecyclerView.Adapter<ColorsAdapter.ViewHolder> {
 
     private final ArrayList<ColorItem> originalData;
     private ArrayList<ColorItem> filteredData;
-    private final ResourcesEditorsActivity activity;
+    private final ResourcesEditorActivity activity;
 
-    public ColorsAdapter(ArrayList<ColorItem> filteredData, ResourcesEditorsActivity activity) {
+    public ColorsAdapter(ArrayList<ColorItem> filteredData, ResourcesEditorActivity activity) {
         this.originalData = filteredData;
         this.filteredData = new ArrayList<>(filteredData);
         this.activity = activity;

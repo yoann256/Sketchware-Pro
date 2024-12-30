@@ -4,13 +4,13 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 
-import pro.sketchware.xml.resources.editors.ResourcesEditorsActivity;
+import pro.sketchware.xml.resources.editors.ResourcesEditorActivity;
 
 public class EditorsAdapter extends FragmentStateAdapter {
 
-    private final ResourcesEditorsActivity activity;
+    private final ResourcesEditorActivity activity;
 
-    public EditorsAdapter(@NonNull ResourcesEditorsActivity activity) {
+    public EditorsAdapter(@NonNull ResourcesEditorActivity activity) {
         super(activity);
         this.activity = activity;
     }

@@ -41,7 +41,7 @@ import pro.sketchware.databinding.ViewStringEditorAddBinding;
 import pro.sketchware.utility.FileUtil;
 import pro.sketchware.utility.SketchwareUtil;
 import pro.sketchware.utility.XmlUtil;
-import pro.sketchware.xml.resources.editors.ResourcesEditorsActivity;
+import pro.sketchware.xml.resources.editors.ResourcesEditorActivity;
 import pro.sketchware.xml.resources.editors.adapters.StringsAdapter;
 
 public class StringEditor extends Fragment {
@@ -64,7 +64,7 @@ public class StringEditor extends Fragment {
 
     private void initialize() {
 
-        filePath = ((ResourcesEditorsActivity) requireActivity()).stringsFilePath;
+        filePath = ((ResourcesEditorActivity) requireActivity()).stringsFilePath;
         isInitialized = true;
 
     }
@@ -72,7 +72,7 @@ public class StringEditor extends Fragment {
     public void updateStringsList() {
         if (isComingFromSrcCodeEditor) {
             convertXmlToListMap(FileUtil.readFile(filePath), listmap);
-            adapter = new StringsAdapter(((ResourcesEditorsActivity) requireActivity()), listmap);
+            adapter = new StringsAdapter(((ResourcesEditorActivity) requireActivity()), listmap);
             binding.recyclerView.setAdapter(adapter);
         }
         isComingFromSrcCodeEditor = false;

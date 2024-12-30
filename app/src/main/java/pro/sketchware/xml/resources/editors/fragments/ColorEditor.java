@@ -42,7 +42,7 @@ import pro.sketchware.utility.PropertiesUtil;
 import pro.sketchware.utility.FileUtil;
 import pro.sketchware.utility.SketchwareUtil;
 import pro.sketchware.utility.XmlUtil;
-import pro.sketchware.xml.resources.editors.ResourcesEditorsActivity;
+import pro.sketchware.xml.resources.editors.ResourcesEditorActivity;
 
 public class ColorEditor extends Fragment {
 
@@ -163,13 +163,13 @@ public class ColorEditor extends Fragment {
     private void initialize() {
         activity = requireActivity();
 
-        contentPath = ((ResourcesEditorsActivity) activity).colorsFilePath;
+        contentPath = ((ResourcesEditorActivity) activity).colorsFilePath;
 
         colorpicker = new Zx(activity, 0xFFFFFFFF, false, false);
 
         parseColorsXML(colorList, FileUtil.readFile(contentPath));
 
-        adapter = new ColorsAdapter(colorList, (ResourcesEditorsActivity) activity);
+        adapter = new ColorsAdapter(colorList, (ResourcesEditorActivity) activity);
         binding.recyclerView.setAdapter(adapter);
         isInitialized = true;
     }

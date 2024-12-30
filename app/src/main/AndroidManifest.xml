@@ -300,7 +300,7 @@
 
         <activity android:name="pro.sketchware.activities.settings.SettingsActivity" />
 
-        <activity android:name="pro.sketchware.xml.resources.editors.ResourcesEditorsActivity" />
+        <activity android:name="pro.sketchware.xml.resources.editors.ResourcesEditorActivity" />
 
         <activity
             android:name=".activities.appcompat.ManageAppCompatActivity"

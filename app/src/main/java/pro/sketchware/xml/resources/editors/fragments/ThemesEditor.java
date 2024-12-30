@@ -39,7 +39,7 @@ import pro.sketchware.xml.resources.editors.adapters.StylesAdapter;
 import pro.sketchware.xml.resources.editors.utils.StylesEditorManager;
 import pro.sketchware.utility.FileUtil;
 import pro.sketchware.utility.SketchwareUtil;
-import pro.sketchware.xml.resources.editors.ResourcesEditorsActivity;
+import pro.sketchware.xml.resources.editors.ResourcesEditorActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -82,7 +82,7 @@ public class ThemesEditor extends Fragment {
     }
 
     private void initialize() {
-        filePath = ((ResourcesEditorsActivity) requireActivity()).themesFilePath;
+        filePath = ((ResourcesEditorActivity) requireActivity()).themesFilePath;
         themesEditorManager = new StylesEditorManager();
         isInitialized =  true;
     }

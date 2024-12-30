@@ -19,7 +19,7 @@ import pro.sketchware.xml.resources.editors.fragments.StringEditor;
 import pro.sketchware.xml.resources.editors.fragments.StylesEditor;
 import pro.sketchware.xml.resources.editors.fragments.ThemesEditor;
 
-public class ResourcesEditorsActivity extends AppCompatActivity {
+public class ResourcesEditorActivity extends AppCompatActivity {
 
     private ResourcesEditorsActivityBinding binding;
     public String sc_id;

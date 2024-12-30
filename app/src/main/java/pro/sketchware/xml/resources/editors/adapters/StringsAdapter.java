@@ -27,15 +27,15 @@ import pro.sketchware.R;
 import pro.sketchware.databinding.PalletCustomviewBinding;
 import pro.sketchware.databinding.ViewStringEditorAddBinding;
 import pro.sketchware.utility.SketchwareUtil;
-import pro.sketchware.xml.resources.editors.ResourcesEditorsActivity;
+import pro.sketchware.xml.resources.editors.ResourcesEditorActivity;
 
 public class StringsAdapter extends RecyclerView.Adapter<StringsAdapter.ViewHolder> {
 
     private final ArrayList<HashMap<String, Object>> originalData;
     private ArrayList<HashMap<String, Object>> filteredData;
-    private final ResourcesEditorsActivity activity;
+    private final ResourcesEditorActivity activity;
 
-    public StringsAdapter(ResourcesEditorsActivity activity, ArrayList<HashMap<String, Object>> data) {
+    public StringsAdapter(ResourcesEditorActivity activity, ArrayList<HashMap<String, Object>> data) {
         this.originalData = new ArrayList<>(data);
         this.filteredData = data;
         this.activity = activity;

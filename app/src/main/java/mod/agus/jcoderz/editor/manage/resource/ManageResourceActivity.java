@@ -47,7 +47,7 @@ import pro.sketchware.utility.FilePathUtil;
 import pro.sketchware.utility.FileResConfig;
 import pro.sketchware.utility.FileUtil;
 import pro.sketchware.utility.SketchwareUtil;
-import pro.sketchware.xml.resources.editors.ResourcesEditorsActivity;
+import pro.sketchware.xml.resources.editors.ResourcesEditorActivity;
 
 @SuppressLint("SetTextI18n")
 public class ManageResourceActivity extends BaseAppCompatActivity {
@@ -332,7 +332,7 @@ public class ManageResourceActivity extends BaseAppCompatActivity {
         String filePath = frc.listFileResource.get(position);
         if (filePath.endsWith("strings.xml") || filePath.endsWith("colors.xml") || filePath.endsWith("styles.xml") || filePath.endsWith("themes.xml")) {
             Intent intent = new Intent();
-            intent.setClass(getApplicationContext(), ResourcesEditorsActivity.class);
+            intent.setClass(getApplicationContext(), ResourcesEditorActivity.class);
             intent.putExtra("sc_id", numProj);
             startActivity(intent);
         } else if (filePath.endsWith("xml")) {

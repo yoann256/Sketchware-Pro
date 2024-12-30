@@ -1,6 +1,5 @@
 package com.besome.sketch.editor;
 
-import static pro.sketchware.utility.SketchwareUtil.getDip;
 import static pro.sketchware.widgets.WidgetsCreatorManager.clearErrorOnTextChanged;
 import static pro.sketchware.xml.resources.editors.fragments.StringEditor.convertListMapToXml;
 import static pro.sketchware.xml.resources.editors.fragments.StringEditor.convertXmlToListMap;
@@ -72,7 +71,6 @@ import com.besome.sketch.editor.view.ViewDummy;
 import com.besome.sketch.editor.view.ViewLogicEditor;
 import com.besome.sketch.lib.base.BaseAppCompatActivity;
 import com.bumptech.glide.Glide;
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
@@ -91,7 +89,6 @@ import a.a.a.DB;
 import a.a.a.FB;
 import a.a.a.Fx;
 import a.a.a.GB;
-import a.a.a.Lx;
 import a.a.a.MA;
 import a.a.a.Mp;
 import a.a.a.NB;
@@ -139,7 +136,7 @@ import pro.sketchware.utility.FilePathUtil;
 import pro.sketchware.utility.FileUtil;
 import pro.sketchware.utility.SketchwareUtil;
 import pro.sketchware.utility.SvgUtils;
-import pro.sketchware.xml.resources.editors.ResourcesEditorsActivity;
+import pro.sketchware.xml.resources.editors.ResourcesEditorActivity;
 import pro.sketchware.activities.editor.view.CodeViewerActivity;
 
 @SuppressLint({"ClickableViewAccessibility", "RtlHardcoded", "SetTextI18n", "DefaultLocale"})
@@ -554,7 +551,7 @@ public class LogicEditorActivity extends BaseAppCompatActivity implements View.O
 
     public void openStringEditor() {
         Intent intent = new Intent();
-        intent.setClass(getApplicationContext(), ResourcesEditorsActivity.class);
+        intent.setClass(getApplicationContext(), ResourcesEditorActivity.class);
         intent.putExtra("sc_id", B);
         openStringEditor.launch(intent);
     }
