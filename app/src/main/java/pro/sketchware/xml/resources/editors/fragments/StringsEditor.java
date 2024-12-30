@@ -44,7 +44,7 @@ import pro.sketchware.utility.XmlUtil;
 import pro.sketchware.xml.resources.editors.ResourcesEditorActivity;
 import pro.sketchware.xml.resources.editors.adapters.StringsAdapter;
 
-public class StringEditor extends Fragment {
+public class StringsEditor extends Fragment {
 
     private final ArrayList<HashMap<String, Object>> listmap = new ArrayList<>();
     private ResourcesEditorFragmentBinding binding;
@@ -223,7 +223,7 @@ public class StringEditor extends Fragment {
 
     public void saveStringsFile() {
         if (isInitialized) {
-            XmlUtil.saveXml(filePath, StringEditor.convertListMapToXml(listmap));
+            XmlUtil.saveXml(filePath, StringsEditor.convertListMapToXml(listmap));
         }
     }
 }

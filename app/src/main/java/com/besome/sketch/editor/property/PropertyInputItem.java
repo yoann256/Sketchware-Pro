@@ -1,7 +1,7 @@
 package com.besome.sketch.editor.property;
 
-import static pro.sketchware.xml.resources.editors.fragments.StringEditor.convertXmlToListMap;
-import static pro.sketchware.xml.resources.editors.fragments.StringEditor.isXmlStringsContains;
+import static pro.sketchware.xml.resources.editors.fragments.StringsEditor.convertXmlToListMap;
+import static pro.sketchware.xml.resources.editors.fragments.StringsEditor.isXmlStringsContains;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;

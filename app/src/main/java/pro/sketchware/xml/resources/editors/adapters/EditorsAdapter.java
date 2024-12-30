@@ -19,7 +19,7 @@ public class EditorsAdapter extends FragmentStateAdapter {
     @Override
     public Fragment createFragment(int position) {
         return switch (position) {
-            case 0 -> activity.stringEditor;
+            case 0 -> activity.stringsEditor;
             case 1 -> activity.colorsEditor;
             case 2 -> activity.stylesEditor;
             case 3 -> activity.themesEditor;

@@ -1,7 +1,7 @@
 package com.besome.sketch.editor.view;
 
-import static pro.sketchware.xml.resources.editors.fragments.StringEditor.convertXmlToListMap;
-import static pro.sketchware.xml.resources.editors.fragments.StringEditor.isXmlStringsContains;
+import static pro.sketchware.xml.resources.editors.fragments.StringsEditor.convertXmlToListMap;
+import static pro.sketchware.xml.resources.editors.fragments.StringsEditor.isXmlStringsContains;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -34,7 +34,6 @@ import com.besome.sketch.beans.ImageBean;
 import com.besome.sketch.beans.LayoutBean;
 import com.besome.sketch.beans.ProjectResourceBean;
 import com.besome.sketch.beans.ViewBean;
-import com.besome.sketch.beans.ProjectLibraryBean;
 import com.besome.sketch.design.DesignActivity;
 import com.besome.sketch.editor.view.item.ItemAdView;
 import com.besome.sketch.editor.view.item.ItemBottomNavigationView;
@@ -82,7 +81,6 @@ import a.a.a.wB;
 import a.a.a.wq;
 import a.a.a.yB;
 import a.a.a.zB;
-import a.a.a.jC;
 
 import dev.aldi.sayuti.editor.view.item.ItemBadgeView;
 import dev.aldi.sayuti.editor.view.item.ItemCircleImageView;
@@ -107,9 +105,7 @@ import mod.agus.jcoderz.editor.view.item.ItemRatingBar;
 import mod.agus.jcoderz.editor.view.item.ItemTimePicker;
 import mod.agus.jcoderz.editor.view.item.ItemVideoView;
 import mod.hey.studios.util.ProjectFile;
-import mod.hey.studios.project.ProjectSettings;
 
-import pro.sketchware.R;
 import pro.sketchware.utility.FilePathUtil;
 import pro.sketchware.utility.FileUtil;
 import pro.sketchware.utility.InjectAttributeHandler;

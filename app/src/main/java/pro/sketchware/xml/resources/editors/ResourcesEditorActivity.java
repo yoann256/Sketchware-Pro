@@ -15,7 +15,7 @@ import pro.sketchware.R;
 import pro.sketchware.databinding.ResourcesEditorsActivityBinding;
 import pro.sketchware.xml.resources.editors.adapters.EditorsAdapter;
 import pro.sketchware.xml.resources.editors.fragments.ColorsEditor;
-import pro.sketchware.xml.resources.editors.fragments.StringEditor;
+import pro.sketchware.xml.resources.editors.fragments.StringsEditor;
 import pro.sketchware.xml.resources.editors.fragments.StylesEditor;
 import pro.sketchware.xml.resources.editors.fragments.ThemesEditor;
 
@@ -28,7 +28,7 @@ public class ResourcesEditorActivity extends AppCompatActivity {
     public String stylesFilePath;
     public String themesFilePath;
 
-    public final StringEditor stringEditor = new StringEditor();
+    public final StringsEditor stringsEditor = new StringsEditor();
     public final ColorsEditor colorsEditor = new ColorsEditor();
     public final StylesEditor stylesEditor = new StylesEditor();
     public final ThemesEditor themesEditor = new ThemesEditor();
@@ -71,7 +71,7 @@ public class ResourcesEditorActivity extends AppCompatActivity {
         binding.fab.setOnClickListener(view -> {
             int currentItem = binding.viewPager.getCurrentItem();
             if (currentItem == 0) {
-                stringEditor.addStringDialog();
+                stringsEditor.addStringDialog();
             } else if (currentItem == 1) {
                 colorsEditor.showColorEditDialog(null, -1);
             } else if (currentItem == 2) {
@@ -84,7 +84,7 @@ public class ResourcesEditorActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        if (stringEditor.isInitialized && stringEditor.checkForUnsavedChanges()
+        if (stringsEditor.isInitialized && stringsEditor.checkForUnsavedChanges()
                 || colorsEditor.isInitialized && colorsEditor.checkForUnsavedChanges()
                 || stylesEditor.isInitialized && stylesEditor.checkForUnsavedChanges()
                 || themesEditor.isInitialized && themesEditor.checkForUnsavedChanges()
@@ -105,8 +105,8 @@ public class ResourcesEditorActivity extends AppCompatActivity {
 
     @Override
     public void onResume() {
-        if (binding.viewPager.getCurrentItem() == 0 && stringEditor.isInitialized) {
-            stringEditor.updateStringsList();
+        if (binding.viewPager.getCurrentItem() == 0 && stringsEditor.isInitialized) {
+            stringsEditor.updateStringsList();
         } else if (binding.viewPager.getCurrentItem() == 1 && colorsEditor.isInitialized) {
             colorsEditor.updateColorsList();
         } else if (binding.viewPager.getCurrentItem() == 2 && stylesEditor.isInitialized) {
@@ -131,7 +131,7 @@ public class ResourcesEditorActivity extends AppCompatActivity {
                     newText = newText.toLowerCase().trim();
                     int currentItem = binding.viewPager.getCurrentItem();
                     if (currentItem == 0) {
-                        stringEditor.adapter.filter(newText);
+                        stringsEditor.adapter.filter(newText);
                     } else if (currentItem == 1) {
                         colorsEditor.adapter.filter(newText);
                     } else if (currentItem == 2) {
@@ -151,7 +151,7 @@ public class ResourcesEditorActivity extends AppCompatActivity {
         MenuItem getDefaultItem = menu.findItem(R.id.action_get_default);
         if (getDefaultItem != null) {
             getDefaultItem.setVisible(
-                    !stringEditor.checkDefaultString(stringsFilePath)
+                    !stringsEditor.checkDefaultString(stringsFilePath)
                     && binding.viewPager.getCurrentItem() != 0
             );
         }
@@ -163,14 +163,14 @@ public class ResourcesEditorActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(android.view.MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.action_save) {
-            stringEditor.saveStringsFile();
+            stringsEditor.saveStringsFile();
             colorsEditor.saveColorsFile();
             stylesEditor.saveStylesFile();
             themesEditor.saveThemesFile();
         } else if (id != R.id.action_search) {
             int currentItem = binding.viewPager.getCurrentItem();
             if (currentItem == 0) {
-                stringEditor.handleOnOptionsItemSelected(id);
+                stringsEditor.handleOnOptionsItemSelected(id);
             } else if (currentItem == 1) {
                 colorsEditor.handleOnOptionsItemSelected();
             } else if (currentItem == 2) {

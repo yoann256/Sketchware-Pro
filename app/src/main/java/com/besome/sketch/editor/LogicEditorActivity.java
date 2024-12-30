@@ -1,9 +1,9 @@
 package com.besome.sketch.editor;
 
 import static pro.sketchware.widgets.WidgetsCreatorManager.clearErrorOnTextChanged;
-import static pro.sketchware.xml.resources.editors.fragments.StringEditor.convertListMapToXml;
-import static pro.sketchware.xml.resources.editors.fragments.StringEditor.convertXmlToListMap;
-import static pro.sketchware.xml.resources.editors.fragments.StringEditor.isXmlStringsContains;
+import static pro.sketchware.xml.resources.editors.fragments.StringsEditor.convertListMapToXml;
+import static pro.sketchware.xml.resources.editors.fragments.StringsEditor.convertXmlToListMap;
+import static pro.sketchware.xml.resources.editors.fragments.StringsEditor.isXmlStringsContains;
 
 import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
