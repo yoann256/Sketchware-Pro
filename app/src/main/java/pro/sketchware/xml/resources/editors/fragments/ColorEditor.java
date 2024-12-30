@@ -50,7 +50,7 @@ public class ColorEditor extends Fragment {
     private static final int MENU_SAVE = 0;
     private static final int MENU_OPEN_IN_EDITOR = 1;
     public static String contentPath;
-    public final ArrayList<ColorItem> colorList = new ArrayList<>();
+    private final ArrayList<ColorItem> colorList = new ArrayList<>();
     private boolean isGoingToEditor;
     public boolean isInitialized = false;
     private ResourcesEditorFragmentBinding binding;
@@ -348,5 +348,11 @@ public class ColorEditor extends Fragment {
         }
         colorList.add(newItem);
         adapter.notifyItemInserted(colorList.size() - 1);
+    }
+
+    public void saveColorsFile() {
+        if (isInitialized) {
+            XmlUtil.saveXml(contentPath, ColorEditor.convertListToXml(colorList));
+        }
     }
 }

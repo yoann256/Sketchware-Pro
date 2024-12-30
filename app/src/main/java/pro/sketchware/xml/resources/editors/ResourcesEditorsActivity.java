@@ -164,11 +164,11 @@ public class ResourcesEditorsActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(android.view.MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.action_save) {
-            XmlUtil.saveXml(stringsFilePath, StringEditor.convertListMapToXml(stringEditor.listmap));
-            XmlUtil.saveXml(colorsFilePath, ColorEditor.convertListToXml(colorsEditor.colorList));
+            stringEditor.saveStringsFile();
+            colorsEditor.saveColorsFile();
             stylesEditor.saveStylesFile();
             themesEditor.saveThemesFile();
-        } else if (id == R.id.action_search) {
+        } else if (id != R.id.action_search) {
             int currentItem = binding.viewPager.getCurrentItem();
             if (currentItem == 0) {
                 stringEditor.handleOnOptionsItemSelected(id);

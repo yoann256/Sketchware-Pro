@@ -52,7 +52,7 @@ import pro.sketchware.xml.resources.editors.adapters.StringsAdapter;
 
 public class StringEditor extends Fragment {
 
-    public final ArrayList<HashMap<String, Object>> listmap = new ArrayList<>();
+    private final ArrayList<HashMap<String, Object>> listmap = new ArrayList<>();
     private ResourcesEditorFragmentBinding binding;
     public StringsAdapter adapter;
     private boolean isComingFromSrcCodeEditor = true;
@@ -227,4 +227,9 @@ public class StringEditor extends Fragment {
         return path.replaceFirst("/values-[a-z]{2}", "/values");
     }
 
+    public void saveStringsFile() {
+        if (isInitialized) {
+            XmlUtil.saveXml(filePath, StringEditor.convertListMapToXml(listmap));
+        }
+    }
 }

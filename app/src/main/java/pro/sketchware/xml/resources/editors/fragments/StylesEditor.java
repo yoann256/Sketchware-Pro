@@ -262,7 +262,9 @@ public class StylesEditor extends Fragment {
     }
 
     public void saveStylesFile() {
-        FileUtil.writeFile(filePath, stylesEditorManager.convertStylesToXML(stylesList));
+        if (isInitialized) {
+            FileUtil.writeFile(filePath, stylesEditorManager.convertStylesToXML(stylesList));
+        }
     }
 
     private void setupAutoComplete(MaterialAutoCompleteTextView attrView, MaterialAutoCompleteTextView valueView) {

@@ -262,7 +262,9 @@ public class ThemesEditor extends Fragment {
     }
 
     public void saveThemesFile() {
-        FileUtil.writeFile(filePath, themesEditorManager.convertStylesToXML(themesList));
+        if (isInitialized) {
+            FileUtil.writeFile(filePath, themesEditorManager.convertStylesToXML(themesList));
+        }
     }
 
     private void setupAutoComplete(MaterialAutoCompleteTextView attrView, MaterialAutoCompleteTextView valueView) {
