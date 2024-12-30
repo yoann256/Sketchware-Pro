@@ -3,9 +3,11 @@ package pro.sketchware.xml.resources.editors.adapters;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import pro.sketchware.databinding.ItemStyleBinding;
+import pro.sketchware.xml.resources.editors.fragments.ThemesEditor;
 import pro.sketchware.xml.resources.editors.models.StyleModel;
 import pro.sketchware.xml.resources.editors.fragments.StylesEditor;
 
@@ -16,12 +18,12 @@ public class StylesAdapter extends RecyclerView.Adapter<StylesAdapter.StyleViewH
 
     private final List<StyleModel> stylesList;
     private final List<StyleModel> originalList;
-    private final StylesEditor activity;
+    private final Fragment fragment;
 
-    public StylesAdapter(ArrayList<StyleModel> stylesList, StylesEditor activity) {
+    public StylesAdapter(ArrayList<StyleModel> stylesList, Fragment fragment) {
         this.stylesList = stylesList;
         this.originalList = new ArrayList<>(stylesList);
-        this.activity = activity;
+        this.fragment = fragment;
     }
 
     @NonNull
@@ -72,10 +74,20 @@ public class StylesAdapter extends RecyclerView.Adapter<StylesAdapter.StyleViewH
                 binding.styleParent.setText(style.getParent());
             }
 
-            binding.getRoot().setOnClickListener(view -> activity.showStyleAttributesDialog(getAbsoluteAdapterPosition()));
+            binding.getRoot().setOnClickListener(view ->{
+                if (fragment instanceof StylesEditor stylesEditor) {
+                    stylesEditor.showStyleAttributesDialog(getAbsoluteAdapterPosition());
+                } else if (fragment instanceof ThemesEditor themesEditor) {
+                    themesEditor.showThemeAttributesDialog(getAbsoluteAdapterPosition());
+                }
+            });
 
             binding.getRoot().setOnLongClickListener(view -> {
-                activity.showEditStyleDialog(getAbsoluteAdapterPosition());
+                if (fragment instanceof StylesEditor stylesEditor) {
+                    stylesEditor.showEditStyleDialog(getAbsoluteAdapterPosition());
+                } else if (fragment instanceof ThemesEditor themesEditor) {
+                    themesEditor.showEditThemeDialog(getAbsoluteAdapterPosition());
+                }
                 return true;
             });
         }

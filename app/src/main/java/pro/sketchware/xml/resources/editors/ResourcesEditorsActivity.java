@@ -18,6 +18,7 @@ import pro.sketchware.xml.resources.editors.adapters.EditorsAdapter;
 import pro.sketchware.xml.resources.editors.fragments.ColorEditor;
 import pro.sketchware.xml.resources.editors.fragments.StringEditor;
 import pro.sketchware.xml.resources.editors.fragments.StylesEditor;
+import pro.sketchware.xml.resources.editors.fragments.ThemesEditor;
 
 public class ResourcesEditorsActivity extends AppCompatActivity {
 
@@ -26,10 +27,12 @@ public class ResourcesEditorsActivity extends AppCompatActivity {
     public String stringsFilePath;
     public String colorsFilePath;
     public String stylesFilePath;
+    public String themesFilePath;
 
     public final StringEditor stringEditor = new StringEditor();
     public final ColorEditor colorsEditor = new ColorEditor();
     public final StylesEditor stylesEditor = new StylesEditor();
+    public final ThemesEditor themesEditor = new ThemesEditor();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +48,7 @@ public class ResourcesEditorsActivity extends AppCompatActivity {
         stringsFilePath = projectResourcesDirectory + "strings.xml";
         colorsFilePath = projectResourcesDirectory + "colors.xml";
         stylesFilePath = projectResourcesDirectory + "styles.xml";
+        themesFilePath = projectResourcesDirectory + "themes.xml";
 
         setupViewPager();
 
@@ -59,7 +63,9 @@ public class ResourcesEditorsActivity extends AppCompatActivity {
                 case 2:
                     tab.setText("styles.xml");
                     break;
-                // TODO: add themes.xml
+                case 3:
+                    tab.setText("themes.xml");
+                    break;
             }
         }).attach();
 
@@ -71,6 +77,8 @@ public class ResourcesEditorsActivity extends AppCompatActivity {
                 colorsEditor.showColorEditDialog(null, -1);
             } else if (currentItem == 2) {
                 stylesEditor.showAddStyleDialog();
+            } else if (currentItem == 3) {
+                themesEditor.showAddThemeDialog();
             }
         });
     }
@@ -80,6 +88,7 @@ public class ResourcesEditorsActivity extends AppCompatActivity {
         if (stringEditor.isInitialized && stringEditor.checkForUnsavedChanges()
                 || colorsEditor.isInitialized && colorsEditor.checkForUnsavedChanges()
                 || stylesEditor.isInitialized && stylesEditor.checkForUnsavedChanges()
+                || themesEditor.isInitialized && themesEditor.checkForUnsavedChanges()
         ) {
             new MaterialAlertDialogBuilder(this)
                     .setTitle("Warning")
@@ -103,6 +112,8 @@ public class ResourcesEditorsActivity extends AppCompatActivity {
             colorsEditor.updateColorsList();
         } else if (binding.viewPager.getCurrentItem() == 2 && stylesEditor.isInitialized) {
             stylesEditor.updateStylesList();
+        } else if (binding.viewPager.getCurrentItem() == 3 && themesEditor.isInitialized) {
+            themesEditor.updateThemesList();
         }
         super.onResume();
     }
@@ -125,7 +136,9 @@ public class ResourcesEditorsActivity extends AppCompatActivity {
                     } else if (currentItem == 1) {
                         colorsEditor.adapter.filter(newText);
                     } else if (currentItem == 2) {
-                    stylesEditor.adapter.filter(newText);
+                        stylesEditor.adapter.filter(newText);
+                    } else if (currentItem == 3) {
+                        themesEditor.adapter.filter(newText);
                     }
                     return false;
                 }
@@ -154,6 +167,7 @@ public class ResourcesEditorsActivity extends AppCompatActivity {
             XmlUtil.saveXml(stringsFilePath, StringEditor.convertListMapToXml(stringEditor.listmap));
             XmlUtil.saveXml(colorsFilePath, ColorEditor.convertListToXml(colorsEditor.colorList));
             stylesEditor.saveStylesFile();
+            themesEditor.saveThemesFile();
         } else if (id == R.id.action_search) {
             int currentItem = binding.viewPager.getCurrentItem();
             if (currentItem == 0) {
@@ -162,6 +176,8 @@ public class ResourcesEditorsActivity extends AppCompatActivity {
                 colorsEditor.handleOnOptionsItemSelected();
             } else if (currentItem == 2) {
                 stylesEditor.handleOnOptionsItemSelected();
+            } else if (currentItem == 3) {
+                themesEditor.handleOnOptionsItemSelected();
             }
         }
         return super.onOptionsItemSelected(item);

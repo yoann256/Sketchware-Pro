@@ -330,7 +330,7 @@ public class ManageResourceActivity extends BaseAppCompatActivity {
 
     private void goEdit(int position) {
         String filePath = frc.listFileResource.get(position);
-        if (filePath.endsWith("strings.xml") || filePath.endsWith("colors.xml") || filePath.endsWith("styles.xml")) {
+        if (filePath.endsWith("strings.xml") || filePath.endsWith("colors.xml") || filePath.endsWith("styles.xml") || filePath.endsWith("themes.xml")) {
             Intent intent = new Intent();
             intent.setClass(getApplicationContext(), ResourcesEditorsActivity.class);
             intent.putExtra("sc_id", numProj);

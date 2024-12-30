@@ -58,7 +58,7 @@ public class StylesEditorManager {
     public String convertStylesToXML(ArrayList<StyleModel> stylesList) {
         StringBuilder xmlContent = new StringBuilder();
 
-        xmlContent.append("<resources>\n");
+        xmlContent.append("<resources>\n\n");
 
         for (StyleModel style : stylesList) {
             xmlContent.append("    <style name=\"").append(style.getStyleName()).append("\"");
