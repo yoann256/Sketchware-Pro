@@ -82,7 +82,7 @@ public class StylesAdapter extends RecyclerView.Adapter<StylesAdapter.StyleViewH
                 }
             });
 
-            binding.getRoot().setOnLongClickListener(view -> {
+            binding.backgroundCard.setOnLongClickListener(view -> {
                 if (fragment instanceof StylesEditor stylesEditor) {
                     stylesEditor.showEditStyleDialog(getAbsoluteAdapterPosition());
                 } else if (fragment instanceof ThemesEditor themesEditor) {
