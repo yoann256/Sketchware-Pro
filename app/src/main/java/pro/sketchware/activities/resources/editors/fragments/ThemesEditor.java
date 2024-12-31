@@ -131,7 +131,7 @@ public class ThemesEditor extends Fragment {
         binding.styleName.setText(theme.getStyleName());
         binding.styleParent.setText(theme.getParent());
 
-        dialog.b("Edit : " + theme.getStyleName());
+        dialog.b("Edit theme");
         dialog.b("Edit", v1 -> {
             String themeName = Objects.requireNonNull(binding.styleName.getText()).toString();
             String parent = Objects.requireNonNull(binding.styleParent.getText()).toString();
@@ -227,7 +227,7 @@ public class ThemesEditor extends Fragment {
             binding.styleParent.setText(theme.getAttribute(attr));
         }
 
-        dialog.b(isEditing ? "Edit : " + attr : "Create new attribute");
+        dialog.b(isEditing ? "Edit attribute " : "Create new attribute");
 
         dialog.b(Helper.getResString(R.string.common_word_save), v1 -> {
             String attribute = Objects.requireNonNull(binding.styleName.getText()).toString();
@@ -256,7 +256,7 @@ public class ThemesEditor extends Fragment {
 
         binding.edInput.setText(themesEditorManager.getAttributesCode(theme));
 
-        dialog.b("Edit all " + theme.getStyleName() + " attributes");
+        dialog.b("Edit all attributes");
         dialog.b(Helper.getResString(R.string.common_word_save), v1 -> {
             try {
                 Map<String, String> attributes = themesEditorManager.convertAttributesToMap(binding.edInput.getText().toString());

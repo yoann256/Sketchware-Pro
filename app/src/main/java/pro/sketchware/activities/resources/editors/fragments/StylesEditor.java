@@ -131,7 +131,7 @@ public class StylesEditor extends Fragment {
         binding.styleName.setText(style.getStyleName());
         binding.styleParent.setText(style.getParent());
 
-        dialog.b("Edit : " + style.getStyleName());
+        dialog.b("Edit style");
         dialog.b("Edit", v1 -> {
             String styleName = Objects.requireNonNull(binding.styleName.getText()).toString();
             String parent = Objects.requireNonNull(binding.styleParent.getText()).toString();
@@ -227,7 +227,7 @@ public class StylesEditor extends Fragment {
             binding.styleParent.setText(style.getAttribute(attr));
         }
 
-        dialog.b(isEditing ? "Edit : " + attr : "Create new attribute");
+        dialog.b(isEditing ? "Edit attribute" : "Create new attribute");
 
         dialog.b(Helper.getResString(R.string.common_word_save), v1 -> {
             String attribute = Objects.requireNonNull(binding.styleName.getText()).toString();
@@ -256,7 +256,8 @@ public class StylesEditor extends Fragment {
 
         binding.edInput.setText(stylesEditorManager.getAttributesCode(style));
 
-        dialog.b("Edit all " + style.getStyleName() + " attributes");
+        dialog.b("Edit all attributes");
+        dialog.b("Edit all attributes");
         dialog.b(Helper.getResString(R.string.common_word_save), v1 -> {
             try {
                 Map<String, String> attributes = stylesEditorManager.convertAttributesToMap(binding.edInput.getText().toString());

@@ -43,6 +43,7 @@ public class ResourcesEditorActivity extends AppCompatActivity {
 
     public String sc_id;
     public String variant;
+    private String variantFullNameStarts = "values-";
     public String stringsFilePath;
     public String colorsFilePath;
     public String stylesFilePath;
@@ -265,8 +266,11 @@ public class ResourcesEditorActivity extends AppCompatActivity {
         if (!(selectedChoice.get() >= 0 && selectedChoice.get() < variants.size() && variants.get(selectedChoice.get()).equals("values" + variant))) {
             binding.input.setText("values" + variant);
         }
+        binding.input.setText(variantFullNameStarts);
 
         binding.input.addTextChangedListener(new TextWatcher() {
+            private boolean isUpdating = false;
+
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
             }
@@ -277,14 +281,24 @@ public class ResourcesEditorActivity extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable s) {
-                String newText = s.toString().trim();
-                if (!newText.isEmpty()) {
-                    for (int i = 0; i < binding.listView.getCount(); i++) {
-                        binding.listView.setItemChecked(i, false);
-                    }
+                if (isUpdating) return;
+
+                String inputText = s.toString();
+                if (!inputText.startsWith(variantFullNameStarts)) {
+                    isUpdating = true;
+                    binding.input.setText(variantFullNameStarts);
+                    binding.input.setSelection(variantFullNameStarts.length());
+                    isUpdating = false;
                 } else {
-                    if (selectedChoice.get() >= 0 && selectedChoice.get() < binding.listView.getCount()) {
-                        binding.listView.setItemChecked(selectedChoice.get(), true);
+                    String newText = inputText.trim();
+                    if (!newText.equals(variantFullNameStarts)) {
+                        for (int i = 0; i < binding.listView.getCount(); i++) {
+                            binding.listView.setItemChecked(i, false);
+                        }
+                    } else {
+                        if (selectedChoice.get() >= 0 && selectedChoice.get() < binding.listView.getCount()) {
+                            binding.listView.setItemChecked(selectedChoice.get(), true);
+                        }
                     }
                 }
             }
@@ -295,8 +309,12 @@ public class ResourcesEditorActivity extends AppCompatActivity {
 
     private void saveVariant(ResourcesVariantSelectorDialogBinding binding, ArrayList<String> variants, AtomicInteger selectedChoice) {
         String newVariant = Objects.requireNonNull(binding.input.getText()).toString().trim();
-        if (!newVariant.isEmpty()) {
-            initialize(newVariant.replace("values", ""));
+        if (!newVariant.equals(variantFullNameStarts)) {
+            if (newVariant.startsWith(variantFullNameStarts)) {
+                initialize(newVariant.replace("values", ""));
+            } else {
+                SketchwareUtil.toastError("Invalid variant input");
+            }
         } else {
             initialize(variants.get(selectedChoice.get()).replace("values", ""));
         }
