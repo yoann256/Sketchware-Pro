@@ -22,8 +22,8 @@
         app:showAsAction="never" />
 
     <item
-        android:id="@+id/action_get_default"
-        android:title="Get default strings"
+        android:id="@+id/action_get_from_variant"
+        android:title="@string/common_word_import_variant"
         app:showAsAction="never" />
 
     <item

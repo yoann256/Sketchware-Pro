@@ -14,6 +14,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.tabs.TabLayoutMediator;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
@@ -37,6 +38,8 @@ import pro.sketchware.utility.SketchwareUtil;
 public class ResourcesEditorActivity extends AppCompatActivity {
 
     private ResourcesEditorsActivityBinding binding;
+
+    private boolean isComingFromSrcCodeEditor;
 
     public String sc_id;
     public String variant;
@@ -83,6 +86,8 @@ public class ResourcesEditorActivity extends AppCompatActivity {
         stylesFilePath = projectResourcesDirectory + "styles.xml";
         themesFilePath = projectResourcesDirectory + "themes.xml";
 
+        binding.viewPager.setOffscreenPageLimit(4);
+
         setupViewPager();
 
         new TabLayoutMediator(binding.tabLayout, binding.viewPager, (tab, position) -> {
@@ -118,10 +123,10 @@ public class ResourcesEditorActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        if (stringsEditor.isInitialized && stringsEditor.checkForUnsavedChanges()
-                || colorsEditor.isInitialized && colorsEditor.checkForUnsavedChanges()
-                || stylesEditor.isInitialized && stylesEditor.checkForUnsavedChanges()
-                || themesEditor.isInitialized && themesEditor.checkForUnsavedChanges()
+        if (stringsEditor.checkForUnsavedChanges()
+                || colorsEditor.checkForUnsavedChanges()
+                || stylesEditor.checkForUnsavedChanges()
+                || themesEditor.checkForUnsavedChanges()
         ) {
             new MaterialAlertDialogBuilder(this)
                     .setTitle("Warning")
@@ -139,15 +144,18 @@ public class ResourcesEditorActivity extends AppCompatActivity {
 
     @Override
     public void onResume() {
-        if (binding.viewPager.getCurrentItem() == 0 && stringsEditor.isInitialized) {
-            stringsEditor.updateStringsList();
-        } else if (binding.viewPager.getCurrentItem() == 1 && colorsEditor.isInitialized) {
-            colorsEditor.updateColorsList();
-        } else if (binding.viewPager.getCurrentItem() == 2 && stylesEditor.isInitialized) {
-            stylesEditor.updateStylesList();
-        } else if (binding.viewPager.getCurrentItem() == 3 && themesEditor.isInitialized) {
-            themesEditor.updateThemesList();
+        if (isComingFromSrcCodeEditor) {
+            if (binding.viewPager.getCurrentItem() == 0) {
+                stringsEditor.updateStringsList(stringsFilePath);
+            } else if (binding.viewPager.getCurrentItem() == 1) {
+                colorsEditor.updateColorsList(colorsFilePath);
+            } else if (binding.viewPager.getCurrentItem() == 2) {
+                stylesEditor.updateStylesList(stylesFilePath);
+            } else if (binding.viewPager.getCurrentItem() == 3) {
+                themesEditor.updateThemesList(themesFilePath);
+            }
         }
+        isComingFromSrcCodeEditor = false;
         super.onResume();
     }
 
@@ -182,12 +190,9 @@ public class ResourcesEditorActivity extends AppCompatActivity {
                 }
             });
         }
-        MenuItem getDefaultItem = menu.findItem(R.id.action_get_default);
-        if (getDefaultItem != null) {
-            getDefaultItem.setVisible(
-                    !stringsEditor.checkDefaultString(stringsFilePath)
-                    && binding.viewPager.getCurrentItem() != 0
-            );
+        MenuItem getFromVariantItem = menu.findItem(R.id.action_get_from_variant);
+        if (getFromVariantItem != null) {
+            getFromVariantItem.setVisible(!variant.isEmpty());
         }
 
         return true;
@@ -204,10 +209,13 @@ public class ResourcesEditorActivity extends AppCompatActivity {
             SketchwareUtil.toast("Save completed");
         } else if (id == R.id.action_select_variant) {
             changeTheVariantDialog();
+        } else if (id == R.id.action_get_from_variant) {
+            importFromDefaultVariant();
         } else if (id != R.id.action_search) {
+            isComingFromSrcCodeEditor = true;
             int currentItem = binding.viewPager.getCurrentItem();
             if (currentItem == 0) {
-                stringsEditor.handleOnOptionsItemSelected(id);
+                stringsEditor.handleOnOptionsItemSelected();
             } else if (currentItem == 1) {
                 colorsEditor.handleOnOptionsItemSelected();
             } else if (currentItem == 2) {
@@ -306,6 +314,37 @@ public class ResourcesEditorActivity extends AppCompatActivity {
             }
         }
         return variants;
+    }
+
+    private void importFromDefaultVariant() {
+        ArrayList<String> resourcesFileNames = new ArrayList<>(
+                List.of("strings.xml",
+                        "colors.xml",
+                        "styles.xml",
+                        "themes.xml"
+                ));
+        boolean[] selectedItems = new boolean[resourcesFileNames.size()];
+
+        new MaterialAlertDialogBuilder(this)
+                .setTitle(Helper.getResString(R.string.common_word_import_variant))
+                .setMultiChoiceItems(
+                        resourcesFileNames.toArray(new String[0]),
+                        selectedItems,
+                        (dialog, which, isChecked) -> selectedItems[which] = isChecked
+                )
+                .setPositiveButton(R.string.common_word_save, (dialog2, which) -> {
+                    for (int i = 0; i < resourcesFileNames.size(); i++) {
+                        if (selectedItems[i]) {
+                            if (i == 0) stringsEditor.updateStringsList(stringsFilePath.replace(variant, ""));
+                            if (i == 1) colorsEditor.updateColorsList(colorsFilePath.replace(variant, ""));
+                            if (i == 2) stylesEditor.updateStylesList(stylesFilePath.replace(variant, ""));
+                            if (i == 3) themesEditor.updateThemesList(themesFilePath.replace(variant, ""));
+                        }
+                    }
+                })
+                .setNegativeButton(R.string.common_word_cancel, null)
+                .create()
+                .show();
     }
 
 }

@@ -49,8 +49,6 @@ public class ColorsEditor extends Fragment {
 
     public static String contentPath;
     private final ArrayList<ColorModel> colorList = new ArrayList<>();
-    private boolean isGoingToEditor = true;
-    public boolean isInitialized = false;
     private ResourcesEditorFragmentBinding binding;
     public ColorsAdapter adapter;
     private Activity activity;
@@ -120,8 +118,6 @@ public class ColorsEditor extends Fragment {
             StringWriter stringWriter = new StringWriter();
 
             xmlSerializer.setOutput(stringWriter);
-            xmlSerializer.startDocument("UTF-8", true);
-            xmlSerializer.text("\n");
             xmlSerializer.startTag(null, "resources");
             xmlSerializer.text("\n");
 
@@ -149,18 +145,15 @@ public class ColorsEditor extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = ResourcesEditorFragmentBinding.inflate(inflater, container, false);
         initialize();
-        updateColorsList();
+        updateColorsList(contentPath);
         return binding.getRoot();
     }
 
-    public void updateColorsList() {
-        if (isGoingToEditor) {
-            parseColorsXML(colorList, FileUtil.readFileIfExist(contentPath));
-            adapter = new ColorsAdapter(colorList, (ResourcesEditorActivity) activity);
-            binding.recyclerView.setAdapter(adapter);
-            updateNoContentLayout();
-        }
-        isGoingToEditor = false;
+    public void updateColorsList(String contentPath) {
+        parseColorsXML(colorList, FileUtil.readFileIfExist(contentPath));
+        adapter = new ColorsAdapter(colorList, (ResourcesEditorActivity) activity);
+        binding.recyclerView.setAdapter(adapter);
+        updateNoContentLayout();
     }
 
     private void updateNoContentLayout() {
@@ -181,8 +174,6 @@ public class ColorsEditor extends Fragment {
         colorpicker = new Zx(activity, 0xFFFFFFFF, false, false);
 
         parseColorsXML(colorList, FileUtil.readFileIfExist(contentPath));
-
-        isInitialized = true;
     }
 
     public boolean checkForUnsavedChanges() {
@@ -200,7 +191,6 @@ public class ColorsEditor extends Fragment {
         intent.setClass(activity, ConfigActivity.isLegacyCeEnabled() ? SrcCodeEditorLegacy.class : SrcCodeEditor.class);
         intent.putExtra("title", "colors.xml");
         intent.putExtra("content", contentPath);
-        isGoingToEditor = true;
         startActivity(intent);
     }
 
@@ -363,7 +353,7 @@ public class ColorsEditor extends Fragment {
     }
 
     public void saveColorsFile() {
-        if (isInitialized) {
+        if (FileUtil.isExistFile(contentPath) || !colorList.isEmpty()) {
             XmlUtil.saveXml(contentPath, ColorsEditor.convertListToXml(colorList));
         }
     }

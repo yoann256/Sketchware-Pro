@@ -1003,6 +1003,7 @@ Please click on Settings to allow permission for Storage. Without this permissio
     <string name="common_word_select_variant">Select a Variant</string>
     <string name="common_word_change_variant">Change the Variant</string>
     <string name="common_word_create_variant">Create new Variant</string>
+    <string name="common_word_import_variant">Import from Default Variant</string>
     <string name="common_word_settings">Settings</string>
     <string name="common_word_share">Share</string>
     <string name="common_word_show">Show</string>

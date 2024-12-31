@@ -52,8 +52,6 @@ public class StylesEditor extends Fragment {
     public StylesAdapter adapter;
     private PropertyInputItem.AttributesAdapter attributesAdapter;
     private ArrayList<StyleModel> stylesList;
-    private boolean isComingFromSrcCodeEditor = true;
-    public boolean isInitialized = false;
     private StylesEditorManager stylesEditorManager;
     private final AttributeSuggestions attributeSuggestions = new AttributeSuggestions();
     private String filePath;
@@ -63,29 +61,25 @@ public class StylesEditor extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = ResourcesEditorFragmentBinding.inflate(inflater, container, false);
         initialize();
-        updateStylesList();
+        updateStylesList(filePath);
         return binding.getRoot();
     }
 
-    public void updateStylesList() {
-        if (isComingFromSrcCodeEditor) {
-            stylesList = new ArrayList<>();
-            try {
-                stylesList = stylesEditorManager.parseStylesFile(FileUtil.readFileIfExist(filePath));
-            } catch (Exception e) {
-                SketchwareUtil.toastError(e.getMessage());
-            }
-            adapter = new StylesAdapter(stylesList, this);
-            binding.recyclerView.setAdapter(adapter);
-            updateNoContentLayout();
+    public void updateStylesList(String filePath) {
+        stylesList = new ArrayList<>();
+        try {
+            stylesList = stylesEditorManager.parseStylesFile(FileUtil.readFileIfExist(filePath));
+        } catch (Exception e) {
+            SketchwareUtil.toastError(e.getMessage());
         }
-        isComingFromSrcCodeEditor = false;
+        adapter = new StylesAdapter(stylesList, this);
+        binding.recyclerView.setAdapter(adapter);
+        updateNoContentLayout();
     }
 
     private void initialize() {
         filePath = ((ResourcesEditorActivity) requireActivity()).stylesFilePath;
         stylesEditorManager = new StylesEditorManager();
-        isInitialized =  true;
     }
 
     private void updateNoContentLayout() {
@@ -278,7 +272,7 @@ public class StylesEditor extends Fragment {
     }
 
     public void saveStylesFile() {
-        if (isInitialized) {
+        if (FileUtil.isExistFile(filePath) || !stylesList.isEmpty()) {
             FileUtil.writeFile(filePath, stylesEditorManager.convertStylesToXML(stylesList));
         }
     }
@@ -314,7 +308,6 @@ public class StylesEditor extends Fragment {
     }
 
     public void handleOnOptionsItemSelected() {
-        isComingFromSrcCodeEditor = true;
         saveStylesFile();
         Intent intent = new Intent();
         intent.setClass(requireActivity(), ConfigActivity.isLegacyCeEnabled() ? SrcCodeEditorLegacy.class : SrcCodeEditor.class);

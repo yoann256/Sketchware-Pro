@@ -7,7 +7,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -21,7 +20,6 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -50,8 +48,6 @@ public class StringsEditor extends Fragment {
     private final ArrayList<HashMap<String, Object>> listmap = new ArrayList<>();
     private ResourcesEditorFragmentBinding binding;
     public StringsAdapter adapter;
-    private boolean isComingFromSrcCodeEditor = true;
-    public boolean isInitialized = false;
     public String filePath;
 
     @Nullable
@@ -59,25 +55,19 @@ public class StringsEditor extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = ResourcesEditorFragmentBinding.inflate(inflater, container, false);
         initialize();
-        updateStringsList();
+        updateStringsList(filePath);
         return binding.getRoot();
     }
 
     private void initialize() {
-
         filePath = ((ResourcesEditorActivity) requireActivity()).stringsFilePath;
-        isInitialized = true;
-
     }
 
-    public void updateStringsList() {
-        if (isComingFromSrcCodeEditor) {
-            convertXmlToListMap(FileUtil.readFileIfExist(filePath), listmap);
-            adapter = new StringsAdapter(((ResourcesEditorActivity) requireActivity()), listmap);
-            binding.recyclerView.setAdapter(adapter);
-            updateNoContentLayout();
-        }
-        isComingFromSrcCodeEditor = false;
+    public void updateStringsList(String filePath) {
+        convertXmlToListMap(FileUtil.readFileIfExist(filePath), listmap);
+        adapter = new StringsAdapter(((ResourcesEditorActivity) requireActivity()), listmap);
+        binding.recyclerView.setAdapter(adapter);
+        updateNoContentLayout();
     }
 
     public void updateNoContentLayout() {
@@ -101,19 +91,13 @@ public class StringsEditor extends Fragment {
         return !cacheListmap.equals(cacheString) && !listmap.isEmpty();
     }
 
-    public void handleOnOptionsItemSelected(@IdRes int id) {
-        if (id == R.id.action_get_default) {
-            convertXmlToListMap(FileUtil.readFileIfExist(getDefaultStringPath(Objects.requireNonNull(filePath))), listmap);
-            adapter.notifyDataSetChanged();
-        } else if (id == R.id.action_open_editor) {
-            isComingFromSrcCodeEditor = true;
-            XmlUtil.saveXml(filePath, convertListMapToXml(listmap));
-            Intent intent = new Intent();
-            intent.setClass(requireActivity(), ConfigActivity.isLegacyCeEnabled() ? SrcCodeEditorLegacy.class : SrcCodeEditor.class);
-            intent.putExtra("title", "strings.xml");
-            intent.putExtra("content", filePath);
-            requireActivity().startActivity(intent);
-        }
+    public void handleOnOptionsItemSelected() {
+        XmlUtil.saveXml(filePath, convertListMapToXml(listmap));
+        Intent intent = new Intent();
+        intent.setClass(requireActivity(), ConfigActivity.isLegacyCeEnabled() ? SrcCodeEditorLegacy.class : SrcCodeEditor.class);
+        intent.putExtra("title", "strings.xml");
+        intent.putExtra("content", filePath);
+        requireActivity().startActivity(intent);
     }
 
     public static void convertXmlToListMap(final String xmlString, final ArrayList<HashMap<String, Object>> listmap) {
@@ -155,7 +139,7 @@ public class StringsEditor extends Fragment {
 
     public static String convertListMapToXml(final ArrayList<HashMap<String, Object>> listmap) {
         StringBuilder xmlString = new StringBuilder();
-        xmlString.append("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<resources>\n");
+        xmlString.append("<resources>\n\n");
         for (HashMap<String, Object> map : listmap) {
             String key = (String) map.get("key");
             Object textObj = map.get("text");
@@ -168,7 +152,7 @@ public class StringsEditor extends Fragment {
             }
             xmlString.append(">").append(escapedText).append("</string>\n");
         }
-        xmlString.append("</resources>");
+        xmlString.append("\n</resources>");
         return xmlString.toString();
     }
 
@@ -228,18 +212,8 @@ public class StringsEditor extends Fragment {
         updateNoContentLayout();
     }
 
-    public boolean checkDefaultString(final String path) {
-        File file = new File(path);
-        String parentFolder = Objects.requireNonNull(file.getParentFile()).getName();
-        return parentFolder.equals("values");
-    }
-
-    public String getDefaultStringPath(final String path) {
-        return path.replaceFirst("/values-[a-z]{2}", "/values");
-    }
-
     public void saveStringsFile() {
-        if (isInitialized) {
+        if (FileUtil.isExistFile(filePath) || !listmap.isEmpty()) {
             XmlUtil.saveXml(filePath, StringsEditor.convertListMapToXml(listmap));
         }
     }
