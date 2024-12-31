@@ -79,7 +79,7 @@ public class StringsEditor extends Fragment {
     }
 
     public boolean checkForUnsavedChanges() {
-        if (!FileUtil.isExistFile(filePath)) {
+        if (!FileUtil.isExistFile(filePath) && listmap.isEmpty()) {
             return false;
         }
         ArrayList<HashMap<String, Object>> cache = new ArrayList<>();

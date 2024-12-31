@@ -88,7 +88,7 @@ public class StylesEditor extends Fragment {
     }
 
     public boolean checkForUnsavedChanges() {
-        if (!FileUtil.isExistFile(filePath)) {
+        if (!FileUtil.isExistFile(filePath) && stylesList.isEmpty()) {
             return false;
         }
         Gson gson = new Gson();

@@ -88,7 +88,7 @@ public class ThemesEditor extends Fragment {
     }
 
     public boolean checkForUnsavedChanges() {
-        if (!FileUtil.isExistFile(filePath)) {
+        if (!FileUtil.isExistFile(filePath) && themesList.isEmpty()) {
             return false;
         }
         Gson gson = new Gson();
