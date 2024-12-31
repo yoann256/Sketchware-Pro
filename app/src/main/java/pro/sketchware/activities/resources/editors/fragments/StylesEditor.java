@@ -77,6 +77,7 @@ public class StylesEditor extends Fragment {
             }
             adapter = new StylesAdapter(stylesList, this);
             binding.recyclerView.setAdapter(adapter);
+            updateNoContentLayout();
         }
         isComingFromSrcCodeEditor = false;
     }
@@ -85,6 +86,16 @@ public class StylesEditor extends Fragment {
         filePath = ((ResourcesEditorActivity) requireActivity()).stylesFilePath;
         stylesEditorManager = new StylesEditorManager();
         isInitialized =  true;
+    }
+
+    private void updateNoContentLayout() {
+        if (stylesList.isEmpty()) {
+            binding.noContentLayout.setVisibility(View.VISIBLE);
+            binding.noContentTitle.setText(String.format(Helper.getResString(R.string.resource_manager_no_list_title), "Styles"));
+            binding.noContentBody.setText(String.format(Helper.getResString(R.string.resource_manager_no_list_body), "Styles"));
+        } else {
+            binding.noContentLayout.setVisibility(View.GONE);
+        }
     }
 
     public boolean checkForUnsavedChanges() {
@@ -111,6 +122,7 @@ public class StylesEditor extends Fragment {
             StyleModel style = new StyleModel(styleName, parent);
             stylesList.add(style);
             adapter.notifyItemInserted(stylesList.size() - 1);
+            updateNoContentLayout();
         });
         dialog.a(getString(R.string.cancel), Helper.getDialogDismissListener(dialog));
         dialog.a(binding.getRoot());
@@ -149,6 +161,7 @@ public class StylesEditor extends Fragment {
                         stylesList.remove(position);
                         adapter.notifyItemRemoved(position);
                         dialog.dismiss();
+                        updateNoContentLayout();
                     })
                     .setNegativeButton("Cancel", null)
                     .create()

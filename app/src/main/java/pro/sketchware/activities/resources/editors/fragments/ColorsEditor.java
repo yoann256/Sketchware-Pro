@@ -31,6 +31,7 @@ import a.a.a.aB;
 import a.a.a.xB;
 import mod.hey.studios.code.SrcCodeEditor;
 import mod.hey.studios.code.SrcCodeEditorLegacy;
+import mod.hey.studios.util.Helper;
 import mod.hilal.saif.activities.tools.ConfigActivity;
 import pro.sketchware.R;
 import pro.sketchware.SketchApplication;
@@ -48,7 +49,7 @@ public class ColorsEditor extends Fragment {
 
     public static String contentPath;
     private final ArrayList<ColorModel> colorList = new ArrayList<>();
-    private boolean isGoingToEditor;
+    private boolean isGoingToEditor = true;
     public boolean isInitialized = false;
     private ResourcesEditorFragmentBinding binding;
     public ColorsAdapter adapter;
@@ -157,8 +158,19 @@ public class ColorsEditor extends Fragment {
             parseColorsXML(colorList, FileUtil.readFileIfExist(contentPath));
             adapter = new ColorsAdapter(colorList, (ResourcesEditorActivity) activity);
             binding.recyclerView.setAdapter(adapter);
+            updateNoContentLayout();
         }
         isGoingToEditor = false;
+    }
+
+    private void updateNoContentLayout() {
+        if (colorList.isEmpty()) {
+            binding.noContentLayout.setVisibility(View.VISIBLE);
+            binding.noContentTitle.setText(String.format(Helper.getResString(R.string.resource_manager_no_list_title), "Color"));
+            binding.noContentBody.setText(String.format(Helper.getResString(R.string.resource_manager_no_list_body), "color"));
+        } else {
+            binding.noContentLayout.setVisibility(View.GONE);
+        }
     }
 
     private void initialize() {
@@ -170,8 +182,6 @@ public class ColorsEditor extends Fragment {
 
         parseColorsXML(colorList, FileUtil.readFileIfExist(contentPath));
 
-        adapter = new ColorsAdapter(colorList, (ResourcesEditorActivity) activity);
-        binding.recyclerView.setAdapter(adapter);
         isInitialized = true;
     }
 
@@ -239,6 +249,7 @@ public class ColorsEditor extends Fragment {
             colorList.remove(position);
             adapter.notifyItemRemoved(position);
             adapter.notifyItemRangeChanged(position, colorList.size());
+            updateNoContentLayout();
             dialog.dismiss();
         });
         dialog.a(xB.b().a(activity, R.string.common_word_cancel), v -> dialog.dismiss());
@@ -328,6 +339,7 @@ public class ColorsEditor extends Fragment {
                 colorList.remove(position);
                 adapter.notifyItemRemoved(position);
                 adapter.notifyItemRangeChanged(position, colorList.size());
+                updateNoContentLayout();
                 dialog.dismiss();
             });
         }

@@ -1064,6 +1064,8 @@ ex)\"*/*\", \"image/*\", \"audio/*\", \"text/*\""</string>
     <string name="design_actionbar_title_manager_sound">Sound manager</string>
     <string name="design_actionbar_title_manager_view">View manager</string>
     <string name="design_actionbar_title_manager_resources">Resources editor</string>
+    <string name="resource_manager_no_list_title">No %s here</string>
+    <string name="resource_manager_no_list_body">You don\'t have any %s here yet, try creating one.</string>
     <string name="design_actionbar_title_show_source_code">Show source code</string>
     <string name="design_button_properties">Properties</string>
     <string name="design_drawer_menu_bottom_title">Global</string>

@@ -34,6 +34,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import a.a.a.aB;
 import mod.hey.studios.code.SrcCodeEditor;
 import mod.hey.studios.code.SrcCodeEditorLegacy;
+import mod.hey.studios.util.Helper;
 import mod.hilal.saif.activities.tools.ConfigActivity;
 import pro.sketchware.R;
 import pro.sketchware.activities.resources.editors.ResourcesEditorActivity;
@@ -74,8 +75,19 @@ public class StringsEditor extends Fragment {
             convertXmlToListMap(FileUtil.readFileIfExist(filePath), listmap);
             adapter = new StringsAdapter(((ResourcesEditorActivity) requireActivity()), listmap);
             binding.recyclerView.setAdapter(adapter);
+            updateNoContentLayout();
         }
         isComingFromSrcCodeEditor = false;
+    }
+
+    public void updateNoContentLayout() {
+        if (listmap.isEmpty()) {
+            binding.noContentLayout.setVisibility(View.VISIBLE);
+            binding.noContentTitle.setText(String.format(Helper.getResString(R.string.resource_manager_no_list_title), "Strings"));
+            binding.noContentBody.setText(String.format(Helper.getResString(R.string.resource_manager_no_list_body), "string"));
+        } else {
+            binding.noContentLayout.setVisibility(View.GONE);
+        }
     }
 
     public boolean checkForUnsavedChanges() {
@@ -213,6 +225,7 @@ public class StringsEditor extends Fragment {
         }
         listmap.add(map);
         adapter.notifyItemInserted(listmap.size() - 1);
+        updateNoContentLayout();
     }
 
     public boolean checkDefaultString(final String path) {

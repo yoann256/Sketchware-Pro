@@ -108,6 +108,7 @@ public class StringsAdapter extends RecyclerView.Adapter<StringsAdapter.ViewHold
                                 } else {
                                     filteredData.remove(adapterPosition);
                                     notifyItemRemoved(adapterPosition);
+                                    activity.stringsEditor.updateNoContentLayout();
                                 }
                             });
                     dialog.a(Helper.getResString(R.string.cancel), v1 -> dialog.dismiss());

@@ -77,8 +77,19 @@ public class ThemesEditor extends Fragment {
             }
             adapter = new StylesAdapter(themesList, this);
             binding.recyclerView.setAdapter(adapter);
+            updateNoContentLayout();
         }
         isComingFromSrcCodeEditor = false;
+    }
+
+    private void updateNoContentLayout() {
+        if (themesList.isEmpty()) {
+            binding.noContentLayout.setVisibility(View.VISIBLE);
+            binding.noContentTitle.setText(String.format(Helper.getResString(R.string.resource_manager_no_list_title), "Themes"));
+            binding.noContentBody.setText(String.format(Helper.getResString(R.string.resource_manager_no_list_body), "themes"));
+        } else {
+            binding.noContentLayout.setVisibility(View.GONE);
+        }
     }
 
     private void initialize() {
@@ -111,6 +122,7 @@ public class ThemesEditor extends Fragment {
             StyleModel theme = new StyleModel(themeName, parent);
             themesList.add(theme);
             adapter.notifyItemInserted(themesList.size() - 1);
+            updateNoContentLayout();
         });
         dialog.a(getString(R.string.cancel), Helper.getDialogDismissListener(dialog));
         dialog.a(binding.getRoot());
@@ -149,6 +161,7 @@ public class ThemesEditor extends Fragment {
                         themesList.remove(position);
                         adapter.notifyItemRemoved(position);
                         dialog.dismiss();
+                        updateNoContentLayout();
                     })
                     .setNegativeButton("Cancel", null)
                     .create()
