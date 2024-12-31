@@ -263,13 +263,12 @@ public class ColorsEditor extends Fragment {
             } else {
                 dialogBinding.colorValueInput.setText(colorModel.getColorValue().replace("#", ""));
                 dialogBinding.hash.setText("#");
-
             }
 
             dialog.b("Edit color");
 
         } else {
-            dialog.b("Add new color");
+            dialog.b("Create new color");
             dialogBinding.colorPreview.setBackgroundColor(0xFFFFFF);
         }
 
