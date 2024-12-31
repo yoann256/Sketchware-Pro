@@ -2115,11 +2115,13 @@ Please try again later"</string>
     <string name="view_widget_favorites_save_guide">Saved widgets are saved to My Collection and are accessible from all the projects.</string>
     <string name="view_widget_favorites_save_guide_new">If you save this widget, this widget will be added to widget collection and images used in this widget will be added to image collection automatically. Saved widget can be used in all projects.</string>
     <string name="view_widget_favorites_save_title">Save widget to my collection</string>
-    <string name="text_title_menu_resource">Resource</string>
+    <string name="text_title_menu_resource">Resource manager</string>
+    <string name="text_title_menu_resource_editor">Resource editor</string>
     <string name="text_title_menu_assets">Asset</string>
     <string name="text_title_menu_permission">Permission</string>
     <string name="text_title_menu_local_library">Local library</string>
-    <string name="text_subtitle_menu_resource">Import resource files</string>
+    <string name="text_subtitle_menu_resource">Manage resource files</string>
+    <string name="text_subtitle_menu_resource_editor">Edit resource files</string>
     <string name="text_subtitle_menu_assets">Import asset files</string>
     <string name="text_subtitle_menu_permission">Add custom permissions</string>
     <string name="text_subtitle_menu_local_library">Add local libraries</string>

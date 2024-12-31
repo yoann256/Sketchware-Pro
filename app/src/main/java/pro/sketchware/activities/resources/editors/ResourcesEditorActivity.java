@@ -64,7 +64,11 @@ public class ResourcesEditorActivity extends AppCompatActivity {
         setSupportActionBar(binding.topAppBar);
 
         sc_id = getIntent().getStringExtra("sc_id");
-        initialize(getIntent().getStringExtra("variant"));
+        if (getIntent().hasExtra("variant")) {
+            initialize(getIntent().getStringExtra("variant"));
+        } else {
+            initialize("");
+        }
     }
 
     private void initialize(String variant) {

@@ -130,6 +130,7 @@ import mod.jbk.diagnostic.CompileErrorSaver;
 import mod.jbk.diagnostic.MissingFileException;
 import mod.jbk.util.LogUtil;
 import mod.khaled.logcat.LogReaderActivity;
+import pro.sketchware.activities.resources.editors.ResourcesEditorActivity;
 import pro.sketchware.utility.ThemeUtils;
 import pro.sketchware.R;
 import pro.sketchware.activities.appcompat.ManageAppCompatActivity;
@@ -988,6 +989,13 @@ public class DesignActivity extends BaseAppCompatActivity implements View.OnClic
      */
     void toResourceManager() {
         launchActivity(ManageResourceActivity.class, openResourcesManager);
+    }
+
+    /**
+     * Opens {@link ResourcesEditorActivity}.
+     */
+    void toResourceEditor() {
+        launchActivity(ResourcesEditorActivity.class, openResourcesManager);
     }
 
     /**
