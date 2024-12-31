@@ -358,7 +358,7 @@ public class ManageResourceActivity extends BaseAppCompatActivity {
     }
 
     public String extractVariant(String fullPath) {
-        String regex = "values(-\\w+)";
+        String regex = "values(-[^/]+)";
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(fullPath);
 
