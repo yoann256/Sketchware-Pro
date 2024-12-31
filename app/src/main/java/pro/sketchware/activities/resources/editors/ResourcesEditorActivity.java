@@ -1,7 +1,11 @@
 package pro.sketchware.activities.resources.editors;
 
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.MenuItem;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
@@ -9,8 +13,16 @@ import androidx.appcompat.widget.SearchView;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.tabs.TabLayoutMediator;
 
+import java.util.ArrayList;
+import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import a.a.a.aB;
 import a.a.a.wq;
 
+import mod.hey.studios.util.Helper;
 import pro.sketchware.R;
 import pro.sketchware.databinding.ResourcesEditorsActivityBinding;
 import pro.sketchware.activities.resources.editors.adapters.EditorsAdapter;
@@ -18,6 +30,8 @@ import pro.sketchware.activities.resources.editors.fragments.ColorsEditor;
 import pro.sketchware.activities.resources.editors.fragments.StringsEditor;
 import pro.sketchware.activities.resources.editors.fragments.StylesEditor;
 import pro.sketchware.activities.resources.editors.fragments.ThemesEditor;
+import pro.sketchware.databinding.ResourcesVariantSelectorDialogBinding;
+import pro.sketchware.utility.FileUtil;
 import pro.sketchware.utility.SketchwareUtil;
 
 public class ResourcesEditorActivity extends AppCompatActivity {
@@ -31,10 +45,10 @@ public class ResourcesEditorActivity extends AppCompatActivity {
     public String stylesFilePath;
     public String themesFilePath;
 
-    public final StringsEditor stringsEditor = new StringsEditor();
-    public final ColorsEditor colorsEditor = new ColorsEditor();
-    public final StylesEditor stylesEditor = new StylesEditor();
-    public final ThemesEditor themesEditor = new ThemesEditor();
+    public StringsEditor stringsEditor;
+    public ColorsEditor colorsEditor;
+    public StylesEditor stylesEditor;
+    public ThemesEditor themesEditor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,7 +60,16 @@ public class ResourcesEditorActivity extends AppCompatActivity {
         setSupportActionBar(binding.topAppBar);
 
         sc_id = getIntent().getStringExtra("sc_id");
-        variant = getIntent().getStringExtra("variant");
+        initialize(getIntent().getStringExtra("variant"));
+    }
+
+    private void initialize(String variant) {
+        this.variant = variant;
+
+        stringsEditor = new StringsEditor();
+        colorsEditor = new ColorsEditor();
+        stylesEditor = new StylesEditor();
+        themesEditor = new ThemesEditor();
 
         String projectResourcesDirectory =
                 String.format(
@@ -179,6 +202,8 @@ public class ResourcesEditorActivity extends AppCompatActivity {
             stylesEditor.saveStylesFile();
             themesEditor.saveThemesFile();
             SketchwareUtil.toast("Save completed");
+        } else if (id == R.id.action_select_variant) {
+            changeTheVariantDialog();
         } else if (id != R.id.action_search) {
             int currentItem = binding.viewPager.getCurrentItem();
             if (currentItem == 0) {
@@ -197,6 +222,90 @@ public class ResourcesEditorActivity extends AppCompatActivity {
     private void setupViewPager() {
         EditorsAdapter adapter = new EditorsAdapter(this);
         binding.viewPager.setAdapter(adapter);
+    }
+
+    private void changeTheVariantDialog() {
+        ArrayList<String> resourcesDir = new ArrayList<>();
+        FileUtil.listDir(wq.b(sc_id) + "/files/resource/", resourcesDir);
+
+        ArrayList<String> variants = extractVariants(resourcesDir);
+        AtomicInteger selectedChoice = new AtomicInteger(variants.indexOf("values" + variant));
+
+        ResourcesVariantSelectorDialogBinding binding = ResourcesVariantSelectorDialogBinding.inflate(getLayoutInflater());
+        aB dialog = new aB(this);
+        dialog.b(Helper.getResString(R.string.common_word_select_variant));
+
+        setupDialog(binding, dialog, variants, selectedChoice);
+
+        dialog.a(Helper.getResString(R.string.common_word_cancel), Helper.getDialogDismissListener(dialog));
+        dialog.a(binding.getRoot());
+        dialog.show();
+    }
+
+    private void setupDialog(ResourcesVariantSelectorDialogBinding binding, aB dialog, ArrayList<String> variants, AtomicInteger selectedChoice) {
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_single_choice, variants);
+        binding.listView.setAdapter(adapter);
+        binding.listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+        binding.listView.setItemChecked(selectedChoice.get(), true);
+
+        binding.listView.setOnItemClickListener((parent, view, which, id) -> {
+            selectedChoice.set(which);
+            binding.input.setText("");
+            binding.input.clearFocus();
+        });
+
+        if (!(selectedChoice.get() >= 0 && selectedChoice.get() < variants.size() && variants.get(selectedChoice.get()).equals("values" + variant))) {
+            binding.input.setText("values" + variant);
+        }
+
+        binding.input.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                String newText = s.toString().trim();
+                if (!newText.isEmpty()) {
+                    for (int i = 0; i < binding.listView.getCount(); i++) {
+                        binding.listView.setItemChecked(i, false);
+                    }
+                } else {
+                    if (selectedChoice.get() >= 0 && selectedChoice.get() < binding.listView.getCount()) {
+                        binding.listView.setItemChecked(selectedChoice.get(), true);
+                    }
+                }
+            }
+        });
+
+        dialog.b(Helper.getResString(R.string.common_word_save), v -> saveVariant(binding, variants, selectedChoice));
+    }
+
+    private void saveVariant(ResourcesVariantSelectorDialogBinding binding, ArrayList<String> variants, AtomicInteger selectedChoice) {
+        String newVariant = Objects.requireNonNull(binding.input.getText()).toString().trim();
+        if (!newVariant.isEmpty()) {
+            initialize(newVariant.replace("values", ""));
+        } else {
+            initialize(variants.get(selectedChoice.get()).replace("values", ""));
+        }
+    }
+
+    public ArrayList<String> extractVariants(ArrayList<String> resourcesDir) {
+        ArrayList<String> variants = new ArrayList<>();
+        for (String dir :  resourcesDir) {
+            String regex = "(values(-[^/]+)*)";
+            Pattern pattern = Pattern.compile(regex);
+            Matcher matcher = pattern.matcher(dir);
+
+            if (matcher.find()) {
+                variants.add(matcher.group(1));
+            }
+        }
+        return variants;
     }
 
 }
