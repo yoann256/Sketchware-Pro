@@ -94,6 +94,7 @@ public class StringsEditor extends Fragment {
             convertXmlToListMap(FileUtil.readFileIfExist(getDefaultStringPath(Objects.requireNonNull(filePath))), listmap);
             adapter.notifyDataSetChanged();
         } else if (id == R.id.action_open_editor) {
+            isComingFromSrcCodeEditor = true;
             XmlUtil.saveXml(filePath, convertListMapToXml(listmap));
             Intent intent = new Intent();
             intent.setClass(requireActivity(), ConfigActivity.isLegacyCeEnabled() ? SrcCodeEditorLegacy.class : SrcCodeEditor.class);

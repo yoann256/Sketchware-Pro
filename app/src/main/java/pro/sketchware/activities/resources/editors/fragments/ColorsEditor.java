@@ -155,7 +155,8 @@ public class ColorsEditor extends Fragment {
     public void updateColorsList() {
         if (isGoingToEditor) {
             parseColorsXML(colorList, FileUtil.readFileIfExist(contentPath));
-            adapter.notifyDataSetChanged();
+            adapter = new ColorsAdapter(colorList, (ResourcesEditorActivity) activity);
+            binding.recyclerView.setAdapter(adapter);
         }
         isGoingToEditor = false;
     }

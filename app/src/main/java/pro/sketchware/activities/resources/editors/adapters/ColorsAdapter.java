@@ -22,8 +22,8 @@ public class ColorsAdapter extends RecyclerView.Adapter<ColorsAdapter.ViewHolder
     private final ResourcesEditorActivity activity;
 
     public ColorsAdapter(ArrayList<ColorModel> filteredData, ResourcesEditorActivity activity) {
-        this.originalData = filteredData;
-        this.filteredData = new ArrayList<>(filteredData);
+        this.originalData = new ArrayList<>(filteredData);
+        this.filteredData = filteredData;
         this.activity = activity;
     }
 
