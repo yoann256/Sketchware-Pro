@@ -30,9 +30,7 @@ import a.a.a.Zx;
 import a.a.a.aB;
 import a.a.a.xB;
 import mod.hey.studios.code.SrcCodeEditor;
-import mod.hey.studios.code.SrcCodeEditorLegacy;
 import mod.hey.studios.util.Helper;
-import mod.hilal.saif.activities.tools.ConfigActivity;
 import pro.sketchware.R;
 import pro.sketchware.SketchApplication;
 import pro.sketchware.activities.resources.editors.ResourcesEditorActivity;
@@ -188,7 +186,7 @@ public class ColorsEditor extends Fragment {
     public void handleOnOptionsItemSelected() {
         XmlUtil.saveXml(contentPath, convertListToXml(colorList));
         Intent intent = new Intent();
-        intent.setClass(activity, ConfigActivity.isLegacyCeEnabled() ? SrcCodeEditorLegacy.class : SrcCodeEditor.class);
+        intent.setClass(activity, SrcCodeEditor.class);
         intent.putExtra("title", "colors.xml");
         intent.putExtra("content", contentPath);
         startActivity(intent);

@@ -31,9 +31,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import a.a.a.aB;
 import mod.hey.studios.code.SrcCodeEditor;
-import mod.hey.studios.code.SrcCodeEditorLegacy;
 import mod.hey.studios.util.Helper;
-import mod.hilal.saif.activities.tools.ConfigActivity;
 import pro.sketchware.R;
 import pro.sketchware.activities.resources.editors.ResourcesEditorActivity;
 import pro.sketchware.databinding.ResourcesEditorFragmentBinding;
@@ -94,7 +92,7 @@ public class StringsEditor extends Fragment {
     public void handleOnOptionsItemSelected() {
         XmlUtil.saveXml(filePath, convertListMapToXml(listmap));
         Intent intent = new Intent();
-        intent.setClass(requireActivity(), ConfigActivity.isLegacyCeEnabled() ? SrcCodeEditorLegacy.class : SrcCodeEditor.class);
+        intent.setClass(requireActivity(), SrcCodeEditor.class);
         intent.putExtra("title", "strings.xml");
         intent.putExtra("content", filePath);
         requireActivity().startActivity(intent);
