@@ -3,7 +3,6 @@ package pro.sketchware.activities.resources.editors.utils;
 import static com.besome.sketch.design.DesignActivity.sc_id;
 
 import static pro.sketchware.activities.resources.editors.fragments.ColorsEditor.parseColorsXML;
-import static pro.sketchware.activities.resources.editors.fragments.StringsEditor.convertXmlToListMap;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -127,7 +126,7 @@ public class AttributeSuggestions {
 
         ArrayList<HashMap<String, Object>> StringsListMap = new ArrayList<>();
 
-        convertXmlToListMap(FileUtil.readFileIfExist(filePath), StringsListMap);
+        new StringsEditorManager().convertXmlStringsToListMap(FileUtil.readFileIfExist(filePath), StringsListMap);
 
         return StringsListMap.stream()
                 .map(stringMap -> "@string/" + stringMap.get("key"))

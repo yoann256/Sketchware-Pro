@@ -13,27 +13,16 @@ import androidx.fragment.app.Fragment;
 
 import com.google.gson.Gson;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
-
-import java.io.ByteArrayInputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 
 import a.a.a.aB;
 import mod.hey.studios.code.SrcCodeEditor;
 import mod.hey.studios.util.Helper;
 import pro.sketchware.R;
 import pro.sketchware.activities.resources.editors.ResourcesEditorActivity;
+import pro.sketchware.activities.resources.editors.utils.StringsEditorManager;
 import pro.sketchware.databinding.ResourcesEditorFragmentBinding;
 import pro.sketchware.databinding.ViewStringEditorAddBinding;
 import pro.sketchware.utility.FileUtil;
@@ -47,6 +36,8 @@ public class StringsEditor extends Fragment {
     private ResourcesEditorFragmentBinding binding;
     public StringsAdapter adapter;
     public String filePath;
+
+    public final StringsEditorManager stringsEditorManager = new StringsEditorManager();
 
     @Nullable
     @Override
@@ -62,7 +53,7 @@ public class StringsEditor extends Fragment {
     }
 
     public void updateStringsList(String filePath) {
-        convertXmlToListMap(FileUtil.readFileIfExist(filePath), listmap);
+        stringsEditorManager.convertXmlStringsToListMap(FileUtil.readFileIfExist(filePath), listmap);
         adapter = new StringsAdapter(((ResourcesEditorActivity) requireActivity()), listmap);
         binding.recyclerView.setAdapter(adapter);
         updateNoContentLayout();
@@ -83,86 +74,19 @@ public class StringsEditor extends Fragment {
             return false;
         }
         ArrayList<HashMap<String, Object>> cache = new ArrayList<>();
-        convertXmlToListMap(FileUtil.readFileIfExist(filePath), cache);
+        stringsEditorManager.convertXmlStringsToListMap(FileUtil.readFileIfExist(filePath), cache);
         String cacheString = new Gson().toJson(cache);
         String cacheListmap = new Gson().toJson(listmap);
         return !cacheListmap.equals(cacheString) && !listmap.isEmpty();
     }
 
     public void handleOnOptionsItemSelected() {
-        XmlUtil.saveXml(filePath, convertListMapToXml(listmap));
+        XmlUtil.saveXml(filePath, stringsEditorManager.convertListMapToXmlStrings(listmap));
         Intent intent = new Intent();
         intent.setClass(requireActivity(), SrcCodeEditor.class);
         intent.putExtra("title", "strings.xml");
         intent.putExtra("content", filePath);
         requireActivity().startActivity(intent);
-    }
-
-    public static void convertXmlToListMap(final String xmlString, final ArrayList<HashMap<String, Object>> listmap) {
-        try {
-            listmap.clear();
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder builder = factory.newDocumentBuilder();
-            ByteArrayInputStream input = new ByteArrayInputStream(xmlString.getBytes(StandardCharsets.UTF_8));
-            Document doc = builder.parse(new InputSource(input));
-            doc.getDocumentElement().normalize();
-            NodeList nodeList = doc.getElementsByTagName("string");
-            for (int i = 0; i < nodeList.getLength(); i++) {
-                Node node = nodeList.item(i);
-                if (node.getNodeType() == Node.ELEMENT_NODE) {
-                    HashMap<String, Object> map = getStringHashMap((Element) node);
-                    listmap.add(map);
-                }
-            }
-        } catch (Exception ignored) {}
-    }
-
-    private static HashMap<String, Object> getStringHashMap(Element node) {
-        HashMap<String, Object> map = new HashMap<>();
-        String key = node.getAttribute("name");
-        String value = node.getTextContent();
-        map.put("key", key);
-        map.put("text", value);
-        return map;
-    }
-
-    public static boolean isXmlStringsContains(ArrayList<HashMap<String, Object>> listMap, String value) {
-        for (Map<String, Object> map : listMap) {
-            if (map.containsKey("key") && value.equals(map.get("key"))) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public static String convertListMapToXml(final ArrayList<HashMap<String, Object>> listmap) {
-        StringBuilder xmlString = new StringBuilder();
-        xmlString.append("<resources>\n\n");
-        for (HashMap<String, Object> map : listmap) {
-            String key = (String) map.get("key");
-            Object textObj = map.get("text");
-            String text = textObj instanceof String ? (String) textObj : textObj.toString();
-            String escapedText = escapeXml(text);
-            xmlString.append("    <string name=\"").append(key).append("\"");
-            if (map.containsKey("translatable")) {
-                String translatable = (String) map.get("translatable");
-                xmlString.append(" translatable=\"").append(translatable).append("\"");
-            }
-            xmlString.append(">").append(escapedText).append("</string>\n");
-        }
-        xmlString.append("\n</resources>");
-        return xmlString.toString();
-    }
-
-    public static String escapeXml(String text) {
-        if (text == null) return "";
-        return text.replace("&", "&amp;")
-                .replace("<", "&lt;")
-                .replace(">", "&gt;")
-                .replace("\"", "&quot;")
-                .replace("'", "&apos;")
-                .replace("\n", "&#10;")
-                .replace("\r", "&#13;");
     }
 
     public void addStringDialog() {
@@ -178,7 +102,7 @@ public class StringsEditor extends Fragment {
                 return;
             }
 
-            if (isXmlStringsContains(listmap, key)) {
+            if (stringsEditorManager.isXmlStringsExist(listmap, key)) {
                 binding.stringKeyInputLayout.setError("\"" + key + "\" is already exist");
                 return;
             }
@@ -212,7 +136,7 @@ public class StringsEditor extends Fragment {
 
     public void saveStringsFile() {
         if (FileUtil.isExistFile(filePath) || !listmap.isEmpty()) {
-            XmlUtil.saveXml(filePath, StringsEditor.convertListMapToXml(listmap));
+            XmlUtil.saveXml(filePath, stringsEditorManager.convertListMapToXmlStrings(listmap));
         }
     }
 }

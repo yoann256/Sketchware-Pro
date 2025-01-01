@@ -1,9 +1,6 @@
 package com.besome.sketch.editor;
 
 import static pro.sketchware.widgets.WidgetsCreatorManager.clearErrorOnTextChanged;
-import static pro.sketchware.activities.resources.editors.fragments.StringsEditor.convertListMapToXml;
-import static pro.sketchware.activities.resources.editors.fragments.StringsEditor.convertXmlToListMap;
-import static pro.sketchware.activities.resources.editors.fragments.StringsEditor.isXmlStringsContains;
 
 import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
@@ -127,6 +124,7 @@ import mod.jbk.editor.manage.MoreblockImporter;
 import mod.jbk.util.BlockUtil;
 import mod.pranav.viewbinding.ViewBindingBuilder;
 import pro.sketchware.R;
+import pro.sketchware.activities.resources.editors.utils.StringsEditorManager;
 import pro.sketchware.databinding.ImagePickerItemBinding;
 import pro.sketchware.databinding.SearchWithRecyclerViewBinding;
 import pro.sketchware.databinding.PropertyPopupSelectorSingleBinding;
@@ -357,14 +355,15 @@ public class LogicEditorActivity extends BaseAppCompatActivity implements View.O
 
             String filePath = new FilePathUtil().getPathResource(B) + "/values/strings.xml";
             ArrayList<HashMap<String, Object>> StringsListMap = new ArrayList<>();
-            convertXmlToListMap(FileUtil.readFile(filePath), StringsListMap);
+            StringsEditorManager stringsEditorManager = new StringsEditorManager();
+            stringsEditorManager.convertXmlStringsToListMap(FileUtil.readFile(filePath), StringsListMap);
 
             clearErrorOnTextChanged(binding.stringKeyInput, binding.stringKeyInputLayout);
 
             String key = Objects.requireNonNull(binding.stringKeyInput.getText()).toString();
             String value = Objects.requireNonNull(binding.stringValueInput.getText()).toString();
 
-            if (isXmlStringsContains(StringsListMap, key)) {
+            if (stringsEditorManager.isXmlStringsExist(StringsListMap, key)) {
                 binding.stringKeyInputLayout.setError("\"" + key + "\" is already exist");
                 return;
             }
@@ -377,9 +376,8 @@ public class LogicEditorActivity extends BaseAppCompatActivity implements View.O
             HashMap<String, Object> map = new HashMap<>();
             map.put("key", key);
             map.put("text", value);
-            map.put("translatable", "true");
             StringsListMap.add(map);
-            FileUtil.writeFile(filePath, convertListMapToXml(StringsListMap));
+            FileUtil.writeFile(filePath, stringsEditorManager.convertListMapToXmlStrings(StringsListMap));
             paletteSelector.performClickPalette(-1);
             dialog.dismiss();
         });
@@ -392,7 +390,8 @@ public class LogicEditorActivity extends BaseAppCompatActivity implements View.O
         String filePath = new FilePathUtil().getPathResource(B) + "/values/strings.xml";
 
         ArrayList<HashMap<String, Object>> stringsList = new ArrayList<>();
-        convertXmlToListMap(FileUtil.readFile(filePath), stringsList);
+        StringsEditorManager stringsEditorManager = new StringsEditorManager();
+        stringsEditorManager.convertXmlStringsToListMap(FileUtil.readFile(filePath), stringsList);
 
         aB dialog = new aB(this);
         dialog.b(getTranslatedString(R.string.logic_editor_title_remove_xml_strings));
@@ -421,7 +420,7 @@ public class LogicEditorActivity extends BaseAppCompatActivity implements View.O
                 }
             }
 
-            FileUtil.writeFile(filePath, convertListMapToXml(stringsList));
+            FileUtil.writeFile(filePath, stringsEditorManager.convertListMapToXmlStrings(stringsList));
 
             paletteSelector.performClickPalette(-1);
             dialog.dismiss();
