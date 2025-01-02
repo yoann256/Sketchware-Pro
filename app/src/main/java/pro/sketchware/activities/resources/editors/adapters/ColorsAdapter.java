@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import pro.sketchware.activities.resources.editors.ResourcesEditorActivity;
 import pro.sketchware.activities.resources.editors.fragments.ColorsEditor;
 import pro.sketchware.activities.resources.editors.models.ColorModel;
+import pro.sketchware.activities.resources.editors.utils.ColorsEditorManager;
 import pro.sketchware.databinding.PalletCustomviewBinding;
 import pro.sketchware.utility.PropertiesUtil;
 
@@ -20,6 +21,7 @@ public class ColorsAdapter extends RecyclerView.Adapter<ColorsAdapter.ViewHolder
     private final ArrayList<ColorModel> originalData;
     private ArrayList<ColorModel> filteredData;
     private final ResourcesEditorActivity activity;
+    private final ColorsEditorManager colorsEditorManager = new ColorsEditorManager();
 
     public ColorsAdapter(ArrayList<ColorModel> filteredData, ResourcesEditorActivity activity) {
         this.originalData = new ArrayList<>(filteredData);
@@ -39,7 +41,7 @@ public class ColorsAdapter extends RecyclerView.Adapter<ColorsAdapter.ViewHolder
         ColorModel colorModel = filteredData.get(position);
         String colorName = colorModel.getColorName();
         String colorValue = colorModel.getColorValue();
-        String valueHex = ColorsEditor.getColorValue(activity.getApplicationContext(), colorValue, 4);
+        String valueHex = colorsEditorManager.getColorValue(activity.getApplicationContext(), colorValue, 4);
 
         holder.itemBinding.title.setHint(colorName);
         holder.itemBinding.sub.setText(colorValue);

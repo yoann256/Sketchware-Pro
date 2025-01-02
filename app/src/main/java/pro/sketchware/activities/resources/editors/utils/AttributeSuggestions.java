@@ -2,8 +2,6 @@ package pro.sketchware.activities.resources.editors.utils;
 
 import static com.besome.sketch.design.DesignActivity.sc_id;
 
-import static pro.sketchware.activities.resources.editors.fragments.ColorsEditor.parseColorsXML;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -141,7 +139,7 @@ public class AttributeSuggestions {
 
         ArrayList<ColorModel> colorList = new ArrayList<>();
 
-        parseColorsXML(colorList, FileUtil.readFileIfExist(filePath));
+        new ColorsEditorManager().parseColorsXML(colorList, FileUtil.readFileIfExist(filePath));
 
         return colorList.stream().map(colorModel -> "@color/" + colorModel.getColorName()).collect(Collectors.toList());
 
