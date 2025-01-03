@@ -1,6 +1,5 @@
 package pro.sketchware.activities.resources.editors.fragments;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,7 +17,6 @@ import java.util.HashMap;
 import java.util.Objects;
 
 import a.a.a.aB;
-import mod.hey.studios.code.SrcCodeEditor;
 import mod.hey.studios.util.Helper;
 import pro.sketchware.R;
 import pro.sketchware.activities.resources.editors.ResourcesEditorActivity;
@@ -45,6 +43,7 @@ public class StringsEditor extends Fragment {
         binding = ResourcesEditorFragmentBinding.inflate(inflater, container, false);
         initialize();
         updateStringsList(filePath);
+        ((ResourcesEditorActivity) requireActivity()).checkForInvalidResources();
         return binding.getRoot();
     }
 
@@ -78,15 +77,6 @@ public class StringsEditor extends Fragment {
         String cacheString = new Gson().toJson(cache);
         String cacheListmap = new Gson().toJson(listmap);
         return !cacheListmap.equals(cacheString) && !listmap.isEmpty();
-    }
-
-    public void handleOnOptionsItemSelected() {
-        XmlUtil.saveXml(filePath, stringsEditorManager.convertListMapToXmlStrings(listmap));
-        Intent intent = new Intent();
-        intent.setClass(requireActivity(), SrcCodeEditor.class);
-        intent.putExtra("title", "strings.xml");
-        intent.putExtra("content", filePath);
-        requireActivity().startActivity(intent);
     }
 
     public void addStringDialog() {

@@ -18,6 +18,8 @@ import pro.sketchware.activities.resources.editors.models.StyleModel;
 
 public class StylesEditorManager {
 
+    public boolean isDataLoadingFailed;
+
     public String getAttributesCode(StyleModel style) {
         StringBuilder attributesCode = new StringBuilder();
 
@@ -84,6 +86,7 @@ public class StylesEditorManager {
     }
 
     public ArrayList<StyleModel> parseStylesFile(String content) {
+        isDataLoadingFailed = false;
         ArrayList<StyleModel> styles = new ArrayList<>();
         try {
 
@@ -119,7 +122,9 @@ public class StylesEditorManager {
                 }
             }
 
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+            isDataLoadingFailed = !content.trim().isEmpty();
+        }
 
         return styles;
     }

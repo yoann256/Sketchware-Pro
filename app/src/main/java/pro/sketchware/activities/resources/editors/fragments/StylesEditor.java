@@ -1,6 +1,5 @@
 package pro.sketchware.activities.resources.editors.fragments;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -22,7 +21,6 @@ import com.google.android.material.textfield.MaterialAutoCompleteTextView;
 import com.google.gson.Gson;
 
 import a.a.a.aB;
-import mod.hey.studios.code.SrcCodeEditor;
 import mod.hey.studios.util.Helper;
 
 import pro.sketchware.R;
@@ -50,7 +48,7 @@ public class StylesEditor extends Fragment {
     public StylesAdapter adapter;
     private PropertyInputItem.AttributesAdapter attributesAdapter;
     private ArrayList<StyleModel> stylesList;
-    private StylesEditorManager stylesEditorManager;
+    public final StylesEditorManager stylesEditorManager = new StylesEditorManager();
     private final AttributeSuggestions attributeSuggestions = new AttributeSuggestions();
     private String filePath;
 
@@ -60,6 +58,7 @@ public class StylesEditor extends Fragment {
         binding = ResourcesEditorFragmentBinding.inflate(inflater, container, false);
         initialize();
         updateStylesList(filePath);
+        ((ResourcesEditorActivity) requireActivity()).checkForInvalidResources();
         return binding.getRoot();
     }
 
@@ -77,7 +76,6 @@ public class StylesEditor extends Fragment {
 
     private void initialize() {
         filePath = ((ResourcesEditorActivity) requireActivity()).stylesFilePath;
-        stylesEditorManager = new StylesEditorManager();
     }
 
     private void updateNoContentLayout() {
@@ -306,12 +304,4 @@ public class StylesEditor extends Fragment {
         });
     }
 
-    public void handleOnOptionsItemSelected() {
-        saveStylesFile();
-        Intent intent = new Intent();
-        intent.setClass(requireActivity(), SrcCodeEditor.class);
-        intent.putExtra("title", "styles.xml");
-        intent.putExtra("content", filePath);
-        startActivity(intent);
-    }
 }

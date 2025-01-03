@@ -1,6 +1,5 @@
 package pro.sketchware.activities.resources.editors.fragments;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -22,7 +21,6 @@ import com.google.android.material.textfield.MaterialAutoCompleteTextView;
 import com.google.gson.Gson;
 
 import a.a.a.aB;
-import mod.hey.studios.code.SrcCodeEditor;
 import mod.hey.studios.util.Helper;
 
 import pro.sketchware.R;
@@ -50,7 +48,7 @@ public class ThemesEditor extends Fragment {
     public StylesAdapter adapter;
     private PropertyInputItem.AttributesAdapter attributesAdapter;
     private ArrayList<StyleModel> themesList;
-    private StylesEditorManager themesEditorManager;
+    public final StylesEditorManager themesEditorManager = new StylesEditorManager();
     private final AttributeSuggestions attributeSuggestions = new AttributeSuggestions();
     private String filePath;
 
@@ -60,6 +58,7 @@ public class ThemesEditor extends Fragment {
         binding = ResourcesEditorFragmentBinding.inflate(inflater, container, false);
         initialize();
         updateThemesList(filePath);
+        ((ResourcesEditorActivity) requireActivity()).checkForInvalidResources();
         return binding.getRoot();
     }
 
@@ -87,7 +86,6 @@ public class ThemesEditor extends Fragment {
 
     private void initialize() {
         filePath = ((ResourcesEditorActivity) requireActivity()).themesFilePath;
-        themesEditorManager = new StylesEditorManager();
     }
 
     public boolean checkForUnsavedChanges() {
@@ -305,12 +303,4 @@ public class ThemesEditor extends Fragment {
         });
     }
 
-    public void handleOnOptionsItemSelected() {
-        saveThemesFile();
-        Intent intent = new Intent();
-        intent.setClass(requireActivity(), SrcCodeEditor.class);
-        intent.putExtra("title", "themes.xml");
-        intent.putExtra("content", filePath);
-        startActivity(intent);
-    }
 }

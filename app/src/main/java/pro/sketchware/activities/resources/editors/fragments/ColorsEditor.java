@@ -1,7 +1,6 @@
 package pro.sketchware.activities.resources.editors.fragments;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -20,7 +19,6 @@ import a.a.a.XB;
 import a.a.a.Zx;
 import a.a.a.aB;
 import a.a.a.xB;
-import mod.hey.studios.code.SrcCodeEditor;
 import mod.hey.studios.util.Helper;
 import pro.sketchware.R;
 import pro.sketchware.activities.resources.editors.ResourcesEditorActivity;
@@ -43,7 +41,7 @@ public class ColorsEditor extends Fragment {
     private Activity activity;
     private Zx colorpicker;
 
-    private final ColorsEditorManager colorsEditorManager = new ColorsEditorManager();
+    public final ColorsEditorManager colorsEditorManager = new ColorsEditorManager();
 
     @Nullable
     @Override
@@ -51,6 +49,7 @@ public class ColorsEditor extends Fragment {
         binding = ResourcesEditorFragmentBinding.inflate(inflater, container, false);
         initialize();
         updateColorsList(contentPath);
+        ((ResourcesEditorActivity) requireActivity()).checkForInvalidResources();
         return binding.getRoot();
     }
 
@@ -90,15 +89,6 @@ public class ColorsEditor extends Fragment {
         String originalXml = FileUtil.readFileIfExist(contentPath);
         String newXml = colorsEditorManager.convertListToXml(colorList);
         return !Objects.equals(XmlUtil.replaceXml(newXml), XmlUtil.replaceXml(originalXml));
-    }
-
-    public void handleOnOptionsItemSelected() {
-        XmlUtil.saveXml(contentPath, colorsEditorManager.convertListToXml(colorList));
-        Intent intent = new Intent();
-        intent.setClass(activity, SrcCodeEditor.class);
-        intent.putExtra("title", "colors.xml");
-        intent.putExtra("content", contentPath);
-        startActivity(intent);
     }
 
     public void showDeleteDialog(int position) {

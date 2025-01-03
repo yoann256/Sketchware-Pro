@@ -1,5 +1,6 @@
 package pro.sketchware.activities.resources.editors;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -23,6 +24,7 @@ import java.util.regex.Pattern;
 import a.a.a.aB;
 import a.a.a.wq;
 
+import mod.hey.studios.code.SrcCodeEditor;
 import mod.hey.studios.util.Helper;
 import pro.sketchware.R;
 import pro.sketchware.databinding.ResourcesEditorsActivityBinding;
@@ -39,11 +41,13 @@ public class ResourcesEditorActivity extends AppCompatActivity {
 
     private ResourcesEditorsActivityBinding binding;
 
-    private boolean isComingFromSrcCodeEditor;
+    private MaterialAlertDialogBuilder builder;
+
+    public boolean isComingFromSrcCodeEditor;
 
     public String sc_id;
     public String variant;
-    private String variantFullNameStarts = "values-";
+    private final String variantFullNameStarts = "values-";
     public String stringsFilePath;
     public String colorsFilePath;
     public String stylesFilePath;
@@ -126,6 +130,46 @@ public class ResourcesEditorActivity extends AppCompatActivity {
         });
     }
 
+    public void checkForInvalidResources() {
+        if (stringsEditor.stringsEditorManager.isDataLoadingFailed) {
+            showLoadFailedDialog("strings.xml", stringsFilePath);
+            return;
+        }
+        if (colorsEditor.colorsEditorManager.isDataLoadingFailed) {
+            showLoadFailedDialog("colors.xml", colorsFilePath);
+            return;
+        }
+        if (stylesEditor.stylesEditorManager.isDataLoadingFailed) {
+            showLoadFailedDialog("styles.xml", stylesFilePath);
+            return;
+        }
+        if (themesEditor.themesEditorManager.isDataLoadingFailed) {
+            showLoadFailedDialog("themes.xml", themesFilePath);
+        }
+    }
+
+    private void goToCodeEditor(String title, String contentPath) {
+        builder = null;
+        isComingFromSrcCodeEditor = true;
+        Intent intent = new Intent();
+        intent.setClass(getApplicationContext(), SrcCodeEditor.class);
+        intent.putExtra("title", title);
+        intent.putExtra("content", contentPath);
+        startActivity(intent);
+    }
+
+    private void showLoadFailedDialog(String title, String contentPath) {
+        if (builder != null) return;
+        builder = new MaterialAlertDialogBuilder(this);
+        builder.setTitle(Helper.getResString(R.string.resources_manager_xml_load_failed_title))
+                .setMessage(String.format(Helper.getResString(R.string.resources_manager_xml_load_failed_message), title))
+                .setPositiveButton("Open code editor", (dialog, which) -> goToCodeEditor(title, contentPath))
+                .setNegativeButton(Helper.getResString(R.string.common_word_exit), ((dialogInterface, i) -> super.onBackPressed()))
+                .setCancelable(false)
+                .create()
+                .show();
+    }
+
     @Override
     public void onBackPressed() {
         if (stringsEditor.checkForUnsavedChanges()
@@ -150,15 +194,24 @@ public class ResourcesEditorActivity extends AppCompatActivity {
     @Override
     public void onResume() {
         if (isComingFromSrcCodeEditor) {
-            if (binding.viewPager.getCurrentItem() == 0) {
+            int currentItem = binding.viewPager.getCurrentItem();
+
+            if (currentItem == 0 || stringsEditor.stringsEditorManager.isDataLoadingFailed) {
                 stringsEditor.updateStringsList(stringsFilePath);
-            } else if (binding.viewPager.getCurrentItem() == 1) {
+            }
+
+            if (currentItem == 1 || colorsEditor.colorsEditorManager.isDataLoadingFailed) {
                 colorsEditor.updateColorsList(colorsFilePath);
-            } else if (binding.viewPager.getCurrentItem() == 2) {
+            }
+
+            if (currentItem == 2 || stylesEditor.stylesEditorManager.isDataLoadingFailed) {
                 stylesEditor.updateStylesList(stylesFilePath);
-            } else if (binding.viewPager.getCurrentItem() == 3) {
+            }
+
+            if (currentItem == 3 || themesEditor.themesEditorManager.isDataLoadingFailed) {
                 themesEditor.updateThemesList(themesFilePath);
             }
+            checkForInvalidResources();
         }
         isComingFromSrcCodeEditor = false;
         super.onResume();
@@ -217,16 +270,19 @@ public class ResourcesEditorActivity extends AppCompatActivity {
         } else if (id == R.id.action_get_from_variant) {
             importFromDefaultVariant();
         } else if (id != R.id.action_search) {
-            isComingFromSrcCodeEditor = true;
             int currentItem = binding.viewPager.getCurrentItem();
             if (currentItem == 0) {
-                stringsEditor.handleOnOptionsItemSelected();
+                stringsEditor.saveStringsFile();
+                goToCodeEditor("strings.xml", stringsFilePath);
             } else if (currentItem == 1) {
-                colorsEditor.handleOnOptionsItemSelected();
+                colorsEditor.saveColorsFile();
+                goToCodeEditor("colors.xml", colorsFilePath);
             } else if (currentItem == 2) {
-                stylesEditor.handleOnOptionsItemSelected();
+                stylesEditor.saveStylesFile();
+                goToCodeEditor("styles.xml", stylesFilePath);
             } else if (currentItem == 3) {
-                themesEditor.handleOnOptionsItemSelected();
+                themesEditor.saveThemesFile();
+                goToCodeEditor("themes.xml", themesFilePath);
             }
         }
         return super.onOptionsItemSelected(item);

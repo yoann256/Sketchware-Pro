@@ -17,7 +17,10 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 public class StringsEditorManager {
 
+    public boolean isDataLoadingFailed;
+
     public void convertXmlStringsToListMap(final String xmlString, final ArrayList<HashMap<String, Object>> listMap) {
+        isDataLoadingFailed = false;
         try {
             listMap.clear();
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -33,7 +36,9 @@ public class StringsEditorManager {
                     listMap.add(map);
                 }
             }
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+            isDataLoadingFailed = !xmlString.trim().isEmpty();
+        }
     }
 
     private HashMap<String, Object> getStringHashMap(Element node) {

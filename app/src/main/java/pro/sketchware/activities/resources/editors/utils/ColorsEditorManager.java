@@ -21,6 +21,7 @@ import pro.sketchware.utility.PropertiesUtil;
 public class ColorsEditorManager {
 
     public String contentPath;
+    public boolean isDataLoadingFailed;
 
     public String getColorValue(Context context, String colorValue, int referencingLimit) {
         if (colorValue == null || referencingLimit <= 0) {
@@ -75,12 +76,12 @@ public class ColorsEditorManager {
                 eventType = parser.next();
             }
 
-        } catch (Exception ignored) {
-        }
+        } catch (Exception ignored) {}
         return null;
     }
 
     public void parseColorsXML(ArrayList<ColorModel> colorList, String colorXml) {
+        isDataLoadingFailed = false;
         try {
             colorList.clear();
             XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
@@ -113,6 +114,7 @@ public class ColorsEditorManager {
                 eventType = parser.next();
             }
         } catch (Exception ignored) {
+            isDataLoadingFailed = !colorXml.trim().isEmpty();
         }
     }
 
