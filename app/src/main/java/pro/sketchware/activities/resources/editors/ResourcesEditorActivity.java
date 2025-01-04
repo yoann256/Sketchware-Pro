@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.SparseBooleanArray;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -27,6 +28,7 @@ import a.a.a.wq;
 import mod.hey.studios.code.SrcCodeEditor;
 import mod.hey.studios.util.Helper;
 import pro.sketchware.R;
+import pro.sketchware.databinding.ResourcesEditorImportDialogBinding;
 import pro.sketchware.databinding.ResourcesEditorsActivityBinding;
 import pro.sketchware.activities.resources.editors.adapters.EditorsAdapter;
 import pro.sketchware.activities.resources.editors.fragments.ColorsEditor;
@@ -197,19 +199,19 @@ public class ResourcesEditorActivity extends AppCompatActivity {
             int currentItem = binding.viewPager.getCurrentItem();
 
             if (currentItem == 0 || stringsEditor.stringsEditorManager.isDataLoadingFailed) {
-                stringsEditor.updateStringsList(stringsFilePath);
+                stringsEditor.updateStringsList(stringsFilePath, 0);
             }
 
             if (currentItem == 1 || colorsEditor.colorsEditorManager.isDataLoadingFailed) {
-                colorsEditor.updateColorsList(colorsFilePath);
+                colorsEditor.updateColorsList(colorsFilePath, 0);
             }
 
             if (currentItem == 2 || stylesEditor.stylesEditorManager.isDataLoadingFailed) {
-                stylesEditor.updateStylesList(stylesFilePath);
+                stylesEditor.updateStylesList(stylesFilePath, 0);
             }
 
             if (currentItem == 3 || themesEditor.themesEditorManager.isDataLoadingFailed) {
-                themesEditor.updateThemesList(themesFilePath);
+                themesEditor.updateThemesList(themesFilePath, 0);
             }
             checkForInvalidResources();
         }
@@ -395,34 +397,41 @@ public class ResourcesEditorActivity extends AppCompatActivity {
     }
 
     private void importFromDefaultVariant() {
-        ArrayList<String> resourcesFileNames = new ArrayList<>(
-                List.of("strings.xml",
-                        "colors.xml",
-                        "styles.xml",
-                        "themes.xml"
-                ));
-        boolean[] selectedItems = new boolean[resourcesFileNames.size()];
+        ResourcesEditorImportDialogBinding binding = ResourcesEditorImportDialogBinding.inflate(getLayoutInflater());
+        aB dialog = new aB(this);
+        dialog.a(binding.getRoot());
+        dialog.b(Helper.getResString(R.string.common_word_import_variant));
 
-        new MaterialAlertDialogBuilder(this)
-                .setTitle(Helper.getResString(R.string.common_word_import_variant))
-                .setMultiChoiceItems(
-                        resourcesFileNames.toArray(new String[0]),
-                        selectedItems,
-                        (dialog, which, isChecked) -> selectedItems[which] = isChecked
-                )
-                .setPositiveButton(R.string.common_word_save, (dialog2, which) -> {
-                    for (int i = 0; i < resourcesFileNames.size(); i++) {
-                        if (selectedItems[i]) {
-                            if (i == 0) stringsEditor.updateStringsList(stringsFilePath.replace(variant, ""));
-                            if (i == 1) colorsEditor.updateColorsList(colorsFilePath.replace(variant, ""));
-                            if (i == 2) stylesEditor.updateStylesList(stylesFilePath.replace(variant, ""));
-                            if (i == 3) themesEditor.updateThemesList(themesFilePath.replace(variant, ""));
-                        }
-                    }
-                })
-                .setNegativeButton(R.string.common_word_cancel, null)
-                .create()
-                .show();
+        ArrayList<String> resourcesFileNames = new ArrayList<>(List.of(
+                "strings.xml",
+                "colors.xml",
+                "styles.xml",
+                "themes.xml"
+        ));
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_multiple_choice, resourcesFileNames);
+
+        ListView listView = binding.resourcesListView;
+        listView.setAdapter(adapter);
+        listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+
+        dialog.b(Helper.getResString(R.string.common_word_save), view -> {
+            SparseBooleanArray selectedItems = listView.getCheckedItemPositions();
+            boolean isSkippingMode = binding.chipMergeAndSkip.isChecked();
+            boolean isMergeAndReplace = binding.chipMergeAndReplace.isChecked();
+            int updateMode = isMergeAndReplace ? 2 : isSkippingMode ? 1 : 0;
+            for (int i = 0; i < resourcesFileNames.size(); i++) {
+                if (selectedItems.get(i)) {
+                    if (i == 0) stringsEditor.updateStringsList(stringsFilePath.replace(variant, ""), updateMode);
+                    if (i == 1) colorsEditor.updateColorsList(colorsFilePath.replace(variant, ""), updateMode);
+                    if (i == 2) stylesEditor.updateStylesList(stylesFilePath.replace(variant, ""), updateMode);
+                    if (i == 3) themesEditor.updateThemesList(themesFilePath.replace(variant, ""), updateMode);
+                }
+            }
+        });
+
+        dialog.a(Helper.getResString(R.string.common_word_cancel), Helper.getDialogDismissListener(dialog));
+        dialog.show();
     }
 
 }

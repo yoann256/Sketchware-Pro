@@ -14,6 +14,7 @@ import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Objects;
 
 import a.a.a.aB;
@@ -42,7 +43,7 @@ public class StringsEditor extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = ResourcesEditorFragmentBinding.inflate(inflater, container, false);
         initialize();
-        updateStringsList(filePath);
+        updateStringsList(filePath, 0);
         ((ResourcesEditorActivity) requireActivity()).checkForInvalidResources();
         return binding.getRoot();
     }
@@ -51,8 +52,39 @@ public class StringsEditor extends Fragment {
         filePath = ((ResourcesEditorActivity) requireActivity()).stringsFilePath;
     }
 
-    public void updateStringsList(String filePath) {
-        stringsEditorManager.convertXmlStringsToListMap(FileUtil.readFileIfExist(filePath), listmap);
+    public void updateStringsList(String filePath, int updateMode) {
+        boolean isSkippingMode = updateMode == 1;
+        boolean isMergeAndReplace = updateMode == 2;
+
+        ArrayList<HashMap<String, Object>> defaultStrings = new ArrayList<>();
+        stringsEditorManager.convertXmlStringsToListMap(FileUtil.readFileIfExist(filePath), defaultStrings);
+
+        if (isSkippingMode) {
+            HashSet<String> existingKeys = new HashSet<>();
+            for (HashMap<String, Object> existingMap : listmap) {
+                existingKeys.add((String) existingMap.get("key"));
+            }
+
+            for (HashMap<String, Object> stringMap : defaultStrings) {
+                String key = (String) stringMap.get("key");
+                if (existingKeys.add(key)) {
+                    listmap.add(stringMap);
+                }
+            }
+        } else {
+            if (isMergeAndReplace) {
+                HashSet<String> newKeys = new HashSet<>();
+                for (HashMap<String, Object> stringMap : defaultStrings) {
+                    newKeys.add((String) stringMap.get("key"));
+                }
+
+                listmap.removeIf(existingMap -> newKeys.contains((String) existingMap.get("key")));
+            } else {
+                listmap.clear();
+            }
+            listmap.addAll(defaultStrings);
+        }
+
         adapter = new StringsAdapter(((ResourcesEditorActivity) requireActivity()), listmap);
         binding.recyclerView.setAdapter(adapter);
         updateNoContentLayout();
@@ -97,6 +129,7 @@ public class StringsEditor extends Fragment {
                 return;
             }
             addString(key, value);
+            updateNoContentLayout();
         });
         dialog.a(getString(R.string.cancel), v1 -> dialog.dismiss());
         dialog.a(binding.getRoot());
@@ -121,7 +154,6 @@ public class StringsEditor extends Fragment {
         }
         listmap.add(map);
         adapter.notifyItemInserted(listmap.size() - 1);
-        updateNoContentLayout();
     }
 
     public void saveStringsFile() {

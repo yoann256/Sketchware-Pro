@@ -38,6 +38,7 @@ import pro.sketchware.utility.FileUtil;
 import pro.sketchware.utility.SketchwareUtil;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -47,7 +48,7 @@ public class ThemesEditor extends Fragment {
     private ResourcesEditorFragmentBinding binding;
     public StylesAdapter adapter;
     private PropertyInputItem.AttributesAdapter attributesAdapter;
-    private ArrayList<StyleModel> themesList;
+    private final ArrayList<StyleModel> themesList = new ArrayList<>();
     public final StylesEditorManager themesEditorManager = new StylesEditorManager();
     private final AttributeSuggestions attributeSuggestions = new AttributeSuggestions();
     private String filePath;
@@ -57,18 +58,42 @@ public class ThemesEditor extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = ResourcesEditorFragmentBinding.inflate(inflater, container, false);
         initialize();
-        updateThemesList(filePath);
+        updateThemesList(filePath, 0);
         ((ResourcesEditorActivity) requireActivity()).checkForInvalidResources();
         return binding.getRoot();
     }
 
-    public void updateThemesList(String filePath) {
-        themesList = new ArrayList<>();
-        try {
-            themesList = themesEditorManager.parseStylesFile(FileUtil.readFileIfExist(filePath));
-        } catch (Exception e) {
-            SketchwareUtil.toastError(e.getMessage());
+    public void updateThemesList(String filePath, int updateMode) {
+        boolean isSkippingMode = updateMode == 1;
+        boolean isMergeAndReplace = updateMode == 2;
+
+        ArrayList<StyleModel> defaultStyles = themesEditorManager.parseStylesFile(FileUtil.readFileIfExist(filePath));
+
+        if (isSkippingMode) {
+            HashSet<String> existingThemeNames = new HashSet<>();
+            for (StyleModel existingStyle : themesList) {
+                existingThemeNames.add(existingStyle.getStyleName());
+            }
+
+            for (StyleModel style : defaultStyles) {
+                if (!existingThemeNames.contains(style.getStyleName())) {
+                    themesList.add(style);
+                }
+            }
+        } else {
+            if (isMergeAndReplace) {
+                HashSet<String> newThemeNames = new HashSet<>();
+                for (StyleModel theme : defaultStyles) {
+                    newThemeNames.add(theme.getStyleName());
+                }
+
+                themesList.removeIf(existingStyle -> newThemeNames.contains(existingStyle.getStyleName()));
+            } else {
+                themesList.clear();
+            }
+            themesList.addAll(defaultStyles);
         }
+
         adapter = new StylesAdapter(themesList, this);
         binding.recyclerView.setAdapter(adapter);
         updateNoContentLayout();

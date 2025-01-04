@@ -38,6 +38,7 @@ import pro.sketchware.utility.FileUtil;
 import pro.sketchware.utility.SketchwareUtil;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -47,7 +48,7 @@ public class StylesEditor extends Fragment {
     private ResourcesEditorFragmentBinding binding;
     public StylesAdapter adapter;
     private PropertyInputItem.AttributesAdapter attributesAdapter;
-    private ArrayList<StyleModel> stylesList;
+    private final ArrayList<StyleModel> stylesList = new ArrayList<>();
     public final StylesEditorManager stylesEditorManager = new StylesEditorManager();
     private final AttributeSuggestions attributeSuggestions = new AttributeSuggestions();
     private String filePath;
@@ -57,18 +58,42 @@ public class StylesEditor extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = ResourcesEditorFragmentBinding.inflate(inflater, container, false);
         initialize();
-        updateStylesList(filePath);
+        updateStylesList(filePath, 0);
         ((ResourcesEditorActivity) requireActivity()).checkForInvalidResources();
         return binding.getRoot();
     }
 
-    public void updateStylesList(String filePath) {
-        stylesList = new ArrayList<>();
-        try {
-            stylesList = stylesEditorManager.parseStylesFile(FileUtil.readFileIfExist(filePath));
-        } catch (Exception e) {
-            SketchwareUtil.toastError(e.getMessage());
+    public void updateStylesList(String filePath, int updateMode) {
+        boolean isSkippingMode = updateMode == 1;
+        boolean isMergeAndReplace = updateMode == 2;
+
+        ArrayList<StyleModel> defaultStyles = stylesEditorManager.parseStylesFile(FileUtil.readFileIfExist(filePath));
+
+        if (isSkippingMode) {
+            HashSet<String> existingStyleNames = new HashSet<>();
+            for (StyleModel existingStyle : stylesList) {
+                existingStyleNames.add(existingStyle.getStyleName());
+            }
+
+            for (StyleModel style : defaultStyles) {
+                if (!existingStyleNames.contains(style.getStyleName())) {
+                    stylesList.add(style);
+                }
+            }
+        } else {
+            if (isMergeAndReplace) {
+                HashSet<String> newStyleNames = new HashSet<>();
+                for (StyleModel style : defaultStyles) {
+                    newStyleNames.add(style.getStyleName());
+                }
+
+                stylesList.removeIf(existingStyle -> newStyleNames.contains(existingStyle.getStyleName()));
+            } else {
+                stylesList.clear();
+            }
+            stylesList.addAll(defaultStyles);
         }
+
         adapter = new StylesAdapter(stylesList, this);
         binding.recyclerView.setAdapter(adapter);
         updateNoContentLayout();

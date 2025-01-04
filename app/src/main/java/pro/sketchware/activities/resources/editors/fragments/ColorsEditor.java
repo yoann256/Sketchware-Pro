@@ -13,6 +13,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Objects;
 
 import a.a.a.XB;
@@ -48,13 +49,43 @@ public class ColorsEditor extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = ResourcesEditorFragmentBinding.inflate(inflater, container, false);
         initialize();
-        updateColorsList(contentPath);
+        updateColorsList(contentPath, 0);
         ((ResourcesEditorActivity) requireActivity()).checkForInvalidResources();
         return binding.getRoot();
     }
 
-    public void updateColorsList(String contentPath) {
-        colorsEditorManager.parseColorsXML(colorList, FileUtil.readFileIfExist(contentPath));
+    public void updateColorsList(String contentPath, int updateMode) {
+        boolean isSkippingMode = updateMode == 1;
+        boolean isMergeAndReplace = updateMode == 2;
+
+        ArrayList<ColorModel> defaultColors = new ArrayList<>();
+        colorsEditorManager.parseColorsXML(defaultColors, FileUtil.readFileIfExist(contentPath));
+
+        if (isSkippingMode) {
+            HashSet<String> existingColorNames = new HashSet<>();
+            for (ColorModel existingModel : colorList) {
+                existingColorNames.add(existingModel.getColorName());
+            }
+
+            for (ColorModel colorModel : defaultColors) {
+                if (!existingColorNames.contains(colorModel.getColorName())) {
+                    colorList.add(colorModel);
+                }
+            }
+        } else {
+            if (isMergeAndReplace) {
+                HashSet<String> newColorNames = new HashSet<>();
+                for (ColorModel color : defaultColors) {
+                    newColorNames.add(color.getColorName());
+                }
+
+                colorList.removeIf(existingColor -> newColorNames.contains(existingColor.getColorName()));
+            } else {
+                colorList.clear();
+            }
+            colorList.addAll(defaultColors);
+        }
+
         adapter = new ColorsAdapter(colorList, (ResourcesEditorActivity) activity);
         binding.recyclerView.setAdapter(adapter);
         updateNoContentLayout();
@@ -163,6 +194,7 @@ public class ColorsEditor extends Fragment {
             } else {
                 addColor(key, value);
             }
+            updateNoContentLayout();
             dialog.dismiss();
         });
 
