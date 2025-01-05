@@ -37,7 +37,7 @@ public class StringsEditor extends Fragment {
     
     public StringsAdapter adapter;
     
-    private final ArrayList<HashMap<String, Object>> listmap = new ArrayList<>();
+    public final ArrayList<HashMap<String, Object>> listmap = new ArrayList<>();
     private boolean isGeneratedContent;
     private String generatedContent;
     public String filePath;

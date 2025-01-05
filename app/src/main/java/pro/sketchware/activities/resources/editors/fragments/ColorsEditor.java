@@ -47,8 +47,8 @@ public class ColorsEditor extends Fragment {
     private boolean isGeneratedContent;
     private String generatedContent;
     public static String contentPath;
-    private final ArrayList<ColorModel> colorList = new ArrayList<>();
-    private final HashMap <String, String> defaultColors = new HashMap<>();
+    public final ArrayList<ColorModel> colorList = new ArrayList<>();
+    public final HashMap <String, String> defaultColors = new HashMap<>();
 
     public final ColorsEditorManager colorsEditorManager = new ColorsEditorManager();
 
@@ -274,13 +274,6 @@ public class ColorsEditor extends Fragment {
     public void saveColorsFile() {
         if (FileUtil.isExistFile(contentPath) || !colorList.isEmpty()) {
             XmlUtil.saveXml(contentPath, colorsEditorManager.convertListToXml(colorList));
-            HashMap<String, Object> metadata = activity.yq.metadata;
-            for (ColorModel color : colorList) {
-                if (defaultColors.containsKey(color.getColorName())) {
-                    metadata.put(defaultColors.get(color.getColorName()), PropertiesUtil.parseColor(colorsEditorManager.getColorValue(activity.getApplicationContext(), color.getColorValue(), 3)));
-                }
-            }
-            lC.a(activity.sc_id, metadata);
         }
     }
 }

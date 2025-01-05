@@ -16,6 +16,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.tabs.TabLayoutMediator;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -23,6 +24,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import a.a.a.aB;
+import a.a.a.lC;
 import a.a.a.wq;
 
 import a.a.a.yq;
@@ -31,6 +33,7 @@ import a.a.a.jC;
 import mod.hey.studios.code.SrcCodeEditor;
 import mod.hey.studios.util.Helper;
 import pro.sketchware.R;
+import pro.sketchware.activities.resources.editors.models.ColorModel;
 import pro.sketchware.databinding.ResourcesEditorImportDialogBinding;
 import pro.sketchware.databinding.ResourcesEditorsActivityBinding;
 import pro.sketchware.activities.resources.editors.adapters.EditorsAdapter;
@@ -40,6 +43,7 @@ import pro.sketchware.activities.resources.editors.fragments.StylesEditor;
 import pro.sketchware.activities.resources.editors.fragments.ThemesEditor;
 import pro.sketchware.databinding.ResourcesVariantSelectorDialogBinding;
 import pro.sketchware.utility.FileUtil;
+import pro.sketchware.utility.PropertiesUtil;
 import pro.sketchware.utility.SketchwareUtil;
 
 public class ResourcesEditorActivity extends AppCompatActivity {
@@ -278,6 +282,7 @@ public class ResourcesEditorActivity extends AppCompatActivity {
             colorsEditor.saveColorsFile();
             stylesEditor.saveStylesFile();
             themesEditor.saveThemesFile();
+            updateProjectMetadata();
             SketchwareUtil.toast("Save completed");
         } else if (id == R.id.action_select_variant) {
             changeTheVariantDialog();
@@ -300,6 +305,26 @@ public class ResourcesEditorActivity extends AppCompatActivity {
             }
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void updateProjectMetadata() {
+        if (variant.isEmpty()) {
+            HashMap<String, Object> metadata = yq.metadata;
+
+            for (ColorModel color : colorsEditor.colorList) {
+                if (colorsEditor.defaultColors.containsKey(color.getColorName())) {
+                    metadata.put(colorsEditor.defaultColors.get(color.getColorName()), PropertiesUtil.parseColor(colorsEditor.colorsEditorManager.getColorValue(getApplicationContext(), color.getColorValue(), 3)));
+                }
+            }
+
+            for (HashMap<String, Object> map : stringsEditor.listmap) {
+                if (map.get("key").toString().equals("app_name")) {
+                    metadata.put("my_app_name", map.get("text").toString());
+                }
+            }
+
+            lC.a(sc_id, metadata);
+        }
     }
 
     private void setupViewPager() {
