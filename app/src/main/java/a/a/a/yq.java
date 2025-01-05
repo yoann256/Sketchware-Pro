@@ -924,7 +924,11 @@ public class yq {
         return "";
     }
     
-    private String getXMLString() {
+    public String getXMLString() {
+        String filePath = wq.b(sc_id) + "/files/resource/values/strings.xml";
+        if (FileUtil.isExistFile(filePath)) {
+            return FileUtil.readFile(filePath);
+        }
         XmlBuilderHelper stringsFileBuilder = new XmlBuilderHelper();
         stringsFileBuilder.addNonTranslatableString("app_name", applicationName);
         return CommandBlock.applyCommands("strings.xml", stringsFileBuilder.toCode());

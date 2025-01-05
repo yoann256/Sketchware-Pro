@@ -31,12 +31,22 @@ import pro.sketchware.activities.resources.editors.adapters.StringsAdapter;
 
 public class StringsEditor extends Fragment {
 
-    private final ArrayList<HashMap<String, Object>> listmap = new ArrayList<>();
     private ResourcesEditorFragmentBinding binding;
+    
+    private final ResourcesEditorActivity activity;
+    
     public StringsAdapter adapter;
+    
+    private final ArrayList<HashMap<String, Object>> listmap = new ArrayList<>();
+    private boolean isGeneratedContent;
+    private String generatedContent;
     public String filePath;
 
     public final StringsEditorManager stringsEditorManager = new StringsEditorManager();
+
+    public StringsEditor(ResourcesEditorActivity activity) {
+        this.activity = activity;
+    }
 
     @Nullable
     @Override
@@ -44,12 +54,12 @@ public class StringsEditor extends Fragment {
         binding = ResourcesEditorFragmentBinding.inflate(inflater, container, false);
         initialize();
         updateStringsList(filePath, 0);
-        ((ResourcesEditorActivity) requireActivity()).checkForInvalidResources();
+        activity.checkForInvalidResources();
         return binding.getRoot();
     }
 
     private void initialize() {
-        filePath = ((ResourcesEditorActivity) requireActivity()).stringsFilePath;
+        filePath = activity.stringsFilePath;
     }
 
     public void updateStringsList(String filePath, int updateMode) {
@@ -57,7 +67,13 @@ public class StringsEditor extends Fragment {
         boolean isMergeAndReplace = updateMode == 2;
 
         ArrayList<HashMap<String, Object>> defaultStrings = new ArrayList<>();
-        stringsEditorManager.convertXmlStringsToListMap(FileUtil.readFileIfExist(filePath), defaultStrings);
+        if (activity.variant.isEmpty() && !FileUtil.isExistFile(filePath)) {
+            isGeneratedContent = true;
+            generatedContent = activity.yq.getXMLString();
+            stringsEditorManager.convertXmlStringsToListMap(generatedContent, defaultStrings);
+        } else {
+            stringsEditorManager.convertXmlStringsToListMap(FileUtil.readFileIfExist(filePath), defaultStrings);
+        }
 
         if (isSkippingMode) {
             HashSet<String> existingKeys = new HashSet<>();
@@ -85,7 +101,7 @@ public class StringsEditor extends Fragment {
             listmap.addAll(defaultStrings);
         }
 
-        adapter = new StringsAdapter(((ResourcesEditorActivity) requireActivity()), listmap);
+        adapter = new StringsAdapter(activity, listmap);
         binding.recyclerView.setAdapter(adapter);
         updateNoContentLayout();
     }
@@ -105,7 +121,11 @@ public class StringsEditor extends Fragment {
             return false;
         }
         ArrayList<HashMap<String, Object>> cache = new ArrayList<>();
-        stringsEditorManager.convertXmlStringsToListMap(FileUtil.readFileIfExist(filePath), cache);
+        if (isGeneratedContent) {
+            stringsEditorManager.convertXmlStringsToListMap(generatedContent, cache);
+        } else {
+            stringsEditorManager.convertXmlStringsToListMap(FileUtil.readFileIfExist(filePath), cache);
+        }
         String cacheString = new Gson().toJson(cache);
         String cacheListmap = new Gson().toJson(listmap);
         return !cacheListmap.equals(cacheString) && !listmap.isEmpty();

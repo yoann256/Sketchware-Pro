@@ -92,7 +92,7 @@ public class ResourcesEditorActivity extends AppCompatActivity {
     private void initialize(String variant) {
         this.variant = variant;
 
-        stringsEditor = new StringsEditor();
+        stringsEditor = new StringsEditor(this);
         colorsEditor = new ColorsEditor();
         stylesEditor = new StylesEditor(this);
         themesEditor = new ThemesEditor();

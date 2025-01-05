@@ -136,6 +136,9 @@ public class StylesEditor extends Fragment {
         if (!FileUtil.isExistFile(filePath) && stylesList.isEmpty()) {
             return false;
         }
+        if (isGeneratedContent && generatedContent.equals(stylesEditorManager.convertStylesToXML(stylesList))) {
+            return false;
+        }
         Gson gson = new Gson();
         return !gson.toJson(stylesList).equals(gson.toJson(stylesEditorManager.parseStylesFile(FileUtil.readFileIfExist(filePath))));
     }
