@@ -212,12 +212,15 @@ public class yq {
     
     private final Context context;
 
+    public final HashMap<String, Object> metadata;
+
     public yq(Context context, String sc_id) {
         this(context, wq.d(sc_id), lC.b(sc_id));
     }
 
     public yq(Context context, String myscFolderPath, HashMap<String, Object> metadata) {
         this.context = context;
+        this.metadata = metadata;
         N = new jq();
         sc_id = yB.c(metadata, "sc_id");
         N.sc_id = sc_id;
@@ -935,6 +938,10 @@ public class yq {
     }
     
     public String getXMLColor() {
+        String filePath = wq.b(sc_id) + "/files/resource/values/colors.xml";
+        if (FileUtil.isExistFile(filePath)) {
+            return FileUtil.readFile(filePath);
+        }
         XmlBuilderHelper colorsFileBuilder = new XmlBuilderHelper();
         colorsFileBuilder.addColor("colorPrimary", String.format("#%06X", colorPrimary & 0xffffff));
         colorsFileBuilder.addColor("colorPrimaryDark", String.format("#%06X", colorPrimaryDark & 0xffffff));

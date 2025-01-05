@@ -12,14 +12,17 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Objects;
 
 import a.a.a.XB;
 import a.a.a.Zx;
 import a.a.a.aB;
+import a.a.a.lC;
 import a.a.a.xB;
 import mod.hey.studios.util.Helper;
+import mod.hey.studios.util.ProjectFile;
 import pro.sketchware.R;
 import pro.sketchware.activities.resources.editors.ResourcesEditorActivity;
 import pro.sketchware.activities.resources.editors.utils.ColorsEditorManager;
@@ -45,6 +48,7 @@ public class ColorsEditor extends Fragment {
     private String generatedContent;
     public static String contentPath;
     private final ArrayList<ColorModel> colorList = new ArrayList<>();
+    private final HashMap <String, String> defaultColors = new HashMap<>();
 
     public final ColorsEditorManager colorsEditorManager = new ColorsEditorManager();
 
@@ -70,7 +74,7 @@ public class ColorsEditor extends Fragment {
 
         if (activity.variant.isEmpty() && !FileUtil.isExistFile(contentPath)) {
             isGeneratedContent = true;
-            generatedContent = activity.yq.getXMLStyle();
+            generatedContent = activity.yq.getXMLColor();
             colorsEditorManager.parseColorsXML(defaultColors, generatedContent);
         } else {
             colorsEditorManager.parseColorsXML(defaultColors, FileUtil.readFileIfExist(contentPath));
@@ -125,6 +129,11 @@ public class ColorsEditor extends Fragment {
         colorpicker = new Zx(activity, 0xFFFFFFFF, false, false);
 
         colorsEditorManager.parseColorsXML(colorList, FileUtil.readFileIfExist(contentPath));
+        defaultColors.put("colorAccent", ProjectFile.COLOR_ACCENT);
+        defaultColors.put("colorPrimary", ProjectFile.COLOR_PRIMARY);
+        defaultColors.put("colorPrimaryDark", ProjectFile.COLOR_PRIMARY_DARK);
+        defaultColors.put("colorControlHighlight", ProjectFile.COLOR_CONTROL_HIGHLIGHT);
+        defaultColors.put("colorControlNormal", ProjectFile.COLOR_CONTROL_NORMAL);
     }
 
     public boolean checkForUnsavedChanges() {
@@ -265,6 +274,13 @@ public class ColorsEditor extends Fragment {
     public void saveColorsFile() {
         if (FileUtil.isExistFile(contentPath) || !colorList.isEmpty()) {
             XmlUtil.saveXml(contentPath, colorsEditorManager.convertListToXml(colorList));
+            HashMap<String, Object> metadata = activity.yq.metadata;
+            for (ColorModel color : colorList) {
+                if (defaultColors.containsKey(color.getColorName())) {
+                    metadata.put(defaultColors.get(color.getColorName()), PropertiesUtil.parseColor(colorsEditorManager.getColorValue(activity.getApplicationContext(), color.getColorValue(), 3)));
+                }
+            }
+            lC.a(activity.sc_id, metadata);
         }
     }
 }
