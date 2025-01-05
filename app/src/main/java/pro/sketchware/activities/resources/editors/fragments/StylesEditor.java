@@ -46,12 +46,23 @@ import java.util.Objects;
 public class StylesEditor extends Fragment {
 
     private ResourcesEditorFragmentBinding binding;
+
     public StylesAdapter adapter;
     private PropertyInputItem.AttributesAdapter attributesAdapter;
+
     private final ArrayList<StyleModel> stylesList = new ArrayList<>();
+
     public final StylesEditorManager stylesEditorManager = new StylesEditorManager();
     private final AttributeSuggestions attributeSuggestions = new AttributeSuggestions();
+
+    private boolean isGeneratedContent;
+    private String generatedContent;
     private String filePath;
+    private final ResourcesEditorActivity activity;
+
+    public StylesEditor(ResourcesEditorActivity activity) {
+        this.activity = activity;
+    }
 
     @Nullable
     @Override
@@ -59,7 +70,7 @@ public class StylesEditor extends Fragment {
         binding = ResourcesEditorFragmentBinding.inflate(inflater, container, false);
         initialize();
         updateStylesList(filePath, 0);
-        ((ResourcesEditorActivity) requireActivity()).checkForInvalidResources();
+        activity.checkForInvalidResources();
         return binding.getRoot();
     }
 
@@ -67,7 +78,15 @@ public class StylesEditor extends Fragment {
         boolean isSkippingMode = updateMode == 1;
         boolean isMergeAndReplace = updateMode == 2;
 
-        ArrayList<StyleModel> defaultStyles = stylesEditorManager.parseStylesFile(FileUtil.readFileIfExist(filePath));
+        ArrayList<StyleModel> defaultStyles;
+
+        if (activity.variant.isEmpty() && !FileUtil.isExistFile(filePath)) {
+            isGeneratedContent = true;
+            generatedContent = activity.yq.getXMLStyle();
+            defaultStyles = stylesEditorManager.parseStylesFile(generatedContent);
+        } else {
+            defaultStyles = stylesEditorManager.parseStylesFile(FileUtil.readFileIfExist(filePath));
+        }
 
         if (isSkippingMode) {
             HashSet<String> existingStyleNames = new HashSet<>();
@@ -100,7 +119,7 @@ public class StylesEditor extends Fragment {
     }
 
     private void initialize() {
-        filePath = ((ResourcesEditorActivity) requireActivity()).stylesFilePath;
+        filePath = activity.stylesFilePath;
     }
 
     private void updateNoContentLayout() {

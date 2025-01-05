@@ -14,6 +14,7 @@ import java.util.Map;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import a.a.a.XmlBuilderHelper;
 import pro.sketchware.activities.resources.editors.models.StyleModel;
 
 public class StylesEditorManager {
@@ -58,31 +59,24 @@ public class StylesEditorManager {
     }
 
     public String convertStylesToXML(ArrayList<StyleModel> stylesList) {
-        StringBuilder xmlContent = new StringBuilder();
+        // Create an instance of XmlBuilderHelper
+        XmlBuilderHelper stylesFileBuilder = new XmlBuilderHelper();
 
-        xmlContent.append("<resources>\n\n");
-
+        // Iterate through the list of styles and add them to the builder
         for (StyleModel style : stylesList) {
-            xmlContent.append("    <style name=\"").append(style.getStyleName()).append("\"");
+            // Provide the style name and parent (or null if no parent)
+            String parentStyle = (style.getParent() != null && !style.getParent().isEmpty()) ? style.getParent() : null;
+            stylesFileBuilder.addStyle(style.getStyleName(), parentStyle);
 
-            if (style.getParent() != null && !style.getParent().isEmpty()) {
-                xmlContent.append(" parent=\"").append(style.getParent()).append("\"");
-            }
-
-            xmlContent.append(">\n");
-
+            // Add attributes as <item> elements to the current style
             Map<String, String> attributes = style.getAttributes();
-            for (String attrName : attributes.keySet()) {
-                String attrValue = attributes.get(attrName);
-                xmlContent.append("        <item name=\"").append(attrName).append("\">").append(attrValue).append("</item>\n");
+            for (Map.Entry<String, String> entry : attributes.entrySet()) {
+                stylesFileBuilder.addItemToStyle(style.getStyleName(), entry.getKey(), entry.getValue());
             }
-
-            xmlContent.append("    </style>\n\n");
         }
 
-        xmlContent.append("</resources>");
-
-        return xmlContent.toString();
+        // Generate and return the XML code
+        return stylesFileBuilder.toCode();
     }
 
     public ArrayList<StyleModel> parseStylesFile(String content) {

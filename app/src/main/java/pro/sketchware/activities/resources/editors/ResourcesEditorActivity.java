@@ -25,6 +25,9 @@ import java.util.regex.Pattern;
 import a.a.a.aB;
 import a.a.a.wq;
 
+import a.a.a.yq;
+import a.a.a.jC;
+
 import mod.hey.studios.code.SrcCodeEditor;
 import mod.hey.studios.util.Helper;
 import pro.sketchware.R;
@@ -44,6 +47,8 @@ public class ResourcesEditorActivity extends AppCompatActivity {
     private ResourcesEditorsActivityBinding binding;
 
     private MaterialAlertDialogBuilder builder;
+
+    public yq yq;
 
     public boolean isComingFromSrcCodeEditor;
 
@@ -70,6 +75,13 @@ public class ResourcesEditorActivity extends AppCompatActivity {
         setSupportActionBar(binding.topAppBar);
 
         sc_id = getIntent().getStringExtra("sc_id");
+
+        yq = new yq(getApplicationContext(), sc_id);
+        var fileManager = jC.b(sc_id);
+        var dataManager = jC.a(sc_id);
+        var libraryManager = jC.c(sc_id);
+        yq.a(libraryManager, fileManager, dataManager, false); // Initialize project metadata
+
         if (getIntent().hasExtra("variant")) {
             initialize(getIntent().getStringExtra("variant"));
         } else {
@@ -82,7 +94,7 @@ public class ResourcesEditorActivity extends AppCompatActivity {
 
         stringsEditor = new StringsEditor();
         colorsEditor = new ColorsEditor();
-        stylesEditor = new StylesEditor();
+        stylesEditor = new StylesEditor(this);
         themesEditor = new ThemesEditor();
 
         String projectResourcesDirectory =
