@@ -39,8 +39,8 @@ import pro.sketchware.utility.SketchwareUtil;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 public class StylesEditor extends Fragment {
@@ -219,12 +219,12 @@ public class StylesEditor extends Fragment {
         attributesAdapter.setOnItemClickListener(
                 new PropertyInputItem.AttributesAdapter.ItemClickListener() {
                     @Override
-                    public void onItemClick(Map<String, String> attributes, String attr) {
+                    public void onItemClick(LinkedHashMap<String, String> attributes, String attr) {
                         showAttributeDialog(style, attr);
                     }
 
                     @Override
-                    public void onItemLongClick(Map<String, String> attributes, String attr) {
+                    public void onItemLongClick(LinkedHashMap<String, String> attributes, String attr) {
                         new MaterialAlertDialogBuilder(requireContext())
                                 .setTitle("Warning")
                                 .setMessage("Are you sure you want to delete " + attr + "?")
@@ -300,7 +300,7 @@ public class StylesEditor extends Fragment {
         dialog.b("Edit all attributes");
         dialog.b(Helper.getResString(R.string.common_word_save), v1 -> {
             try {
-                Map<String, String> attributes = stylesEditorManager.convertAttributesToMap(binding.edInput.getText().toString());
+                LinkedHashMap<String, String> attributes = stylesEditorManager.convertAttributesToMap(binding.edInput.getText().toString());
                 style.setAttributes(attributes);
                 attributesAdapter.submitList(new ArrayList<>(attributes.keySet()));
             } catch (Exception e) {

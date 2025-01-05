@@ -625,13 +625,13 @@ public class PropertyInputItem extends RelativeLayout implements View.OnClickLis
         adapter.setOnItemClickListener(
                 new AttributesAdapter.ItemClickListener() {
                     @Override
-                    public void onItemClick(Map<String, String> attributes, String attr) {
+                    public void onItemClick(LinkedHashMap<String, String> attributes, String attr) {
                         setAttributeValue(attr, attributes);
                         dialog.dismiss();
                     }
 
                     @Override
-                    public void onItemLongClick(Map<String, String> attributes, String attr) {
+                    public void onItemLongClick(LinkedHashMap<String, String> attributes, String attr) {
                         dialog.dismiss();
                         var builder =
                                 new MaterialAlertDialogBuilder(getContext())
@@ -786,8 +786,8 @@ public class PropertyInputItem extends RelativeLayout implements View.OnClickLis
         if (valueChangeListener != null) valueChangeListener.a(key, value);
     }
 
-    private Map<String, String> readAttributes() {
-        Map<String, String> attributes = new LinkedHashMap<>();
+    private LinkedHashMap<String, String> readAttributes() {
+        LinkedHashMap<String, String> attributes = new LinkedHashMap<>();
 
         try {
             XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
@@ -830,10 +830,10 @@ public class PropertyInputItem extends RelativeLayout implements View.OnClickLis
             super(DIFF_CALLBACK);
         }
 
-        private Map<String, String> attributes;
+        private LinkedHashMap<String, String> attributes;
         private ItemClickListener listener;
 
-        public void setAttributes(Map<String, String> attributes) {
+        public void setAttributes(LinkedHashMap<String, String> attributes) {
             this.attributes = attributes;
         }
 
@@ -882,9 +882,9 @@ public class PropertyInputItem extends RelativeLayout implements View.OnClickLis
 
         public interface ItemClickListener {
 
-            void onItemClick(Map<String, String> attributes, String item);
+            void onItemClick(LinkedHashMap<String, String> attributes, String item);
 
-            void onItemLongClick(Map<String, String> attributes, String item);
+            void onItemLongClick(LinkedHashMap<String, String> attributes, String item);
         }
     }
 }

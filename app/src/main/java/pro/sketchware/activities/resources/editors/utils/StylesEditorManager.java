@@ -8,7 +8,7 @@ import org.xml.sax.InputSource;
 
 import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -36,8 +36,8 @@ public class StylesEditorManager {
         return attributesCode.toString().trim();
     }
 
-    public Map<String, String> convertAttributesToMap(String attributesCode) {
-        Map<String, String> attributesMap = new HashMap<>();
+    public LinkedHashMap<String, String> convertAttributesToMap(String attributesCode) {
+        LinkedHashMap<String, String> attributesMap = new LinkedHashMap<>();
 
 
         String[] lines = attributesCode.split("\n");
@@ -100,7 +100,7 @@ public class StylesEditorManager {
 
                     String parent = element.hasAttribute("parent") ? element.getAttribute("parent") : null;
 
-                    HashMap<String, String> attributes = new HashMap<>();
+                    LinkedHashMap<String, String> attributes = new LinkedHashMap<>();
                     NodeList childNodes = element.getChildNodes();
                     for (int j = 0; j < childNodes.getLength(); j++) {
                         Node childNode = childNodes.item(j);

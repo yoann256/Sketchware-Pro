@@ -1,15 +1,14 @@
 package pro.sketchware.activities.resources.editors.models;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.LinkedHashMap;
 
 public class StyleModel {
 
     private String styleName;
     private String parent;
-    private Map<String, String> attributes;
+    private LinkedHashMap<String, String> attributes;
 
-    public StyleModel(String styleName, String parent, Map<String, String> attributes) {
+    public StyleModel(String styleName, String parent, LinkedHashMap<String, String> attributes) {
         this.styleName = styleName;
         this.parent = parent;
         this.attributes = attributes;
@@ -18,7 +17,7 @@ public class StyleModel {
     public StyleModel(String styleName, String parent) {
         this.styleName = styleName;
         this.parent = parent;
-        this.attributes = new HashMap<>();
+        this.attributes = new LinkedHashMap<>();
     }
 
     public String getStyleName() {
@@ -37,17 +36,17 @@ public class StyleModel {
         this.parent = parent;
     }
 
-    public Map<String, String> getAttributes() {
+    public LinkedHashMap<String, String> getAttributes() {
         return attributes;
     }
 
-    public void setAttributes(Map<String, String> attributes) {
+    public void setAttributes(LinkedHashMap<String, String> attributes) {
         this.attributes = attributes;
     }
 
     public void addAttribute(String attrName, String attrValue) {
         if (attributes == null) {
-            attributes = new HashMap<>();
+            attributes = new LinkedHashMap<>();
         }
         attributes.put(attrName, attrValue);
     }
