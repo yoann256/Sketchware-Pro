@@ -1,6 +1,5 @@
 package pro.sketchware.activities.resources.editors.fragments;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -35,14 +34,23 @@ import pro.sketchware.utility.XmlUtil;
 
 public class ColorsEditor extends Fragment {
 
-    public static String contentPath;
-    private final ArrayList<ColorModel> colorList = new ArrayList<>();
     private ResourcesEditorFragmentBinding binding;
+
+    private final ResourcesEditorActivity activity;
+
     public ColorsAdapter adapter;
-    private Activity activity;
     private Zx colorpicker;
 
+    private boolean isGeneratedContent;
+    private String generatedContent;
+    public static String contentPath;
+    private final ArrayList<ColorModel> colorList = new ArrayList<>();
+
     public final ColorsEditorManager colorsEditorManager = new ColorsEditorManager();
+
+    public ColorsEditor(ResourcesEditorActivity activity) {
+        this.activity = activity;
+    }
 
     @Nullable
     @Override
@@ -50,7 +58,7 @@ public class ColorsEditor extends Fragment {
         binding = ResourcesEditorFragmentBinding.inflate(inflater, container, false);
         initialize();
         updateColorsList(contentPath, 0);
-        ((ResourcesEditorActivity) requireActivity()).checkForInvalidResources();
+        activity.checkForInvalidResources();
         return binding.getRoot();
     }
 
@@ -59,7 +67,14 @@ public class ColorsEditor extends Fragment {
         boolean isMergeAndReplace = updateMode == 2;
 
         ArrayList<ColorModel> defaultColors = new ArrayList<>();
-        colorsEditorManager.parseColorsXML(defaultColors, FileUtil.readFileIfExist(contentPath));
+
+        if (activity.variant.isEmpty() && !FileUtil.isExistFile(contentPath)) {
+            isGeneratedContent = true;
+            generatedContent = activity.yq.getXMLStyle();
+            colorsEditorManager.parseColorsXML(defaultColors, generatedContent);
+        } else {
+            colorsEditorManager.parseColorsXML(defaultColors, FileUtil.readFileIfExist(contentPath));
+        }
 
         if (isSkippingMode) {
             HashSet<String> existingColorNames = new HashSet<>();
@@ -86,7 +101,7 @@ public class ColorsEditor extends Fragment {
             colorList.addAll(defaultColors);
         }
 
-        adapter = new ColorsAdapter(colorList, (ResourcesEditorActivity) activity);
+        adapter = new ColorsAdapter(colorList, activity);
         binding.recyclerView.setAdapter(adapter);
         updateNoContentLayout();
     }
@@ -102,9 +117,8 @@ public class ColorsEditor extends Fragment {
     }
 
     private void initialize() {
-        activity = requireActivity();
 
-        contentPath = ((ResourcesEditorActivity) activity).colorsFilePath;
+        contentPath = activity.colorsFilePath;
 
         colorsEditorManager.contentPath = contentPath;
 
@@ -119,6 +133,9 @@ public class ColorsEditor extends Fragment {
         }
         String originalXml = FileUtil.readFileIfExist(contentPath);
         String newXml = colorsEditorManager.convertListToXml(colorList);
+        if (isGeneratedContent && generatedContent.equals(newXml)) {
+            return false;
+        }
         return !Objects.equals(XmlUtil.replaceXml(newXml), XmlUtil.replaceXml(originalXml));
     }
 

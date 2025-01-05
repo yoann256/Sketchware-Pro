@@ -934,7 +934,7 @@ public class yq {
         return CommandBlock.applyCommands("strings.xml", stringsFileBuilder.toCode());
     }
     
-    private String getXMLColor() {
+    public String getXMLColor() {
         XmlBuilderHelper colorsFileBuilder = new XmlBuilderHelper();
         colorsFileBuilder.addColor("colorPrimary", String.format("#%06X", colorPrimary & 0xffffff));
         colorsFileBuilder.addColor("colorPrimaryDark", String.format("#%06X", colorPrimaryDark & 0xffffff));
