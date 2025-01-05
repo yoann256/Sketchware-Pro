@@ -1,6 +1,10 @@
 package pro.sketchware.activities.resources.editors.fragments;
 
+import static pro.sketchware.utility.UI.animateLayoutChanges;
+
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,7 +23,6 @@ import java.util.Objects;
 import a.a.a.XB;
 import a.a.a.Zx;
 import a.a.a.aB;
-import a.a.a.lC;
 import a.a.a.xB;
 import mod.hey.studios.util.Helper;
 import mod.hey.studios.util.ProjectFile;
@@ -172,6 +175,7 @@ public class ColorsEditor extends Fragment {
         if (colorModel != null) {
             dialogBinding.colorKeyInput.setText(colorModel.getColorName());
             dialogBinding.colorPreview.setBackgroundColor(PropertiesUtil.parseColor(colorsEditorManager.getColorValue(activity.getApplicationContext(), colorModel.getColorValue(), 3)));
+            dialogBinding.importantNote.setVisibility(defaultColors.containsKey(colorModel.getColorName()) ? View.VISIBLE : View.GONE);
 
             if (colorModel.getColorValue().startsWith("@")) {
                 dialogBinding.colorValueInput.setText(colorModel.getColorValue().replace("@", ""));
@@ -190,6 +194,27 @@ public class ColorsEditor extends Fragment {
             dialog.b("Create new color");
             dialogBinding.colorPreview.setBackgroundColor(0xFFFFFF);
         }
+
+        dialogBinding.importantNote.setOnClickListener(view -> {
+            animateLayoutChanges(dialogBinding.getRoot());
+            dialogBinding.imgColorGuide.setVisibility(dialogBinding.imgColorGuide.getVisibility() == View.GONE ? View.VISIBLE : View.GONE);
+        });
+
+        dialogBinding.colorKeyInput.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                animateLayoutChanges(dialogBinding.getRoot());
+                dialogBinding.importantNote.setVisibility(defaultColors.containsKey(s.toString()) ? View.VISIBLE : View.GONE);
+            }
+        });
 
         dialog.b("Save", v1 -> {
             String key = Objects.requireNonNull(dialogBinding.colorKeyInput.getText()).toString();

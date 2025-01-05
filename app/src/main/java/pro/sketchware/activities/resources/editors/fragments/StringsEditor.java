@@ -1,6 +1,10 @@
 package pro.sketchware.activities.resources.editors.fragments;
 
+import static pro.sketchware.utility.UI.animateLayoutChanges;
+
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -135,6 +139,21 @@ public class StringsEditor extends Fragment {
         aB dialog = new aB(requireActivity());
         ViewStringEditorAddBinding binding = ViewStringEditorAddBinding.inflate(getLayoutInflater());
         dialog.b("Create new string");
+        binding.stringKeyInput.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                animateLayoutChanges(binding.getRoot());
+                binding.importantNote.setVisibility(s.toString().equals("app_name") ? View.VISIBLE : View.GONE);
+            }
+        });
         dialog.b("Create", v1 -> {
             String key = Objects.requireNonNull(binding.stringKeyInput.getText()).toString();
             String value = Objects.requireNonNull(binding.stringValueInput.getText()).toString();

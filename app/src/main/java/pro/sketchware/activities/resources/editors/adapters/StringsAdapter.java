@@ -4,7 +4,12 @@ import static com.besome.sketch.design.DesignActivity.sc_id;
 import static com.besome.sketch.editor.LogicEditorActivity.getAllJavaFileNames;
 import static com.besome.sketch.editor.LogicEditorActivity.getAllXmlFileNames;
 
+import static pro.sketchware.utility.UI.animateLayoutChanges;
+
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
@@ -68,6 +73,21 @@ public class StringsAdapter extends RecyclerView.Adapter<StringsAdapter.ViewHold
                     ViewStringEditorAddBinding dialogBinding =
                             ViewStringEditorAddBinding.inflate(activity.getLayoutInflater());
 
+                    dialogBinding.stringKeyInput.addTextChangedListener(new TextWatcher() {
+                        @Override
+                        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                        }
+
+                        @Override
+                        public void onTextChanged(CharSequence s, int start, int before, int count) {
+                        }
+
+                        @Override
+                        public void afterTextChanged(Editable s) {
+                            animateLayoutChanges(dialogBinding.getRoot());
+                            dialogBinding.importantNote.setVisibility(s.toString().equals("app_name") ? View.VISIBLE : View.GONE);
+                        }
+                    });
                     dialogBinding.stringKeyInput.setText((String) currentItem.get("key"));
                     dialogBinding.stringValueInput.setText((String) currentItem.get("text"));
 

@@ -2255,7 +2255,10 @@ Please try again later"</string>
     
     <string name="code_viewer">Code Viewer</string>
 
-    <string name="resources_manager_xml_load_failed_message">data loading failed in \"%s\" \n Please open the code editor to fix the issue manually</string>
+    <string name="resources_manager_xml_load_failed_message">data loading failed in \"%s\" \nPlease open the code editor to fix the issue manually</string>
     <string name="resources_manager_xml_load_failed_title">Data Loading Failed</string>
+    <string name="resources_manager_xml_important_note_title">Important Note :</string>
+    <string name="resources_manager_xml_important_note_message_strings">Changing the `app_name` value will directly affect this project\'s application name</string>
+    <string name="resources_manager_xml_important_note_message_colors">Changing primary colors will affect the app\'s visual theme, including buttons and highlights</string>
 
 </resources>
