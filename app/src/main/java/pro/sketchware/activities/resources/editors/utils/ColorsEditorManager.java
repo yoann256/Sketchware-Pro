@@ -4,21 +4,19 @@ import static com.besome.sketch.design.DesignActivity.sc_id;
 import static mod.hey.studios.util.ProjectFile.getDefaultColor;
 
 import android.content.Context;
-import android.util.Xml;
 
 import androidx.core.content.ContextCompat;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserFactory;
-import org.xmlpull.v1.XmlSerializer;
 
 import java.io.StringReader;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
+import a.a.a.XmlBuilderHelper;
 import a.a.a.lC;
 import a.a.a.wq;
 import a.a.a.yB;
@@ -95,7 +93,11 @@ public class ColorsEditorManager {
 
     public void parseColorsXML(ArrayList<ColorModel> colorList, String colorXml) {
         isDataLoadingFailed = false;
-        ArrayList<String> foundedPrimaryColors = new ArrayList<>();
+        ArrayList<String> foundPrimaryColors = new ArrayList<>();
+        ArrayList<ColorModel> colorOrderList = new ArrayList<>();
+        ArrayList<ColorModel> otherColors = new ArrayList<>();
+        boolean hasChanges = false; // Flag to track changes
+
         try {
             colorList.clear();
             XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
@@ -106,6 +108,7 @@ public class ColorsEditorManager {
             String colorName = null;
             String colorValue = null;
 
+            // Parsing the color XML
             while (eventType != XmlPullParser.END_DOCUMENT) {
                 String tagName = parser.getName();
                 switch (eventType) {
@@ -118,35 +121,53 @@ public class ColorsEditorManager {
                         colorValue = parser.getText();
                         break;
                     case XmlPullParser.END_TAG:
-                        if ("color".equals(tagName)) {
-                            if ((colorName != null) && PropertiesUtil.isHexColor(getColorValue(SketchApplication.getContext(), colorValue, 4))) {
+                        if ("color".equals(tagName) && colorName != null) {
+                            if (PropertiesUtil.isHexColor(getColorValue(SketchApplication.getContext(), colorValue, 4))) {
+                                ColorModel colorModel = new ColorModel(colorName, colorValue);
                                 if (defaultColors != null && defaultColors.containsKey(colorName)) {
-                                    foundedPrimaryColors.add(colorName);
+                                    foundPrimaryColors.add(colorName);
+                                    colorOrderList.add(colorModel);
+                                } else {
+                                    otherColors.add(colorModel);
                                 }
-                                colorList.add(new ColorModel(colorName, colorValue));
                             }
                         }
                         break;
                 }
                 eventType = parser.next();
             }
+
             if (isDefaultVariant && defaultColors != null && sc_id != null) {
                 HashMap<String, Object> metadata = lC.b(sc_id);
                 Set<String> missingKeys = new HashSet<>(defaultColors.keySet());
-                foundedPrimaryColors.forEach(missingKeys::remove);
-                if (!missingKeys.isEmpty()) {
-                    ArrayList<String> keys = new ArrayList<>(defaultColors.keySet());
-                    for (int i = 0; i < keys.size(); i++) {
-                        String color = keys.get(i);
-                        if (missingKeys.contains(color)) {
-                            String colorHex = String.format("#%06X", yB.a(metadata, defaultColors.get(color), getDefaultColor(defaultColors.get(color))) & 0xffffff);
-                            colorList.add(i, new ColorModel(color, colorHex));
-                        }
-                    }
+                foundPrimaryColors.forEach(missingKeys::remove);
 
-                    XmlUtil.saveXml(wq.b(sc_id) + "/files/resource/values/colors.xml", convertListToXml(colorList));
+                if (!missingKeys.isEmpty()) {
+                    for (String missingColor : missingKeys) {
+                        String colorHex = String.format("#%06X", yB.a(metadata, defaultColors.get(missingColor), getDefaultColor(defaultColors.get(missingColor))) & 0xffffff);
+                        ColorModel missingColorModel = new ColorModel(missingColor, colorHex);
+                        colorOrderList.add(missingColorModel);
+                        hasChanges = true;
+                    }
                 }
             }
+
+            // Reorder colors to ensure default colors are at the top
+            // Clear the list and add default colors first, followed by other colors
+            ArrayList<ColorModel> previousColorList = new ArrayList<>(colorList); // Save the original list for comparison
+            colorList.clear();
+            colorList.addAll(colorOrderList);
+            colorList.addAll(otherColors);
+
+            if (!previousColorList.equals(colorList)) {
+                hasChanges = true;
+            }
+
+            // Save the updated color XML only if there are changes
+            if (hasChanges) {
+                XmlUtil.saveXml(wq.b(sc_id) + "/files/resource/values/colors.xml", convertListToXml(colorList));
+            }
+
         } catch (Exception ignored) {
             isDataLoadingFailed = !colorXml.trim().isEmpty();
         }
@@ -154,26 +175,13 @@ public class ColorsEditorManager {
 
     public String convertListToXml(ArrayList<ColorModel> colorList) {
         try {
-            XmlSerializer xmlSerializer = Xml.newSerializer();
-            StringWriter stringWriter = new StringWriter();
-
-            xmlSerializer.setOutput(stringWriter);
-            xmlSerializer.startTag(null, "resources");
-            xmlSerializer.text("\n");
+            XmlBuilderHelper colorsFileBuilder = new XmlBuilderHelper();
 
             for (ColorModel colorModel : colorList) {
-                xmlSerializer.startTag(null, "color");
-                xmlSerializer.attribute(null, "name", colorModel.getColorName());
-                xmlSerializer.text(colorModel.getColorValue());
-                xmlSerializer.endTag(null, "color");
-                xmlSerializer.text("\n");
+                colorsFileBuilder.addColor(colorModel.getColorName(), colorModel.getColorValue());
             }
 
-            xmlSerializer.endTag(null, "resources");
-            xmlSerializer.text("\n");
-            xmlSerializer.endDocument();
-
-            return stringWriter.toString();
+            return colorsFileBuilder.toCode();
 
         } catch (Exception ignored) {
         }
