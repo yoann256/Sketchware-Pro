@@ -15,12 +15,21 @@ import java.util.Map;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import a.a.a.lC;
+import a.a.a.wq;
+import a.a.a.yB;
+import pro.sketchware.utility.XmlUtil;
+
 public class StringsEditorManager {
 
+    public boolean isDefaultVariant = true;
     public boolean isDataLoadingFailed;
+    public boolean hasAppNameKey;
+    public String sc_id;
 
     public void convertXmlStringsToListMap(final String xmlString, final ArrayList<HashMap<String, Object>> listMap) {
         isDataLoadingFailed = false;
+        hasAppNameKey = false;
         try {
             listMap.clear();
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -32,22 +41,33 @@ public class StringsEditorManager {
             for (int i = 0; i < nodeList.getLength(); i++) {
                 Node node = nodeList.item(i);
                 if (node.getNodeType() == Node.ELEMENT_NODE) {
-                    HashMap<String, Object> map = getStringHashMap((Element) node);
-                    listMap.add(map);
+                    addToListMap(listMap, (Element) node);
                 }
+            }
+            if (isDefaultVariant && !hasAppNameKey) {
+                HashMap<String, Object> map = new HashMap<>();
+                map.put("key", "app_name");
+                map.put("text", yB.c(lC.b(sc_id), "my_app_name"));
+                listMap.add(0, map);
+                XmlUtil.saveXml(wq.b(sc_id) + "/files/resource/values/strings.xml", convertListMapToXmlStrings(listMap));
             }
         } catch (Exception ignored) {
             isDataLoadingFailed = !xmlString.trim().isEmpty();
         }
     }
 
-    private HashMap<String, Object> getStringHashMap(Element node) {
+    private void addToListMap(ArrayList<HashMap<String, Object>> list, Element node) {
         HashMap<String, Object> map = new HashMap<>();
         String key = node.getAttribute("name");
         String value = node.getTextContent();
         map.put("key", key);
         map.put("text", value);
-        return map;
+        if (key.equals("app_name")) {
+            hasAppNameKey = true;
+            list.add(0, map);
+        } else {
+            list.add(map);
+        }
     }
 
     public boolean isXmlStringsExist(ArrayList<HashMap<String, Object>> listMap, String value) {

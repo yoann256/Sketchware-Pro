@@ -1,5 +1,8 @@
 package pro.sketchware.activities.resources.editors.utils;
 
+import static com.besome.sketch.design.DesignActivity.sc_id;
+import static mod.hey.studios.util.ProjectFile.getDefaultColor;
+
 import android.content.Context;
 import android.util.Xml;
 
@@ -12,16 +15,26 @@ import org.xmlpull.v1.XmlSerializer;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
+import a.a.a.lC;
+import a.a.a.wq;
+import a.a.a.yB;
 import pro.sketchware.SketchApplication;
 import pro.sketchware.activities.resources.editors.models.ColorModel;
 import pro.sketchware.utility.FileUtil;
 import pro.sketchware.utility.PropertiesUtil;
+import pro.sketchware.utility.XmlUtil;
 
 public class ColorsEditorManager {
 
     public String contentPath;
     public boolean isDataLoadingFailed;
+    public boolean isDefaultVariant = true;
+
+    public HashMap<String, String> defaultColors;
 
     public String getColorValue(Context context, String colorValue, int referencingLimit) {
         if (colorValue == null || referencingLimit <= 0) {
@@ -82,6 +95,7 @@ public class ColorsEditorManager {
 
     public void parseColorsXML(ArrayList<ColorModel> colorList, String colorXml) {
         isDataLoadingFailed = false;
+        ArrayList<String> foundedPrimaryColors = new ArrayList<>();
         try {
             colorList.clear();
             XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
@@ -106,12 +120,32 @@ public class ColorsEditorManager {
                     case XmlPullParser.END_TAG:
                         if ("color".equals(tagName)) {
                             if ((colorName != null) && PropertiesUtil.isHexColor(getColorValue(SketchApplication.getContext(), colorValue, 4))) {
+                                if (defaultColors != null && defaultColors.containsKey(colorName)) {
+                                    foundedPrimaryColors.add(colorName);
+                                }
                                 colorList.add(new ColorModel(colorName, colorValue));
                             }
                         }
                         break;
                 }
                 eventType = parser.next();
+            }
+            if (isDefaultVariant && defaultColors != null && sc_id != null) {
+                HashMap<String, Object> metadata = lC.b(sc_id);
+                Set<String> missingKeys = new HashSet<>(defaultColors.keySet());
+                foundedPrimaryColors.forEach(missingKeys::remove);
+                if (!missingKeys.isEmpty()) {
+                    ArrayList<String> keys = new ArrayList<>(defaultColors.keySet());
+                    for (int i = 0; i < keys.size(); i++) {
+                        String color = keys.get(i);
+                        if (missingKeys.contains(color)) {
+                            String colorHex = String.format("#%06X", yB.a(metadata, defaultColors.get(color), getDefaultColor(defaultColors.get(color))) & 0xffffff);
+                            colorList.add(i, new ColorModel(color, colorHex));
+                        }
+                    }
+
+                    XmlUtil.saveXml(wq.b(sc_id) + "/files/resource/values/colors.xml", convertListToXml(colorList));
+                }
             }
         } catch (Exception ignored) {
             isDataLoadingFailed = !colorXml.trim().isEmpty();

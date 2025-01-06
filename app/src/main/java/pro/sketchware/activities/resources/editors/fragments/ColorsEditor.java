@@ -72,6 +72,7 @@ public class ColorsEditor extends Fragment {
     public void updateColorsList(String contentPath, int updateMode) {
         boolean isSkippingMode = updateMode == 1;
         boolean isMergeAndReplace = updateMode == 2;
+        colorsEditorManager.isDefaultVariant = activity.variant.isEmpty();
 
         ArrayList<ColorModel> defaultColors = new ArrayList<>();
 
@@ -137,6 +138,8 @@ public class ColorsEditor extends Fragment {
         defaultColors.put("colorPrimaryDark", ProjectFile.COLOR_PRIMARY_DARK);
         defaultColors.put("colorControlHighlight", ProjectFile.COLOR_CONTROL_HIGHLIGHT);
         defaultColors.put("colorControlNormal", ProjectFile.COLOR_CONTROL_NORMAL);
+
+        colorsEditorManager.defaultColors = defaultColors;
     }
 
     public boolean checkForUnsavedChanges() {
@@ -174,6 +177,9 @@ public class ColorsEditor extends Fragment {
 
         if (colorModel != null) {
             dialogBinding.colorKeyInput.setText(colorModel.getColorName());
+            if (defaultColors.containsKey(colorModel.getColorName())) {
+                dialogBinding.colorKeyInput.setEnabled(false);
+            }
             dialogBinding.colorPreview.setBackgroundColor(PropertiesUtil.parseColor(colorsEditorManager.getColorValue(activity.getApplicationContext(), colorModel.getColorValue(), 3)));
             dialogBinding.importantNote.setVisibility(defaultColors.containsKey(colorModel.getColorName()) ? View.VISIBLE : View.GONE);
 
@@ -268,7 +274,7 @@ public class ColorsEditor extends Fragment {
             colorpicker.showAtLocation(v, Gravity.CENTER, 0, 0);
         });
 
-        if (colorModel != null) {
+        if (colorModel != null && !defaultColors.containsKey(colorModel.getColorName())) {
             dialog.configureDefaultButton("Delete", v1 -> {
                 colorList.remove(position);
                 adapter.notifyItemRemoved(position);

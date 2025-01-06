@@ -22,6 +22,7 @@ import java.util.HashSet;
 import java.util.Objects;
 
 import a.a.a.aB;
+
 import mod.hey.studios.util.Helper;
 import pro.sketchware.R;
 import pro.sketchware.activities.resources.editors.ResourcesEditorActivity;
@@ -64,11 +65,13 @@ public class StringsEditor extends Fragment {
 
     private void initialize() {
         filePath = activity.stringsFilePath;
+        stringsEditorManager.sc_id = activity.sc_id;
     }
 
     public void updateStringsList(String filePath, int updateMode) {
         boolean isSkippingMode = updateMode == 1;
         boolean isMergeAndReplace = updateMode == 2;
+        stringsEditorManager.isDefaultVariant = activity.variant.isEmpty();
 
         ArrayList<HashMap<String, Object>> defaultStrings = new ArrayList<>();
         if (activity.variant.isEmpty() && !FileUtil.isExistFile(filePath)) {

@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.stream.Collectors;
 
 import pro.sketchware.activities.resources.editors.ResourcesEditorActivity;
-import pro.sketchware.activities.resources.editors.fragments.ColorsEditor;
 import pro.sketchware.activities.resources.editors.models.ColorModel;
 import pro.sketchware.activities.resources.editors.utils.ColorsEditorManager;
 import pro.sketchware.databinding.PalletCustomviewBinding;
@@ -51,10 +50,6 @@ public class ColorsAdapter extends RecyclerView.Adapter<ColorsAdapter.ViewHolder
         }
 
         holder.itemBinding.backgroundCard.setOnClickListener(v -> activity.colorsEditor.showColorEditDialog(colorModel, position));
-        holder.itemBinding.backgroundCard.setOnLongClickListener(v -> {
-            activity.colorsEditor.showDeleteDialog(position);
-            return true;
-        });
     }
 
     @Override

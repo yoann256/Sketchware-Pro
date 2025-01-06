@@ -91,6 +91,10 @@ public class StringsAdapter extends RecyclerView.Adapter<StringsAdapter.ViewHold
                     dialogBinding.stringKeyInput.setText((String) currentItem.get("key"));
                     dialogBinding.stringValueInput.setText((String) currentItem.get("text"));
 
+                    if ("app_name".equals(currentItem.get("key"))) {
+                        dialogBinding.stringKeyInput.setEnabled(false);
+                    }
+
                     dialog.b("Edit string");
                     dialog.b(
                             "Save",
@@ -117,20 +121,20 @@ public class StringsAdapter extends RecyclerView.Adapter<StringsAdapter.ViewHold
                                 notifyItemChanged(adapterPosition);
                             });
 
-                    dialog.configureDefaultButton(
-                            "Delete",
-                            v1 -> {
-                                if (isXmlStringUsed(key)) {
-                                    SketchwareUtil.toastError(
-                                            Helper.getResString(
-                                                    R.string
-                                                            .logic_editor_title_remove_xml_string_error));
-                                } else {
-                                    filteredData.remove(adapterPosition);
-                                    notifyItemRemoved(adapterPosition);
-                                    activity.stringsEditor.updateNoContentLayout();
-                                }
-                            });
+                    if (!"app_name".equals(currentItem.get("key"))) {
+                        dialog.configureDefaultButton(Helper.getResString(R.string.common_word_delete), v1 -> {
+                            if (isXmlStringUsed(key)) {
+                                SketchwareUtil.toastError(
+                                        Helper.getResString(
+                                                R.string
+                                                        .logic_editor_title_remove_xml_string_error));
+                            } else {
+                                filteredData.remove(adapterPosition);
+                                notifyItemRemoved(adapterPosition);
+                                activity.stringsEditor.updateNoContentLayout();
+                            }
+                        });
+                    }
                     dialog.a(Helper.getResString(R.string.cancel), v1 -> dialog.dismiss());
                     dialog.a(dialogBinding.getRoot());
                     dialog.show();
