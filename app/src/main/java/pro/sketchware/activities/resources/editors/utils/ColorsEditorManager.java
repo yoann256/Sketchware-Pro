@@ -4,9 +4,17 @@ import static com.besome.sketch.design.DesignActivity.sc_id;
 import static mod.hey.studios.util.ProjectFile.getDefaultColor;
 
 import android.content.Context;
+import android.util.Log;
 
 import androidx.core.content.ContextCompat;
 
+import com.google.gson.Gson;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserFactory;
 
@@ -15,6 +23,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 
 import a.a.a.XmlBuilderHelper;
 import a.a.a.lC;
@@ -33,6 +44,7 @@ public class ColorsEditorManager {
     public boolean isDefaultVariant = true;
 
     public HashMap<String, String> defaultColors;
+    public HashMap<Integer, String> notesMap = new HashMap<>();
 
     public String getColorValue(Context context, String colorValue, int referencingLimit) {
         if (colorValue == null || referencingLimit <= 0) {
@@ -100,41 +112,38 @@ public class ColorsEditorManager {
 
         try {
             colorList.clear();
-            XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
-            XmlPullParser parser = factory.newPullParser();
-            parser.setInput(new StringReader(colorXml));
 
-            int eventType = parser.getEventType();
-            String colorName = null;
-            String colorValue = null;
+            // Parse the XML using DocumentBuilder
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            Document document = builder.parse(new InputSource(new StringReader(colorXml)));
+            document.getDocumentElement().normalize();
 
-            // Parsing the color XML
-            while (eventType != XmlPullParser.END_DOCUMENT) {
-                String tagName = parser.getName();
-                switch (eventType) {
-                    case XmlPullParser.START_TAG:
-                        if ("color".equals(tagName)) {
-                            colorName = parser.getAttributeValue(null, "name");
+            NodeList childNodes = document.getDocumentElement().getChildNodes();
+
+            for (int i = 0; i < childNodes.getLength(); i++) {
+                Node node = childNodes.item(i);
+
+                if (node.getNodeType() == Node.COMMENT_NODE) {
+                    // Save comments in notesMap
+                    notesMap.put(colorList.size(), node.getNodeValue().trim());
+                } else if (node.getNodeType() == Node.ELEMENT_NODE && node.getNodeName().equals("color")) {
+                    Element element = (Element) node;
+                    String colorName = element.getAttribute("name");
+                    String colorValue = element.getTextContent().trim();
+
+                    if (PropertiesUtil.isHexColor(getColorValue(SketchApplication.getContext(), colorValue, 4))) {
+                        ColorModel colorModel = new ColorModel(colorName, colorValue);
+                        colorList.add(colorModel);
+
+                        if (defaultColors != null && defaultColors.containsKey(colorName)) {
+                            foundPrimaryColors.add(colorName);
+                            colorOrderList.add(colorModel);
+                        } else {
+                            otherColors.add(colorModel);
                         }
-                        break;
-                    case XmlPullParser.TEXT:
-                        colorValue = parser.getText();
-                        break;
-                    case XmlPullParser.END_TAG:
-                        if ("color".equals(tagName) && colorName != null) {
-                            if (PropertiesUtil.isHexColor(getColorValue(SketchApplication.getContext(), colorValue, 4))) {
-                                ColorModel colorModel = new ColorModel(colorName, colorValue);
-                                if (defaultColors != null && defaultColors.containsKey(colorName)) {
-                                    foundPrimaryColors.add(colorName);
-                                    colorOrderList.add(colorModel);
-                                } else {
-                                    otherColors.add(colorModel);
-                                }
-                            }
-                        }
-                        break;
+                    }
                 }
-                eventType = parser.next();
             }
 
             if (isDefaultVariant && defaultColors != null && sc_id != null) {
@@ -152,8 +161,7 @@ public class ColorsEditorManager {
                 }
             }
 
-            // Reorder colors to ensure default colors are at the top
-            // Clear the list and add default colors first, followed by other colors
+            // Reorder colors
             ArrayList<ColorModel> previousColorList = new ArrayList<>(colorList); // Save the original list for comparison
             colorList.clear();
             colorList.addAll(colorOrderList);
@@ -163,21 +171,26 @@ public class ColorsEditorManager {
                 hasChanges = true;
             }
 
-            // Save the updated color XML only if there are changes
+            // Save the updated XML if changes are detected
             if (hasChanges) {
-                XmlUtil.saveXml(wq.b(sc_id) + "/files/resource/values/colors.xml", convertListToXml(colorList));
+                XmlUtil.saveXml(wq.b(sc_id) + "/files/resource/values/colors.xml", convertListToXml(colorList, notesMap));
             }
 
-        } catch (Exception ignored) {
+        } catch (Exception e) {
             isDataLoadingFailed = !colorXml.trim().isEmpty();
         }
     }
 
-    public String convertListToXml(ArrayList<ColorModel> colorList) {
+    public String convertListToXml(ArrayList<ColorModel> colorList, HashMap<Integer, String> notesMap) {
         try {
             XmlBuilderHelper colorsFileBuilder = new XmlBuilderHelper();
 
-            for (ColorModel colorModel : colorList) {
+            for (int i = 0; i < colorList.size(); i++) {
+                if (notesMap.containsKey(i)) {
+                    colorsFileBuilder.addComment(notesMap.get(i), i);
+                }
+
+                ColorModel colorModel = colorList.get(i);
                 colorsFileBuilder.addColor(colorModel.getColorName(), colorModel.getColorValue());
             }
 

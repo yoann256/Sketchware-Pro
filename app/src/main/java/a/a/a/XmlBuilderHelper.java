@@ -76,4 +76,11 @@ public class XmlBuilderHelper {
         rootBuilder.a(styleBuilder);
         styleBuilders.put(styleName, styleBuilder);
     }
+
+    public void addComment(String comment, int position) {
+        XmlBuilder commentBuilder = new XmlBuilder(comment);
+        commentBuilder.isComment = true;
+        commentBuilder.c = comment;
+        rootBuilder.f.add(position, commentBuilder);
+    }
 }

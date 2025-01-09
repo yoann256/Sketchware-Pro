@@ -1,12 +1,14 @@
 package pro.sketchware.activities.resources.editors.adapters;
 
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.stream.Collectors;
 
 import pro.sketchware.activities.resources.editors.ResourcesEditorActivity;
@@ -19,13 +21,15 @@ public class ColorsAdapter extends RecyclerView.Adapter<ColorsAdapter.ViewHolder
 
     private final ArrayList<ColorModel> originalData;
     private ArrayList<ColorModel> filteredData;
+    private final HashMap<Integer, String> notesMap;
     private final ResourcesEditorActivity activity;
     private final ColorsEditorManager colorsEditorManager = new ColorsEditorManager();
 
-    public ColorsAdapter(ArrayList<ColorModel> filteredData, ResourcesEditorActivity activity) {
+    public ColorsAdapter(ArrayList<ColorModel> filteredData, ResourcesEditorActivity activity, HashMap<Integer, String> notesMap) {
         this.originalData = new ArrayList<>(filteredData);
         this.filteredData = filteredData;
         this.activity = activity;
+        this.notesMap = notesMap;
     }
 
     @NonNull
@@ -41,6 +45,12 @@ public class ColorsAdapter extends RecyclerView.Adapter<ColorsAdapter.ViewHolder
         String colorName = colorModel.getColorName();
         String colorValue = colorModel.getColorValue();
         String valueHex = colorsEditorManager.getColorValue(activity.getApplicationContext(), colorValue, 4);
+        if (notesMap.containsKey(position)) {
+            holder.itemBinding.tvTitle.setHint(notesMap.get(position));
+            holder.itemBinding.tvTitle.setVisibility(View.VISIBLE);
+        } else {
+            holder.itemBinding.tvTitle.setVisibility(View.GONE);
+        }
 
         holder.itemBinding.title.setHint(colorName);
         holder.itemBinding.sub.setText(colorValue);

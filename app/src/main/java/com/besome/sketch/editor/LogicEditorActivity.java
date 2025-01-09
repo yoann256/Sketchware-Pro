@@ -377,7 +377,7 @@ public class LogicEditorActivity extends BaseAppCompatActivity implements View.O
             map.put("key", key);
             map.put("text", value);
             StringsListMap.add(map);
-            FileUtil.writeFile(filePath, stringsEditorManager.convertListMapToXmlStrings(StringsListMap));
+            FileUtil.writeFile(filePath, stringsEditorManager.convertListMapToXmlStrings(StringsListMap, new HashMap<>()));
             paletteSelector.performClickPalette(-1);
             dialog.dismiss();
         });
@@ -420,7 +420,7 @@ public class LogicEditorActivity extends BaseAppCompatActivity implements View.O
                 }
             }
 
-            FileUtil.writeFile(filePath, stringsEditorManager.convertListMapToXmlStrings(stringsList));
+            FileUtil.writeFile(filePath, stringsEditorManager.convertListMapToXmlStrings(stringsList, new HashMap<>()));
 
             paletteSelector.performClickPalette(-1);
             dialog.dismiss();

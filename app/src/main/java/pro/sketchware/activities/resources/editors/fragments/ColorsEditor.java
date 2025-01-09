@@ -52,6 +52,7 @@ public class ColorsEditor extends Fragment {
     public static String contentPath;
     public final ArrayList<ColorModel> colorList = new ArrayList<>();
     public final HashMap <String, String> defaultColors = new HashMap<>();
+    private HashMap<Integer, String> notesMap = new HashMap<>();
 
     public final ColorsEditorManager colorsEditorManager = new ColorsEditorManager();
 
@@ -83,6 +84,7 @@ public class ColorsEditor extends Fragment {
         } else {
             colorsEditorManager.parseColorsXML(defaultColors, FileUtil.readFileIfExist(contentPath));
         }
+        notesMap = new HashMap<>(colorsEditorManager.notesMap);
 
         if (isSkippingMode) {
             HashSet<String> existingColorNames = new HashSet<>();
@@ -109,7 +111,7 @@ public class ColorsEditor extends Fragment {
             colorList.addAll(defaultColors);
         }
 
-        adapter = new ColorsAdapter(colorList, activity);
+        adapter = new ColorsAdapter(colorList, activity, notesMap);
         binding.recyclerView.setAdapter(adapter);
         updateNoContentLayout();
     }
@@ -147,7 +149,7 @@ public class ColorsEditor extends Fragment {
             return false;
         }
         String originalXml = FileUtil.readFileIfExist(contentPath);
-        String newXml = colorsEditorManager.convertListToXml(colorList);
+        String newXml = colorsEditorManager.convertListToXml(colorList, notesMap);
         if (isGeneratedContent && generatedContent.equals(newXml)) {
             return false;
         }
@@ -180,6 +182,7 @@ public class ColorsEditor extends Fragment {
             if (defaultColors.containsKey(colorModel.getColorName())) {
                 dialogBinding.colorKeyInput.setEnabled(false);
             }
+            dialogBinding.stringHeaderInput.setText(notesMap.getOrDefault(position, ""));
             dialogBinding.colorPreview.setBackgroundColor(PropertiesUtil.parseColor(colorsEditorManager.getColorValue(activity.getApplicationContext(), colorModel.getColorValue(), 3)));
             dialogBinding.importantNote.setVisibility(defaultColors.containsKey(colorModel.getColorName()) ? View.VISIBLE : View.GONE);
 
@@ -247,9 +250,15 @@ public class ColorsEditor extends Fragment {
                     colorModel.setColorValue("#" + value);
                 }
 
+                String headerInput = dialogBinding.stringHeaderInput.getText().toString();
+                if (headerInput.isEmpty()) {
+                    notesMap.remove(position);
+                } else {
+                    notesMap.put(position, headerInput);
+                }
                 adapter.notifyItemChanged(position);
             } else {
-                addColor(key, value);
+                addColor(key, value, dialogBinding.stringHeaderInput.getText().toString());
             }
             updateNoContentLayout();
             dialog.dismiss();
@@ -289,22 +298,25 @@ public class ColorsEditor extends Fragment {
         dialog.show();
     }
 
-    private void addColor(String name, String value) {
+    private void addColor(String name, String value, String note) {
         ColorModel newItem = new ColorModel(name, "#" + value);
         for (int i = 0; i < colorList.size(); i++) {
             if (colorList.get(i).getColorName().equals(name)) {
                 colorList.set(i, newItem);
                 adapter.notifyItemChanged(i);
+                notesMap.put(i, note);
                 return;
             }
         }
         colorList.add(newItem);
-        adapter.notifyItemInserted(colorList.size() - 1);
+        int notifyPosition = colorList.size() - 1;
+        notesMap.put(notifyPosition, note);
+        adapter.notifyItemInserted(notifyPosition);
     }
 
     public void saveColorsFile() {
         if (FileUtil.isExistFile(contentPath) || !colorList.isEmpty()) {
-            XmlUtil.saveXml(contentPath, colorsEditorManager.convertListToXml(colorList));
+            XmlUtil.saveXml(contentPath, colorsEditorManager.convertListToXml(colorList, notesMap));
         }
     }
 }

@@ -5,6 +5,7 @@ import static pro.sketchware.utility.UI.animateLayoutChanges;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,6 +44,7 @@ public class StringsEditor extends Fragment {
     public StringsAdapter adapter;
     
     public final ArrayList<HashMap<String, Object>> listmap = new ArrayList<>();
+    private HashMap<Integer, String> notesMap = new HashMap<>();
     private boolean isGeneratedContent;
     private String generatedContent;
     public String filePath;
@@ -81,6 +83,7 @@ public class StringsEditor extends Fragment {
         } else {
             stringsEditorManager.convertXmlStringsToListMap(FileUtil.readFileIfExist(filePath), defaultStrings);
         }
+        notesMap = new HashMap<>(stringsEditorManager.notesMap);
 
         if (isSkippingMode) {
             HashSet<String> existingKeys = new HashSet<>();
@@ -108,7 +111,7 @@ public class StringsEditor extends Fragment {
             listmap.addAll(defaultStrings);
         }
 
-        adapter = new StringsAdapter(activity, listmap);
+        adapter = new StringsAdapter(activity, listmap, notesMap);
         binding.recyclerView.setAdapter(adapter);
         updateNoContentLayout();
     }
@@ -127,14 +130,20 @@ public class StringsEditor extends Fragment {
         if (!FileUtil.isExistFile(filePath) && listmap.isEmpty()) {
             return false;
         }
+        Gson gson = new Gson();
         ArrayList<HashMap<String, Object>> cache = new ArrayList<>();
         if (isGeneratedContent) {
             stringsEditorManager.convertXmlStringsToListMap(generatedContent, cache);
         } else {
             stringsEditorManager.convertXmlStringsToListMap(FileUtil.readFileIfExist(filePath), cache);
         }
-        String cacheString = new Gson().toJson(cache);
-        String cacheListmap = new Gson().toJson(listmap);
+        if (!stringsEditorManager.notesMap.equals(notesMap)) {
+            Log.d("ABCD", String.valueOf(stringsEditorManager.notesMap));
+            Log.d("ABCD", String.valueOf(notesMap));
+            return true;
+        }
+        String cacheString = gson.toJson(cache);
+        String cacheListmap = gson.toJson(listmap);
         return !cacheListmap.equals(cacheString) && !listmap.isEmpty();
     }
 
@@ -162,15 +171,15 @@ public class StringsEditor extends Fragment {
             String value = Objects.requireNonNull(binding.stringValueInput.getText()).toString();
 
             if (key.isEmpty() || value.isEmpty()) {
-                SketchwareUtil.toast("Please fill in all fields", Toast.LENGTH_SHORT);
+                SketchwareUtil.toast("Please fill in all fields");
                 return;
             }
 
             if (stringsEditorManager.isXmlStringsExist(listmap, key)) {
-                binding.stringKeyInputLayout.setError("\"" + key + "\" is already exist");
+                SketchwareUtil.toast("\"" + key + "\" is already exist");
                 return;
             }
-            addString(key, value);
+            addString(key, value, Objects.requireNonNull(binding.stringHeaderInput.getText()).toString().trim());
             updateNoContentLayout();
         });
         dialog.a(getString(R.string.cancel), v1 -> dialog.dismiss());
@@ -178,29 +187,29 @@ public class StringsEditor extends Fragment {
         dialog.show();
     }
 
-    public void addString(final String key, final String text) {
+    public void addString(final String key, final String text, String note) {
         HashMap<String, Object> map = new HashMap<>();
         map.put("key", key);
         map.put("text", text);
         if (listmap.isEmpty()) {
             listmap.add(map);
             adapter.notifyItemInserted(0);
+            if (!note.isEmpty()) {
+                notesMap.put(0, note);
+            }
             return;
         }
-        for (int i = 0; i < listmap.size(); i++) {
-            if (Objects.equals(listmap.get(i).get("key"), key)) {
-                listmap.set(i, map);
-                adapter.notifyItemChanged(i);
-                return;
-            }
-        }
         listmap.add(map);
-        adapter.notifyItemInserted(listmap.size() - 1);
+        int notifyPosition = listmap.size() - 1;
+        if (!note.isEmpty()) {
+            notesMap.put(notifyPosition, note);
+        }
+        adapter.notifyItemInserted(notifyPosition);
     }
 
     public void saveStringsFile() {
         if (FileUtil.isExistFile(filePath) || !listmap.isEmpty()) {
-            XmlUtil.saveXml(filePath, stringsEditorManager.convertListMapToXmlStrings(listmap));
+            XmlUtil.saveXml(filePath, stringsEditorManager.convertListMapToXmlStrings(listmap, notesMap));
         }
     }
 }

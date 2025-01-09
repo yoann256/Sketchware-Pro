@@ -39,11 +39,13 @@ public class StringsAdapter extends RecyclerView.Adapter<StringsAdapter.ViewHold
     private final ArrayList<HashMap<String, Object>> originalData;
     private ArrayList<HashMap<String, Object>> filteredData;
     private final ResourcesEditorActivity activity;
+    private final HashMap<Integer, String> notesMap;
 
-    public StringsAdapter(ResourcesEditorActivity activity, ArrayList<HashMap<String, Object>> data) {
+    public StringsAdapter(ResourcesEditorActivity activity, ArrayList<HashMap<String, Object>> data, HashMap<Integer, String> notesMap) {
         this.originalData = new ArrayList<>(data);
         this.filteredData = data;
         this.activity = activity;
+        this.notesMap = notesMap;
     }
 
     @NonNull
@@ -63,6 +65,13 @@ public class StringsAdapter extends RecyclerView.Adapter<StringsAdapter.ViewHold
         String text = (String) item.get("text");
         holder.binding.title.setHint(key);
         holder.binding.sub.setText(text);
+
+        if (notesMap.containsKey(position)) {
+            holder.binding.tvTitle.setText(notesMap.get(position));
+            holder.binding.tvTitle.setVisibility(View.VISIBLE);
+        } else {
+            holder.binding.tvTitle.setVisibility(View.GONE);
+        }
 
         holder.binding.backgroundCard.setOnClickListener(
                 v -> {
@@ -90,6 +99,7 @@ public class StringsAdapter extends RecyclerView.Adapter<StringsAdapter.ViewHold
                     });
                     dialogBinding.stringKeyInput.setText((String) currentItem.get("key"));
                     dialogBinding.stringValueInput.setText((String) currentItem.get("text"));
+                    dialogBinding.stringHeaderInput.setText(notesMap.getOrDefault(adapterPosition, ""));
 
                     if ("app_name".equals(currentItem.get("key"))) {
                         dialogBinding.stringKeyInput.setEnabled(false);
@@ -113,28 +123,26 @@ public class StringsAdapter extends RecyclerView.Adapter<StringsAdapter.ViewHold
                                             "Please fill in all fields", Toast.LENGTH_SHORT);
                                     return;
                                 }
-                                if (keyInput.equals(key) && valueInput.equals(text)) {
-                                    return;
-                                }
                                 currentItem.put("key", keyInput);
                                 currentItem.put("text", valueInput);
+                                String note = dialogBinding.stringHeaderInput.getText().toString().trim();
+                                if (note.isEmpty()) {
+                                    notesMap.remove(adapterPosition);
+                                } else {
+                                    notesMap.put(adapterPosition, note);
+                                }
                                 notifyItemChanged(adapterPosition);
                             });
 
-                    if (!"app_name".equals(currentItem.get("key"))) {
-                        dialog.configureDefaultButton(Helper.getResString(R.string.common_word_delete), v1 -> {
-                            if (isXmlStringUsed(key)) {
-                                SketchwareUtil.toastError(
-                                        Helper.getResString(
-                                                R.string
-                                                        .logic_editor_title_remove_xml_string_error));
-                            } else {
-                                filteredData.remove(adapterPosition);
-                                notifyItemRemoved(adapterPosition);
-                                activity.stringsEditor.updateNoContentLayout();
-                            }
-                        });
-                    }
+                    dialog.configureDefaultButton(Helper.getResString(R.string.common_word_delete), v1 -> {
+                        if (isXmlStringUsed(key)) {
+                            SketchwareUtil.toastError(Helper.getResString(R.string.logic_editor_title_remove_xml_string_error));
+                        } else {
+                            filteredData.remove(adapterPosition);
+                            notifyItemRemoved(adapterPosition);
+                            activity.stringsEditor.updateNoContentLayout();
+                        }
+                    });
                     dialog.a(Helper.getResString(R.string.cancel), v1 -> dialog.dismiss());
                     dialog.a(dialogBinding.getRoot());
                     dialog.show();

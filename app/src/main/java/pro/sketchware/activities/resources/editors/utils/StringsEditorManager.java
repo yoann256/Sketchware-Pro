@@ -1,4 +1,4 @@
-package pro.sketchware.activities.resources.editors.utils;
+ package pro.sketchware.activities.resources.editors.utils;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -15,9 +15,11 @@ import java.util.Map;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import a.a.a.XmlBuilderHelper;
 import a.a.a.lC;
 import a.a.a.wq;
 import a.a.a.yB;
+import pro.sketchware.utility.SketchwareUtil;
 import pro.sketchware.utility.XmlUtil;
 
 public class StringsEditorManager {
@@ -27,20 +29,26 @@ public class StringsEditorManager {
     public boolean hasAppNameKey;
     public String sc_id;
 
+    public HashMap<Integer, String> notesMap = new HashMap<>();
+
     public void convertXmlStringsToListMap(final String xmlString, final ArrayList<HashMap<String, Object>> listMap) {
         isDataLoadingFailed = false;
         hasAppNameKey = false;
         try {
             listMap.clear();
+            notesMap.clear(); // Clear notes map at the beginning
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = factory.newDocumentBuilder();
             ByteArrayInputStream input = new ByteArrayInputStream(xmlString.getBytes(StandardCharsets.UTF_8));
             Document doc = builder.parse(new InputSource(input));
             doc.getDocumentElement().normalize();
-            NodeList nodeList = doc.getElementsByTagName("string");
-            for (int i = 0; i < nodeList.getLength(); i++) {
-                Node node = nodeList.item(i);
-                if (node.getNodeType() == Node.ELEMENT_NODE) {
+            NodeList childNodes = doc.getDocumentElement().getChildNodes();
+            for (int i = 0; i < childNodes.getLength(); i++) {
+                Node node = childNodes.item(i);
+                if (node.getNodeType() == Node.COMMENT_NODE) {
+                    // Save comments in notesMap
+                    notesMap.put(listMap.size(), node.getNodeValue().trim());
+                } else if (node.getNodeType() == Node.ELEMENT_NODE && node.getNodeName().equals("string")) {
                     addToListMap(listMap, (Element) node);
                 }
             }
@@ -49,7 +57,7 @@ public class StringsEditorManager {
                 map.put("key", "app_name");
                 map.put("text", yB.c(lC.b(sc_id), "my_app_name"));
                 listMap.add(0, map);
-                XmlUtil.saveXml(wq.b(sc_id) + "/files/resource/values/strings.xml", convertListMapToXmlStrings(listMap));
+                XmlUtil.saveXml(wq.b(sc_id) + "/files/resource/values/strings.xml", convertListMapToXmlStrings(listMap, notesMap));
             }
         } catch (Exception ignored) {
             isDataLoadingFailed = !xmlString.trim().isEmpty();
@@ -79,10 +87,14 @@ public class StringsEditorManager {
         return false;
     }
 
-    public String convertListMapToXmlStrings(final ArrayList<HashMap<String, Object>> listMap) {
+    public String convertListMapToXmlStrings(final ArrayList<HashMap<String, Object>> listMap, HashMap<Integer, String> notesMap) {
         StringBuilder xmlString = new StringBuilder();
-        xmlString.append("<resources>\n\n");
-        for (HashMap<String, Object> map : listMap) {
+        xmlString.append("<resources>\n");
+        for (int i = 0; i < listMap.size(); i++) {
+            if (notesMap.containsKey(i)) {
+                xmlString.append("    <!-- ").append(notesMap.get(i)).append(" -->\n");
+            }
+            HashMap<String, Object> map = listMap.get(i);
             String key = (String) map.get("key");
             Object textObj = map.get("text");
             String text = textObj instanceof String ? (String) textObj : textObj.toString();
@@ -94,7 +106,7 @@ public class StringsEditorManager {
             }
             xmlString.append(">").append(escapedText).append("</string>\n");
         }
-        xmlString.append("\n</resources>");
+        xmlString.append("</resources>");
         return xmlString.toString();
     }
 
@@ -108,5 +120,4 @@ public class StringsEditorManager {
                 .replace("\n", "&#10;")
                 .replace("\r", "&#13;");
     }
-
 }
