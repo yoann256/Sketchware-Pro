@@ -38,6 +38,7 @@ import pro.sketchware.utility.FileUtil;
 import pro.sketchware.utility.SketchwareUtil;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -46,11 +47,16 @@ import java.util.Objects;
 public class ThemesEditor extends Fragment {
 
     private ResourcesEditorFragmentBinding binding;
+
     public StylesAdapter adapter;
     private PropertyInputItem.AttributesAdapter attributesAdapter;
+
     private final ArrayList<StyleModel> themesList = new ArrayList<>();
+    private HashMap<Integer, String> notesMap = new HashMap<>();
+
     public final StylesEditorManager themesEditorManager = new StylesEditorManager();
     private final AttributeSuggestions attributeSuggestions = new AttributeSuggestions();
+
     private String filePath;
 
     @Nullable
@@ -94,7 +100,8 @@ public class ThemesEditor extends Fragment {
             themesList.addAll(defaultStyles);
         }
 
-        adapter = new StylesAdapter(themesList, this);
+        notesMap = new HashMap<>(themesEditorManager.notesMap);
+        adapter = new StylesAdapter(themesList, this, notesMap);
         binding.recyclerView.setAdapter(adapter);
         updateNoContentLayout();
     }
@@ -117,6 +124,9 @@ public class ThemesEditor extends Fragment {
         if (!FileUtil.isExistFile(filePath) && themesList.isEmpty()) {
             return false;
         }
+        if (!themesEditorManager.notesMap.equals(notesMap)) {
+            return true;
+        }
         Gson gson = new Gson();
         return !gson.toJson(themesList).equals(gson.toJson(themesEditorManager.parseStylesFile(FileUtil.readFileIfExist(filePath))));
     }
@@ -128,6 +138,7 @@ public class ThemesEditor extends Fragment {
         dialog.b("Create", v1 -> {
             String themeName = Objects.requireNonNull(binding.styleName.getText()).toString();
             String parent = Objects.requireNonNull(binding.styleParent.getText()).toString();
+            String header = Objects.requireNonNull(binding.styleHeaderInput.getText()).toString();
 
             if (themeName.isEmpty()) {
                 SketchwareUtil.toastError("Theme name Input is Empty");
@@ -136,7 +147,11 @@ public class ThemesEditor extends Fragment {
 
             StyleModel theme = new StyleModel(themeName, parent);
             themesList.add(theme);
-            adapter.notifyItemInserted(themesList.size() - 1);
+            int notifyPosition = themesList.size() - 1;
+            if (!header.isEmpty()) {
+                notesMap.put(notifyPosition, header);
+            }
+            adapter.notifyItemInserted(notifyPosition);
             updateNoContentLayout();
         });
         dialog.a(getString(R.string.cancel), Helper.getDialogDismissListener(dialog));
@@ -151,11 +166,15 @@ public class ThemesEditor extends Fragment {
 
         binding.styleName.setText(theme.getStyleName());
         binding.styleParent.setText(theme.getParent());
+        if (notesMap.containsKey(position)) {
+            binding.styleHeaderInput.setText(notesMap.get(position));
+        }
 
         dialog.b("Edit theme");
         dialog.b("Edit", v1 -> {
             String themeName = Objects.requireNonNull(binding.styleName.getText()).toString();
             String parent = Objects.requireNonNull(binding.styleParent.getText()).toString();
+            String header = Objects.requireNonNull(binding.styleHeaderInput.getText()).toString();
 
             if (themeName.isEmpty()) {
                 SketchwareUtil.toastError("Theme name Input is Empty");
@@ -164,6 +183,11 @@ public class ThemesEditor extends Fragment {
 
             theme.setStyleName(themeName);
             theme.setParent(parent);
+            if (header.isEmpty()) {
+                notesMap.remove(position);
+            } else {
+                notesMap.put(position, header);
+            }
 
             adapter.notifyItemChanged(position);
         });
@@ -174,6 +198,7 @@ public class ThemesEditor extends Fragment {
                     .setMessage("Are you sure you want to delete " + theme.getStyleName() + "?")
                     .setPositiveButton(R.string.common_word_yes, (d, w) -> {
                         themesList.remove(position);
+                        notesMap.remove(position);
                         adapter.notifyItemRemoved(position);
                         dialog.dismiss();
                         updateNoContentLayout();
@@ -294,7 +319,7 @@ public class ThemesEditor extends Fragment {
 
     public void saveThemesFile() {
         if (FileUtil.isExistFile(filePath) || !themesList.isEmpty()) {
-            FileUtil.writeFile(filePath, themesEditorManager.convertStylesToXML(themesList));
+            FileUtil.writeFile(filePath, themesEditorManager.convertStylesToXML(themesList, notesMap));
         }
     }
 

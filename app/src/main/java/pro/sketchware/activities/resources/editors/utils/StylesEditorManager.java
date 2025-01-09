@@ -1,5 +1,6 @@
 package pro.sketchware.activities.resources.editors.utils;
 
+import org.w3c.dom.Comment;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -8,6 +9,7 @@ import org.xml.sax.InputSource;
 
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -20,6 +22,7 @@ import pro.sketchware.activities.resources.editors.models.StyleModel;
 public class StylesEditorManager {
 
     public boolean isDataLoadingFailed;
+    public LinkedHashMap<Integer, String> notesMap = new LinkedHashMap<>();
 
     public String getAttributesCode(StyleModel style) {
         StringBuilder attributesCode = new StringBuilder();
@@ -39,7 +42,6 @@ public class StylesEditorManager {
     public LinkedHashMap<String, String> convertAttributesToMap(String attributesCode) {
         LinkedHashMap<String, String> attributesMap = new LinkedHashMap<>();
 
-
         String[] lines = attributesCode.split("\n");
         for (String line : lines) {
             if (line.startsWith("<item name=\"") && line.endsWith("</item>")) {
@@ -58,46 +60,51 @@ public class StylesEditorManager {
         return attributesMap;
     }
 
-    public String convertStylesToXML(ArrayList<StyleModel> stylesList) {
-        // Create an instance of XmlBuilderHelper
+    public String convertStylesToXML(ArrayList<StyleModel> stylesList, HashMap<Integer, String> notesMap) {
         XmlBuilderHelper stylesFileBuilder = new XmlBuilderHelper();
 
-        // Iterate through the list of styles and add them to the builder
+        int styleIndex = 0;
         for (StyleModel style : stylesList) {
-            // Provide the style name and parent (or null if no parent)
             String parentStyle = (style.getParent() != null && !style.getParent().isEmpty()) ? style.getParent() : null;
             stylesFileBuilder.addStyle(style.getStyleName(), parentStyle);
 
-            // Add attributes as <item> elements to the current style
+            if (notesMap.containsKey(styleIndex)) {
+                stylesFileBuilder.addComment(notesMap.get(styleIndex), styleIndex);
+            }
+
             Map<String, String> attributes = style.getAttributes();
             for (Map.Entry<String, String> entry : attributes.entrySet()) {
                 stylesFileBuilder.addItemToStyle(style.getStyleName(), entry.getKey(), entry.getValue());
             }
+            styleIndex++;
         }
 
-        // Generate and return the XML code
         return stylesFileBuilder.toCode();
     }
 
     public ArrayList<StyleModel> parseStylesFile(String content) {
         isDataLoadingFailed = false;
         ArrayList<StyleModel> styles = new ArrayList<>();
-        try {
+        notesMap.clear();
 
+        try {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = factory.newDocumentBuilder();
             InputSource inputSource = new InputSource(new StringReader(content));
             Document document = builder.parse(inputSource);
             document.getDocumentElement().normalize();
 
-            NodeList nodeList = document.getElementsByTagName("style");
-            for (int i = 0; i < nodeList.getLength(); i++) {
-                Node node = nodeList.item(i);
-                if (node.getNodeType() == Node.ELEMENT_NODE) {
+            NodeList allNodes = document.getDocumentElement().getChildNodes();
+            for (int i = 0; i < allNodes.getLength(); i++) {
+                Node node = allNodes.item(i);
+
+                if (node.getNodeType() == Node.COMMENT_NODE) {
+                    Comment comment = (Comment) node;
+                    String commentText = comment.getTextContent().trim();
+                    notesMap.put(styles.size(), commentText);
+                } else if (node.getNodeType() == Node.ELEMENT_NODE && "style".equals(node.getNodeName())) {
                     Element element = (Element) node;
-
                     String styleName = element.getAttribute("name");
-
                     String parent = element.hasAttribute("parent") ? element.getAttribute("parent") : null;
 
                     LinkedHashMap<String, String> attributes = new LinkedHashMap<>();
@@ -122,5 +129,4 @@ public class StylesEditorManager {
 
         return styles;
     }
-
 }

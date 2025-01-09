@@ -153,7 +153,7 @@ public class ColorsEditor extends Fragment {
         if (isGeneratedContent && generatedContent.equals(newXml)) {
             return false;
         }
-        return !Objects.equals(XmlUtil.replaceXml(newXml), XmlUtil.replaceXml(originalXml));
+        return !originalXml.equals(newXml);
     }
 
     public void showDeleteDialog(int position) {

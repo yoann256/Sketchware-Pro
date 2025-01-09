@@ -138,8 +138,6 @@ public class StringsEditor extends Fragment {
             stringsEditorManager.convertXmlStringsToListMap(FileUtil.readFileIfExist(filePath), cache);
         }
         if (!stringsEditorManager.notesMap.equals(notesMap)) {
-            Log.d("ABCD", String.valueOf(stringsEditorManager.notesMap));
-            Log.d("ABCD", String.valueOf(notesMap));
             return true;
         }
         String cacheString = gson.toJson(cache);

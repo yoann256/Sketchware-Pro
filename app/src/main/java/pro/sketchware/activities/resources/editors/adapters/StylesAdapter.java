@@ -1,6 +1,7 @@
 package pro.sketchware.activities.resources.editors.adapters;
 
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -12,17 +13,20 @@ import pro.sketchware.databinding.PalletCustomviewBinding;
 import pro.sketchware.activities.resources.editors.models.StyleModel;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class StylesAdapter extends RecyclerView.Adapter<StylesAdapter.StyleViewHolder> {
 
     private final List<StyleModel> stylesList;
     private final List<StyleModel> originalList;
+    private final HashMap<Integer, String> notesMap;
     private final Fragment fragment;
 
-    public StylesAdapter(ArrayList<StyleModel> stylesList, Fragment fragment) {
+    public StylesAdapter(ArrayList<StyleModel> stylesList, Fragment fragment, HashMap<Integer, String> notesMap) {
         this.stylesList = stylesList;
         this.originalList = new ArrayList<>(stylesList);
+        this.notesMap = notesMap;
         this.fragment = fragment;
     }
 
@@ -72,6 +76,12 @@ public class StylesAdapter extends RecyclerView.Adapter<StylesAdapter.StyleViewH
                 binding.sub.setText("No Parent");
             } else {
                 binding.sub.setText(style.getParent());
+            }
+            if (notesMap.containsKey(getAbsoluteAdapterPosition())) {
+                binding.tvTitle.setText(notesMap.get(getAbsoluteAdapterPosition()));
+                binding.tvTitle.setVisibility(View.VISIBLE);
+            } else {
+                binding.tvTitle.setVisibility(View.GONE);
             }
 
             binding.backgroundCard.setOnClickListener(view ->{

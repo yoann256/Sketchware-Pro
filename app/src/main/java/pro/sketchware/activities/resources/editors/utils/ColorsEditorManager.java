@@ -112,7 +112,7 @@ public class ColorsEditorManager {
 
         try {
             colorList.clear();
-
+            notesMap.clear();
             // Parse the XML using DocumentBuilder
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = factory.newDocumentBuilder();

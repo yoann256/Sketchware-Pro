@@ -38,6 +38,7 @@ import pro.sketchware.utility.FileUtil;
 import pro.sketchware.utility.SketchwareUtil;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -51,6 +52,7 @@ public class StylesEditor extends Fragment {
     private PropertyInputItem.AttributesAdapter attributesAdapter;
 
     private final ArrayList<StyleModel> stylesList = new ArrayList<>();
+    private HashMap<Integer, String> notesMap = new HashMap<>();
 
     public final StylesEditorManager stylesEditorManager = new StylesEditorManager();
     private final AttributeSuggestions attributeSuggestions = new AttributeSuggestions();
@@ -113,7 +115,8 @@ public class StylesEditor extends Fragment {
             stylesList.addAll(defaultStyles);
         }
 
-        adapter = new StylesAdapter(stylesList, this);
+        notesMap = new HashMap<>(stylesEditorManager.notesMap);
+        adapter = new StylesAdapter(stylesList, this, notesMap);
         binding.recyclerView.setAdapter(adapter);
         updateNoContentLayout();
     }
@@ -136,8 +139,11 @@ public class StylesEditor extends Fragment {
         if (!FileUtil.isExistFile(filePath) && stylesList.isEmpty()) {
             return false;
         }
-        if (isGeneratedContent && generatedContent.equals(stylesEditorManager.convertStylesToXML(stylesList))) {
+        if (isGeneratedContent && generatedContent.equals(stylesEditorManager.convertStylesToXML(stylesList, notesMap))) {
             return false;
+        }
+        if (!stylesEditorManager.notesMap.equals(notesMap)) {
+            return true;
         }
         Gson gson = new Gson();
         return !gson.toJson(stylesList).equals(gson.toJson(stylesEditorManager.parseStylesFile(FileUtil.readFileIfExist(filePath))));
@@ -150,6 +156,7 @@ public class StylesEditor extends Fragment {
         dialog.b("Create", v1 -> {
             String styleName = Objects.requireNonNull(binding.styleName.getText()).toString();
             String parent = Objects.requireNonNull(binding.styleParent.getText()).toString();
+            String header = Objects.requireNonNull(binding.styleHeaderInput.getText()).toString();
 
             if (styleName.isEmpty()) {
                 SketchwareUtil.toastError("Style name Input is Empty");
@@ -158,7 +165,11 @@ public class StylesEditor extends Fragment {
 
             StyleModel style = new StyleModel(styleName, parent);
             stylesList.add(style);
-            adapter.notifyItemInserted(stylesList.size() - 1);
+            int notifyPosition = stylesList.size() - 1;
+            if (!header.isEmpty()) {
+                notesMap.put(notifyPosition, header);
+            }
+            adapter.notifyItemInserted(notifyPosition);
             updateNoContentLayout();
         });
         dialog.a(getString(R.string.cancel), Helper.getDialogDismissListener(dialog));
@@ -173,11 +184,15 @@ public class StylesEditor extends Fragment {
 
         binding.styleName.setText(style.getStyleName());
         binding.styleParent.setText(style.getParent());
+        if (notesMap.containsKey(position)) {
+            binding.styleHeaderInput.setText(notesMap.get(position));
+        }
 
         dialog.b("Edit style");
         dialog.b("Edit", v1 -> {
             String styleName = Objects.requireNonNull(binding.styleName.getText()).toString();
             String parent = Objects.requireNonNull(binding.styleParent.getText()).toString();
+            String header = Objects.requireNonNull(binding.styleHeaderInput.getText()).toString();
 
             if (styleName.isEmpty()) {
                 SketchwareUtil.toastError("Style name Input is Empty");
@@ -186,7 +201,11 @@ public class StylesEditor extends Fragment {
 
             style.setStyleName(styleName);
             style.setParent(parent);
-
+            if (header.isEmpty()) {
+                notesMap.remove(position);
+            } else {
+                notesMap.put(position, header);
+            }
             adapter.notifyItemChanged(position);
         });
         dialog.setDismissOnDefaultButtonClick(false);
@@ -196,6 +215,7 @@ public class StylesEditor extends Fragment {
                     .setMessage("Are you sure you want to delete " + style.getStyleName() + "?")
                     .setPositiveButton(R.string.common_word_yes, (d, w) -> {
                         stylesList.remove(position);
+                        notesMap.remove(position);
                         adapter.notifyItemRemoved(position);
                         dialog.dismiss();
                         updateNoContentLayout();
@@ -317,7 +337,7 @@ public class StylesEditor extends Fragment {
 
     public void saveStylesFile() {
         if (FileUtil.isExistFile(filePath) || !stylesList.isEmpty()) {
-            FileUtil.writeFile(filePath, stylesEditorManager.convertStylesToXML(stylesList));
+            FileUtil.writeFile(filePath, stylesEditorManager.convertStylesToXML(stylesList, notesMap));
         }
     }
 
