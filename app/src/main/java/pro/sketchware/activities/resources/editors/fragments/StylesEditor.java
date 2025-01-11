@@ -70,13 +70,12 @@ public class StylesEditor extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = ResourcesEditorFragmentBinding.inflate(inflater, container, false);
-        initialize();
-        updateStylesList(filePath, 0);
         activity.checkForInvalidResources();
         return binding.getRoot();
     }
 
     public void updateStylesList(String filePath, int updateMode) {
+        this.filePath = filePath;
         boolean isSkippingMode = updateMode == 1;
         boolean isMergeAndReplace = updateMode == 2;
 
@@ -115,14 +114,12 @@ public class StylesEditor extends Fragment {
             stylesList.addAll(defaultStyles);
         }
 
-        notesMap = new HashMap<>(stylesEditorManager.notesMap);
-        adapter = new StylesAdapter(stylesList, this, notesMap);
-        binding.recyclerView.setAdapter(adapter);
-        updateNoContentLayout();
-    }
-
-    private void initialize() {
-        filePath = activity.stylesFilePath;
+        activity.runOnUiThread(() -> {
+            notesMap = new HashMap<>(stylesEditorManager.notesMap);
+            adapter = new StylesAdapter(stylesList, this, notesMap);
+            binding.recyclerView.setAdapter(adapter);
+            updateNoContentLayout();
+        });
     }
 
     private void updateNoContentLayout() {

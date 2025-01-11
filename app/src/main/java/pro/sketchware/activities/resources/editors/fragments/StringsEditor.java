@@ -59,18 +59,12 @@ public class StringsEditor extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = ResourcesEditorFragmentBinding.inflate(inflater, container, false);
-        initialize();
-        updateStringsList(filePath, 0);
-        activity.checkForInvalidResources();
-        return binding.getRoot();
-    }
-
-    private void initialize() {
-        filePath = activity.stringsFilePath;
-        stringsEditorManager.sc_id = activity.sc_id;
+        stringsEditorManager.sc_id = activity.sc_id;return binding.getRoot();
     }
 
     public void updateStringsList(String filePath, int updateMode) {
+        this.filePath = filePath;
+
         boolean isSkippingMode = updateMode == 1;
         boolean isMergeAndReplace = updateMode == 2;
         stringsEditorManager.isDefaultVariant = activity.variant.isEmpty();
@@ -111,9 +105,12 @@ public class StringsEditor extends Fragment {
             listmap.addAll(defaultStrings);
         }
 
-        adapter = new StringsAdapter(activity, listmap, notesMap);
-        binding.recyclerView.setAdapter(adapter);
-        updateNoContentLayout();
+        activity.runOnUiThread(() -> {
+            adapter = new StringsAdapter(activity, listmap, notesMap);
+            binding.recyclerView.setAdapter(adapter);
+            activity.checkForInvalidResources();
+            updateNoContentLayout();
+        });
     }
 
     public void updateNoContentLayout() {

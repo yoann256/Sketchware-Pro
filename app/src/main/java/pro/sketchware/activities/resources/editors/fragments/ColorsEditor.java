@@ -65,12 +65,13 @@ public class ColorsEditor extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = ResourcesEditorFragmentBinding.inflate(inflater, container, false);
         initialize();
-        updateColorsList(contentPath, 0);
-        activity.checkForInvalidResources();
         return binding.getRoot();
     }
 
     public void updateColorsList(String contentPath, int updateMode) {
+        this.contentPath = contentPath;
+        colorsEditorManager.contentPath = contentPath;
+
         boolean isSkippingMode = updateMode == 1;
         boolean isMergeAndReplace = updateMode == 2;
         colorsEditorManager.isDefaultVariant = activity.variant.isEmpty();
@@ -111,9 +112,12 @@ public class ColorsEditor extends Fragment {
             colorList.addAll(defaultColors);
         }
 
-        adapter = new ColorsAdapter(colorList, activity, notesMap);
-        binding.recyclerView.setAdapter(adapter);
-        updateNoContentLayout();
+        activity.runOnUiThread(() -> {
+            adapter = new ColorsAdapter(colorList, activity, notesMap);
+            binding.recyclerView.setAdapter(adapter);
+            activity.checkForInvalidResources();
+            updateNoContentLayout();
+        });
     }
 
     private void updateNoContentLayout() {
@@ -128,13 +132,8 @@ public class ColorsEditor extends Fragment {
 
     private void initialize() {
 
-        contentPath = activity.colorsFilePath;
-
-        colorsEditorManager.contentPath = contentPath;
-
         colorpicker = new Zx(activity, 0xFFFFFFFF, false, false);
 
-        colorsEditorManager.parseColorsXML(colorList, FileUtil.readFileIfExist(contentPath));
         defaultColors.put("colorAccent", ProjectFile.COLOR_ACCENT);
         defaultColors.put("colorPrimary", ProjectFile.COLOR_PRIMARY);
         defaultColors.put("colorPrimaryDark", ProjectFile.COLOR_PRIMARY_DARK);

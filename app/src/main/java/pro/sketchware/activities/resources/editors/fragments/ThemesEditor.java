@@ -63,13 +63,11 @@ public class ThemesEditor extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = ResourcesEditorFragmentBinding.inflate(inflater, container, false);
-        initialize();
-        updateThemesList(filePath, 0);
-        ((ResourcesEditorActivity) requireActivity()).checkForInvalidResources();
         return binding.getRoot();
     }
 
     public void updateThemesList(String filePath, int updateMode) {
+        this.filePath = filePath;
         boolean isSkippingMode = updateMode == 1;
         boolean isMergeAndReplace = updateMode == 2;
 
@@ -100,10 +98,13 @@ public class ThemesEditor extends Fragment {
             themesList.addAll(defaultStyles);
         }
 
-        notesMap = new HashMap<>(themesEditorManager.notesMap);
-        adapter = new StylesAdapter(themesList, this, notesMap);
-        binding.recyclerView.setAdapter(adapter);
-        updateNoContentLayout();
+        requireActivity().runOnUiThread(() -> {
+            notesMap = new HashMap<>(themesEditorManager.notesMap);
+            adapter = new StylesAdapter(themesList, this, notesMap);
+            binding.recyclerView.setAdapter(adapter);
+            ((ResourcesEditorActivity) requireActivity()).checkForInvalidResources();
+            updateNoContentLayout();
+        });
     }
 
     private void updateNoContentLayout() {
@@ -114,10 +115,6 @@ public class ThemesEditor extends Fragment {
         } else {
             binding.noContentLayout.setVisibility(View.GONE);
         }
-    }
-
-    private void initialize() {
-        filePath = ((ResourcesEditorActivity) requireActivity()).themesFilePath;
     }
 
     public boolean checkForUnsavedChanges() {

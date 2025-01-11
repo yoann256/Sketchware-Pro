@@ -2,6 +2,8 @@ package pro.sketchware.activities.resources.editors;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.SparseBooleanArray;
@@ -9,9 +11,9 @@ import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 
+import com.besome.sketch.lib.base.BaseAppCompatActivity;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.tabs.TabLayoutMediator;
 
@@ -19,6 +21,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -45,8 +48,9 @@ import pro.sketchware.databinding.ResourcesVariantSelectorDialogBinding;
 import pro.sketchware.utility.FileUtil;
 import pro.sketchware.utility.PropertiesUtil;
 import pro.sketchware.utility.SketchwareUtil;
+import pro.sketchware.utility.UI;
 
-public class ResourcesEditorActivity extends AppCompatActivity {
+public class ResourcesEditorActivity extends BaseAppCompatActivity {
 
     private ResourcesEditorsActivityBinding binding;
 
@@ -70,82 +74,75 @@ public class ResourcesEditorActivity extends AppCompatActivity {
     public ThemesEditor themesEditor;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        setupUI();
+        initializeManagers();
+        initializeEditors();
+        setupFab();
+        initializeBackgroundTask("");
+    }
+
+    private void setupUI() {
         binding = ResourcesEditorsActivityBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-
         setSupportActionBar(binding.topAppBar);
+        binding.viewPager.setOffscreenPageLimit(4);
+    }
 
+    private void initializeManagers() {
         sc_id = getIntent().getStringExtra("sc_id");
 
         yq = new yq(getApplicationContext(), sc_id);
-        var fileManager = jC.b(sc_id);
-        var dataManager = jC.a(sc_id);
-        var libraryManager = jC.c(sc_id);
-        yq.a(libraryManager, fileManager, dataManager, false); // Initialize project metadata
-
-        if (getIntent().hasExtra("variant")) {
-            initialize(getIntent().getStringExtra("variant"));
-        } else {
-            initialize("");
-        }
+        yq.a(jC.c(sc_id), jC.b(sc_id), jC.a(sc_id), false);
     }
 
-    private void initialize(String variant) {
-        this.variant = variant;
-
+    private void initializeEditors() {
         stringsEditor = new StringsEditor(this);
         colorsEditor = new ColorsEditor(this);
         stylesEditor = new StylesEditor(this);
         themesEditor = new ThemesEditor();
+    }
 
-        String projectResourcesDirectory =
-                String.format(
-                        "%s/files/resource/values%s/",
-                        wq.b(sc_id),
-                        variant
-                );
-
-        stringsFilePath = projectResourcesDirectory + "strings.xml";
-        colorsFilePath = projectResourcesDirectory + "colors.xml";
-        stylesFilePath = projectResourcesDirectory + "styles.xml";
-        themesFilePath = projectResourcesDirectory + "themes.xml";
-
-        binding.viewPager.setOffscreenPageLimit(4);
+    private void initializeBackgroundTask(String variant) {
+        this.variant = variant;
+        String baseDir = String.format("%s/files/resource/values%s/", wq.b(sc_id), variant);
+        stringsFilePath = baseDir + "strings.xml";
+        colorsFilePath = baseDir + "colors.xml";
+        stylesFilePath = baseDir + "styles.xml";
+        themesFilePath = baseDir + "themes.xml";
 
         setupViewPager();
+        startBackgroundTask();
+    }
 
-        new TabLayoutMediator(binding.tabLayout, binding.viewPager, (tab, position) -> {
-            switch (position) {
-                case 0:
-                    tab.setText("strings" + variant + ".xml");
-                    break;
-                case 1:
-                    tab.setText("colors" + variant + ".xml");
-                    break;
-                case 2:
-                    tab.setText("styles" + variant + ".xml");
-                    break;
-                case 3:
-                    tab.setText("themes" + variant + ".xml");
-                    break;
-            }
-        }).attach();
-
+    private void setupFab() {
         binding.fab.setOnClickListener(view -> {
             int currentItem = binding.viewPager.getCurrentItem();
-            if (currentItem == 0) {
-                stringsEditor.addStringDialog();
-            } else if (currentItem == 1) {
-                colorsEditor.showColorEditDialog(null, -1);
-            } else if (currentItem == 2) {
-                stylesEditor.showAddStyleDialog();
-            } else if (currentItem == 3) {
-                themesEditor.showAddThemeDialog();
+            switch (currentItem) {
+                case 0 -> stringsEditor.addStringDialog();
+                case 1 -> colorsEditor.showColorEditDialog(null, -1);
+                case 2 -> stylesEditor.showAddStyleDialog();
+                case 3 -> themesEditor.showAddThemeDialog();
             }
         });
+    }
+
+    private void startBackgroundTask() {
+        k();
+
+        Executors.newSingleThreadExecutor().execute(() -> new Handler(Looper.getMainLooper()).postDelayed(() -> {
+            loadDataInBackground();
+            runOnUiThread(this::h);
+        }, 1000));
+    }
+
+    private void loadDataInBackground() {
+        stringsEditor.updateStringsList(stringsFilePath, 0);
+        colorsEditor.updateColorsList(colorsFilePath, 0);
+        stylesEditor.updateStylesList(stylesFilePath, 0);
+        themesEditor.updateThemesList(themesFilePath, 0);
     }
 
     public void checkForInvalidResources() {
@@ -330,6 +327,24 @@ public class ResourcesEditorActivity extends AppCompatActivity {
     private void setupViewPager() {
         EditorsAdapter adapter = new EditorsAdapter(this);
         binding.viewPager.setAdapter(adapter);
+
+        new TabLayoutMediator(binding.tabLayout, binding.viewPager, (tab, position) -> {
+            switch (position) {
+                case 0:
+                    tab.setText("strings" + variant + ".xml");
+                    break;
+                case 1:
+                    tab.setText("colors" + variant + ".xml");
+                    break;
+                case 2:
+                    tab.setText("styles" + variant + ".xml");
+                    break;
+                case 3:
+                    tab.setText("themes" + variant + ".xml");
+                    break;
+            }
+        }).attach();
+        UI.animateLayoutChanges(binding.viewPager);
     }
 
     private void changeTheVariantDialog() {
@@ -410,12 +425,12 @@ public class ResourcesEditorActivity extends AppCompatActivity {
         String newVariant = Objects.requireNonNull(binding.input.getText()).toString().trim();
         if (!newVariant.equals(variantFullNameStarts)) {
             if (newVariant.startsWith(variantFullNameStarts)) {
-                initialize(newVariant.replace("values", ""));
+                initializeBackgroundTask(newVariant.replace("values", ""));
             } else {
                 SketchwareUtil.toastError("Invalid variant input");
             }
         } else {
-            initialize(variants.get(selectedChoice.get()).replace("values", ""));
+            initializeBackgroundTask(variants.get(selectedChoice.get()).replace("values", ""));
         }
     }
 
