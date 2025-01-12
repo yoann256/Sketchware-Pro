@@ -36,6 +36,7 @@ import a.a.a.jC;
 import mod.hey.studios.code.SrcCodeEditor;
 import mod.hey.studios.util.Helper;
 import pro.sketchware.R;
+import pro.sketchware.activities.resources.editors.fragments.ArraysEditor;
 import pro.sketchware.activities.resources.editors.models.ColorModel;
 import pro.sketchware.databinding.ResourcesEditorImportDialogBinding;
 import pro.sketchware.databinding.ResourcesEditorsActivityBinding;
@@ -67,11 +68,13 @@ public class ResourcesEditorActivity extends BaseAppCompatActivity {
     public String colorsFilePath;
     public String stylesFilePath;
     public String themesFilePath;
+    public String arrayFilePath;
 
     public StringsEditor stringsEditor;
     public ColorsEditor colorsEditor;
     public StylesEditor stylesEditor;
     public ThemesEditor themesEditor;
+    public ArraysEditor arraysEditor;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -103,6 +106,7 @@ public class ResourcesEditorActivity extends BaseAppCompatActivity {
         colorsEditor = new ColorsEditor(this);
         stylesEditor = new StylesEditor(this);
         themesEditor = new ThemesEditor();
+        arraysEditor = new ArraysEditor(this);
     }
 
     private void initializeBackgroundTask(String variant) {
@@ -112,6 +116,7 @@ public class ResourcesEditorActivity extends BaseAppCompatActivity {
         colorsFilePath = baseDir + "colors.xml";
         stylesFilePath = baseDir + "styles.xml";
         themesFilePath = baseDir + "themes.xml";
+        arrayFilePath = baseDir + "arrays.xml";
 
         setupViewPager();
         startBackgroundTask();
@@ -125,6 +130,7 @@ public class ResourcesEditorActivity extends BaseAppCompatActivity {
                 case 1 -> colorsEditor.showColorEditDialog(null, -1);
                 case 2 -> stylesEditor.showAddStyleDialog();
                 case 3 -> themesEditor.showAddThemeDialog();
+                case 4 -> arraysEditor.showAddArrayDialog();
             }
         });
     }
@@ -143,6 +149,7 @@ public class ResourcesEditorActivity extends BaseAppCompatActivity {
         colorsEditor.updateColorsList(colorsFilePath, 0);
         stylesEditor.updateStylesList(stylesFilePath, 0);
         themesEditor.updateThemesList(themesFilePath, 0);
+        arraysEditor.updateArraysList(arrayFilePath, 0);
     }
 
     public void checkForInvalidResources() {
@@ -160,6 +167,10 @@ public class ResourcesEditorActivity extends BaseAppCompatActivity {
         }
         if (themesEditor.themesEditorManager.isDataLoadingFailed) {
             showLoadFailedDialog("themes.xml", themesFilePath);
+        }
+
+        if (arraysEditor.arraysEditorManager.isDataLoadingFailed) {
+            showLoadFailedDialog("arrays.xml", arrayFilePath);
         }
     }
 
@@ -191,6 +202,7 @@ public class ResourcesEditorActivity extends BaseAppCompatActivity {
                 || colorsEditor.checkForUnsavedChanges()
                 || stylesEditor.checkForUnsavedChanges()
                 || themesEditor.checkForUnsavedChanges()
+                || arraysEditor.checkForUnsavedChanges()
         ) {
             new MaterialAlertDialogBuilder(this)
                     .setTitle("Warning")
@@ -226,6 +238,10 @@ public class ResourcesEditorActivity extends BaseAppCompatActivity {
             if (currentItem == 3 || themesEditor.themesEditorManager.isDataLoadingFailed) {
                 themesEditor.updateThemesList(themesFilePath, 0);
             }
+
+            if (currentItem == 4 || arraysEditor.arraysEditorManager.isDataLoadingFailed) {
+                arraysEditor.updateArraysList(arrayFilePath, 0);
+            }
             checkForInvalidResources();
         }
         isComingFromSrcCodeEditor = false;
@@ -253,6 +269,8 @@ public class ResourcesEditorActivity extends BaseAppCompatActivity {
                         stylesEditor.adapter.filter(newText);
                     } else if (currentItem == 3) {
                         themesEditor.adapter.filter(newText);
+                    } else if (currentItem == 4) {
+                        arraysEditor.adapter.filter(newText);
                     }
                     return false;
                 }
@@ -279,6 +297,7 @@ public class ResourcesEditorActivity extends BaseAppCompatActivity {
             colorsEditor.saveColorsFile();
             stylesEditor.saveStylesFile();
             themesEditor.saveThemesFile();
+            arraysEditor.saveArraysFile();
             updateProjectMetadata();
             SketchwareUtil.toast("Save completed");
         } else if (id == R.id.action_select_variant) {
@@ -299,6 +318,9 @@ public class ResourcesEditorActivity extends BaseAppCompatActivity {
             } else if (currentItem == 3) {
                 themesEditor.saveThemesFile();
                 goToCodeEditor("themes.xml", themesFilePath);
+            } else if (currentItem == 4) {
+                arraysEditor.saveArraysFile();
+                goToCodeEditor("arrays.xml", arrayFilePath);
             }
         }
         return super.onOptionsItemSelected(item);
@@ -342,6 +364,8 @@ public class ResourcesEditorActivity extends BaseAppCompatActivity {
                 case 3:
                     tab.setText("themes" + variant + ".xml");
                     break;
+                case 4:
+                    tab.setText("arrays" + variant + ".xml");
             }
         }).attach();
         UI.animateLayoutChanges(binding.viewPager);
@@ -478,6 +502,7 @@ public class ResourcesEditorActivity extends BaseAppCompatActivity {
                     if (i == 1) colorsEditor.updateColorsList(colorsFilePath.replace(variant, ""), updateMode);
                     if (i == 2) stylesEditor.updateStylesList(stylesFilePath.replace(variant, ""), updateMode);
                     if (i == 3) themesEditor.updateThemesList(themesFilePath.replace(variant, ""), updateMode);
+                    if (i == 4) arraysEditor.updateArraysList(arrayFilePath.replace(variant, ""), updateMode);
                 }
             }
         });

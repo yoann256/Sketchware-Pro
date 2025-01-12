@@ -23,12 +23,13 @@ public class EditorsAdapter extends FragmentStateAdapter {
             case 1 -> activity.colorsEditor;
             case 2 -> activity.stylesEditor;
             case 3 -> activity.themesEditor;
+            case 4 -> activity.arraysEditor;
             default -> throw new IllegalArgumentException("Invalid position");
         };
     }
 
     @Override
     public int getItemCount() {
-        return 4;
+        return 5;
     }
 }
