@@ -23,7 +23,6 @@ import java.util.Objects;
 import a.a.a.XB;
 import a.a.a.Zx;
 import a.a.a.aB;
-import a.a.a.xB;
 import mod.hey.studios.util.Helper;
 import mod.hey.studios.util.ProjectFile;
 import pro.sketchware.R;
@@ -47,8 +46,7 @@ public class ColorsEditor extends Fragment {
     public ColorsAdapter adapter;
     private Zx colorpicker;
 
-    private boolean isGeneratedContent;
-    private String generatedContent;
+    public boolean hasUnsavedChanges;
     public static String contentPath;
     public final ArrayList<ColorModel> colorList = new ArrayList<>();
     public final HashMap <String, String> defaultColors = new HashMap<>();
@@ -68,8 +66,9 @@ public class ColorsEditor extends Fragment {
         return binding.getRoot();
     }
 
-    public void updateColorsList(String contentPath, int updateMode) {
-        this.contentPath = contentPath;
+    public void updateColorsList(String filePath, int updateMode, boolean hasUnsavedChangesStatus) {
+        hasUnsavedChanges = hasUnsavedChangesStatus;
+        contentPath = filePath;
         colorsEditorManager.contentPath = contentPath;
 
         boolean isSkippingMode = updateMode == 1;
@@ -79,8 +78,7 @@ public class ColorsEditor extends Fragment {
         ArrayList<ColorModel> defaultColors = new ArrayList<>();
 
         if (activity.variant.isEmpty() && !FileUtil.isExistFile(contentPath)) {
-            isGeneratedContent = true;
-            generatedContent = activity.yq.getXMLColor();
+            String generatedContent = activity.yq.getXMLColor();
             colorsEditorManager.parseColorsXML(defaultColors, generatedContent);
         } else {
             colorsEditorManager.parseColorsXML(defaultColors, FileUtil.readFileIfExist(contentPath));
@@ -141,34 +139,6 @@ public class ColorsEditor extends Fragment {
         defaultColors.put("colorControlNormal", ProjectFile.COLOR_CONTROL_NORMAL);
 
         colorsEditorManager.defaultColors = defaultColors;
-    }
-
-    public boolean checkForUnsavedChanges() {
-        if (!FileUtil.isExistFile(contentPath) && colorList.isEmpty()) {
-            return false;
-        }
-        String originalXml = FileUtil.readFileIfExist(contentPath);
-        String newXml = colorsEditorManager.convertListToXml(colorList, notesMap);
-        if (isGeneratedContent && generatedContent.equals(newXml)) {
-            return false;
-        }
-        return !originalXml.equals(newXml);
-    }
-
-    public void showDeleteDialog(int position) {
-        aB dialog = new aB(activity);
-        dialog.a(R.drawable.ic_mtrl_delete);
-        dialog.b(xB.b().a(activity, R.string.color_editor_delete_color));
-        dialog.a(xB.b().a(activity, R.string.picker_color_message_delete_all_custom_color));
-        dialog.b(xB.b().a(activity, R.string.common_word_delete), v -> {
-            colorList.remove(position);
-            adapter.notifyItemRemoved(position);
-            adapter.notifyItemRangeChanged(position, colorList.size());
-            updateNoContentLayout();
-            dialog.dismiss();
-        });
-        dialog.a(xB.b().a(activity, R.string.common_word_cancel), v -> dialog.dismiss());
-        dialog.show();
     }
 
     public void showColorEditDialog(ColorModel colorModel, int position) {
@@ -249,18 +219,19 @@ public class ColorsEditor extends Fragment {
                     colorModel.setColorValue("#" + value);
                 }
 
-                String headerInput = dialogBinding.stringHeaderInput.getText().toString();
+                String headerInput = Objects.requireNonNull(dialogBinding.stringHeaderInput.getText()).toString();
                 if (headerInput.isEmpty()) {
                     notesMap.remove(position);
                 } else {
                     notesMap.put(position, headerInput);
                 }
                 adapter.notifyItemChanged(position);
+
             } else {
-                addColor(key, value, dialogBinding.stringHeaderInput.getText().toString());
+                addColor(key, value, Objects.requireNonNull(dialogBinding.stringHeaderInput.getText()).toString());
             }
+            hasUnsavedChanges = true;
             updateNoContentLayout();
-            dialog.dismiss();
         });
 
         dialogBinding.colorPreviewCard.setOnClickListener(v -> {
@@ -288,6 +259,7 @@ public class ColorsEditor extends Fragment {
                 adapter.notifyItemRemoved(position);
                 adapter.notifyItemRangeChanged(position, colorList.size());
                 updateNoContentLayout();
+                hasUnsavedChanges = true;
                 dialog.dismiss();
             });
         }
@@ -309,13 +281,16 @@ public class ColorsEditor extends Fragment {
         }
         colorList.add(newItem);
         int notifyPosition = colorList.size() - 1;
-        notesMap.put(notifyPosition, note);
+        if (!note.isEmpty()) {
+            notesMap.put(notifyPosition, note);
+        }
         adapter.notifyItemInserted(notifyPosition);
     }
 
     public void saveColorsFile() {
-        if (FileUtil.isExistFile(contentPath) || !colorList.isEmpty()) {
+        if (hasUnsavedChanges && FileUtil.isExistFile(contentPath) || !colorList.isEmpty()) {
             XmlUtil.saveXml(contentPath, colorsEditorManager.convertListToXml(colorList, notesMap));
+            hasUnsavedChanges = false;
         }
     }
 }

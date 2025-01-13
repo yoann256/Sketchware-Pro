@@ -15,7 +15,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.besome.sketch.editor.property.PropertyInputItem;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.google.gson.Gson;
 
 import a.a.a.aB;
 import mod.hey.studios.util.Helper;
@@ -51,6 +50,7 @@ public class ArraysEditor extends Fragment {
 
     public final ArraysEditorManager arraysEditorManager;
 
+    public boolean hasUnsavedChanges;
     private String filePath;
     private final ResourcesEditorActivity activity;
 
@@ -71,7 +71,8 @@ public class ArraysEditor extends Fragment {
         return binding.getRoot();
     }
 
-    public void updateArraysList(String filePath, int updateMode) {
+    public void updateArraysList(String filePath, int updateMode, boolean hasUnsavedChangesStatus) {
+        hasUnsavedChanges = hasUnsavedChangesStatus;
         this.filePath = filePath;
         boolean isSkippingMode = updateMode == 1;
         boolean isMergeAndReplace = updateMode == 2;
@@ -121,17 +122,6 @@ public class ArraysEditor extends Fragment {
         }
     }
 
-    public boolean checkForUnsavedChanges() {
-        if (!FileUtil.isExistFile(filePath) && arraysList.isEmpty()) {
-            return false;
-        }
-        if (!arraysEditorManager.notesMap.equals(notesMap)) {
-            return true;
-        }
-        Gson gson = new Gson();
-        return !gson.toJson(arraysList).equals(gson.toJson(arraysEditorManager.parseArraysFile(FileUtil.readFileIfExist(filePath))));
-    }
-
     public void showAddArrayDialog() {
         aB dialog = new aB(requireActivity());
         ArraysEditorAddBinding binding = ArraysEditorAddBinding.inflate(getLayoutInflater());
@@ -173,6 +163,7 @@ public class ArraysEditor extends Fragment {
             }
             adapter.notifyItemInserted(notifyPosition);
             updateNoContentLayout();
+            hasUnsavedChanges = true;
         });
 
         dialog.a(getString(R.string.cancel), Helper.getDialogDismissListener(dialog));
@@ -219,6 +210,7 @@ public class ArraysEditor extends Fragment {
                 notesMap.put(position, header);
             }
             adapter.notifyItemChanged(position);
+            hasUnsavedChanges = true;
         });
         dialog.setDismissOnDefaultButtonClick(false);
         dialog.configureDefaultButton(Helper.getResString(R.string.common_word_delete), view -> new MaterialAlertDialogBuilder(requireContext())
@@ -230,6 +222,7 @@ public class ArraysEditor extends Fragment {
                     adapter.notifyItemRemoved(position);
                     dialog.dismiss();
                     updateNoContentLayout();
+                    hasUnsavedChanges = true;
                 })
                 .setNegativeButton("Cancel", null)
                 .create()
@@ -265,6 +258,7 @@ public class ArraysEditor extends Fragment {
                                     attributes.remove(attr);
                                     array.setAttributes(attributes);
                                     attributesAdapter.submitList(new ArrayList<>(attributes.keySet()));
+                                    hasUnsavedChanges = true;
                                 })
                                 .setNegativeButton("Cancel", null)
                                 .create()
@@ -318,6 +312,7 @@ public class ArraysEditor extends Fragment {
             array.addAttribute(attribute, value);
             attributesAdapter.submitList(new ArrayList<>(array.getAttributes().keySet()));
             attributesAdapter.notifyDataSetChanged();
+            hasUnsavedChanges = true;
         });
 
         dialog.a(getString(R.string.cancel), Helper.getDialogDismissListener(dialog));
@@ -325,8 +320,9 @@ public class ArraysEditor extends Fragment {
         dialog.show();
     }
     public void saveArraysFile() {
-        if (FileUtil.isExistFile(filePath) || !arraysList.isEmpty()) {
+        if (hasUnsavedChanges && FileUtil.isExistFile(filePath) || !arraysList.isEmpty()) {
             FileUtil.writeFile(filePath, arraysEditorManager.convertArraysToXML(arraysList, notesMap));
+            hasUnsavedChanges = false;
         }
     }
 

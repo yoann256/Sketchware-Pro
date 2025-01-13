@@ -18,7 +18,6 @@ import com.besome.sketch.editor.property.PropertyInputItem;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.MaterialAutoCompleteTextView;
-import com.google.gson.Gson;
 
 import a.a.a.aB;
 import mod.hey.studios.util.Helper;
@@ -26,7 +25,6 @@ import mod.hey.studios.util.Helper;
 import pro.sketchware.R;
 import pro.sketchware.activities.resources.editors.ResourcesEditorActivity;
 import pro.sketchware.activities.resources.editors.utils.AttributeSuggestions;
-import pro.sketchware.databinding.PropertyPopupInputTextBinding;
 import pro.sketchware.databinding.PropertyPopupParentAttrBinding;
 import pro.sketchware.databinding.ResourcesEditorFragmentBinding;
 import pro.sketchware.databinding.StyleEditorAddAttrBinding;
@@ -57,8 +55,7 @@ public class StylesEditor extends Fragment {
     public final StylesEditorManager stylesEditorManager = new StylesEditorManager();
     private final AttributeSuggestions attributeSuggestions = new AttributeSuggestions();
 
-    private boolean isGeneratedContent;
-    private String generatedContent;
+    public boolean hasUnsavedChanges;
     private String filePath;
     private final ResourcesEditorActivity activity;
 
@@ -74,7 +71,8 @@ public class StylesEditor extends Fragment {
         return binding.getRoot();
     }
 
-    public void updateStylesList(String filePath, int updateMode) {
+    public void updateStylesList(String filePath, int updateMode, boolean hasUnsavedChangesStatus) {
+        hasUnsavedChanges = hasUnsavedChangesStatus;
         this.filePath = filePath;
         boolean isSkippingMode = updateMode == 1;
         boolean isMergeAndReplace = updateMode == 2;
@@ -82,8 +80,7 @@ public class StylesEditor extends Fragment {
         ArrayList<StyleModel> defaultStyles;
 
         if (activity.variant.isEmpty() && !FileUtil.isExistFile(filePath)) {
-            isGeneratedContent = true;
-            generatedContent = activity.yq.getXMLStyle();
+            String generatedContent = activity.yq.getXMLStyle();
             defaultStyles = stylesEditorManager.parseStylesFile(generatedContent);
         } else {
             defaultStyles = stylesEditorManager.parseStylesFile(FileUtil.readFileIfExist(filePath));
@@ -132,20 +129,6 @@ public class StylesEditor extends Fragment {
         }
     }
 
-    public boolean checkForUnsavedChanges() {
-        if (!FileUtil.isExistFile(filePath) && stylesList.isEmpty()) {
-            return false;
-        }
-        if (isGeneratedContent && generatedContent.equals(stylesEditorManager.convertStylesToXML(stylesList, notesMap))) {
-            return false;
-        }
-        if (!stylesEditorManager.notesMap.equals(notesMap)) {
-            return true;
-        }
-        Gson gson = new Gson();
-        return !gson.toJson(stylesList).equals(gson.toJson(stylesEditorManager.parseStylesFile(FileUtil.readFileIfExist(filePath))));
-    }
-
     public void showAddStyleDialog() {
         aB dialog = new aB(requireActivity());
         StyleEditorAddBinding binding = StyleEditorAddBinding.inflate(getLayoutInflater());
@@ -166,6 +149,7 @@ public class StylesEditor extends Fragment {
             if (!header.isEmpty()) {
                 notesMap.put(notifyPosition, header);
             }
+            hasUnsavedChanges = true;
             adapter.notifyItemInserted(notifyPosition);
             updateNoContentLayout();
         });
@@ -203,24 +187,24 @@ public class StylesEditor extends Fragment {
             } else {
                 notesMap.put(position, header);
             }
+            hasUnsavedChanges = true;
             adapter.notifyItemChanged(position);
         });
         dialog.setDismissOnDefaultButtonClick(false);
-        dialog.configureDefaultButton(Helper.getResString(R.string.common_word_delete), view -> {
-            new MaterialAlertDialogBuilder(requireContext())
-                    .setTitle("Warning")
-                    .setMessage("Are you sure you want to delete " + style.getStyleName() + "?")
-                    .setPositiveButton(R.string.common_word_yes, (d, w) -> {
-                        stylesList.remove(position);
-                        notesMap.remove(position);
-                        adapter.notifyItemRemoved(position);
-                        dialog.dismiss();
-                        updateNoContentLayout();
-                    })
-                    .setNegativeButton("Cancel", null)
-                    .create()
-                    .show();
-        });
+        dialog.configureDefaultButton(Helper.getResString(R.string.common_word_delete), view -> new MaterialAlertDialogBuilder(requireContext())
+                .setTitle("Warning")
+                .setMessage("Are you sure you want to delete " + style.getStyleName() + "?")
+                .setPositiveButton(R.string.common_word_yes, (d, w) -> {
+                    stylesList.remove(position);
+                    notesMap.remove(position);
+                    adapter.notifyItemRemoved(position);
+                    dialog.dismiss();
+                    updateNoContentLayout();
+                    hasUnsavedChanges = true;
+                })
+                .setNegativeButton("Cancel", null)
+                .create()
+                .show());
         dialog.a(getString(R.string.cancel), Helper.getDialogDismissListener(dialog));
         dialog.a(binding.getRoot());
         dialog.show();
@@ -252,6 +236,7 @@ public class StylesEditor extends Fragment {
                                     attributes.remove(attr);
                                     style.setAttributes(attributes);
                                     attributesAdapter.submitList(new ArrayList<>(attributes.keySet()));
+                                    hasUnsavedChanges = true;
                                 })
                                 .setNegativeButton("Cancel", null)
                                 .create()
@@ -270,9 +255,6 @@ public class StylesEditor extends Fragment {
 
         binding.add.setOnClickListener(
                 v -> showAttributeDialog(style, ""));
-        binding.sourceCode.setVisibility(View.VISIBLE);
-        binding.sourceCode.setOnClickListener(
-                v -> showAttributesEditorDialog(style));
     }
 
     private void showAttributeDialog(StyleModel style, String attr) {
@@ -303,38 +285,18 @@ public class StylesEditor extends Fragment {
             style.addAttribute(attribute, value);
             attributesAdapter.submitList(new ArrayList<>(style.getAttributes().keySet()));
             attributesAdapter.notifyDataSetChanged();
+            hasUnsavedChanges = true;
         });
 
-        dialog.a(getString(R.string.cancel), Helper.getDialogDismissListener(dialog));
-        dialog.a(binding.getRoot());
-        dialog.show();
-    }
-
-    public void showAttributesEditorDialog(StyleModel style) {
-        aB dialog = new aB(requireActivity());
-        PropertyPopupInputTextBinding binding = PropertyPopupInputTextBinding.inflate(getLayoutInflater());
-
-        binding.edInput.setText(stylesEditorManager.getAttributesCode(style));
-
-        dialog.b("Edit all attributes");
-        dialog.b("Edit all attributes");
-        dialog.b(Helper.getResString(R.string.common_word_save), v1 -> {
-            try {
-                LinkedHashMap<String, String> attributes = stylesEditorManager.convertAttributesToMap(binding.edInput.getText().toString());
-                style.setAttributes(attributes);
-                attributesAdapter.submitList(new ArrayList<>(attributes.keySet()));
-            } catch (Exception e) {
-                SketchwareUtil.toastError("Failed to parse attributes. Please check the format");
-            }
-        });
         dialog.a(getString(R.string.cancel), Helper.getDialogDismissListener(dialog));
         dialog.a(binding.getRoot());
         dialog.show();
     }
 
     public void saveStylesFile() {
-        if (FileUtil.isExistFile(filePath) || !stylesList.isEmpty()) {
+        if (hasUnsavedChanges && FileUtil.isExistFile(filePath) || !stylesList.isEmpty()) {
             FileUtil.writeFile(filePath, stylesEditorManager.convertStylesToXML(stylesList, notesMap));
+            hasUnsavedChanges = false;
         }
     }
 

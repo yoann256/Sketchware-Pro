@@ -15,11 +15,9 @@ import java.util.Map;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import a.a.a.XmlBuilderHelper;
 import a.a.a.lC;
 import a.a.a.wq;
 import a.a.a.yB;
-import pro.sketchware.utility.SketchwareUtil;
 import pro.sketchware.utility.XmlUtil;
 
 public class StringsEditorManager {
@@ -97,6 +95,7 @@ public class StringsEditorManager {
             HashMap<String, Object> map = listMap.get(i);
             String key = (String) map.get("key");
             Object textObj = map.get("text");
+            assert textObj != null;
             String text = textObj instanceof String ? (String) textObj : textObj.toString();
             String escapedText = escapeXml(text);
             xmlString.append("    <string name=\"").append(key).append("\"");

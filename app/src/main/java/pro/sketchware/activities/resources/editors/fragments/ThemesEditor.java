@@ -18,7 +18,6 @@ import com.besome.sketch.editor.property.PropertyInputItem;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.MaterialAutoCompleteTextView;
-import com.google.gson.Gson;
 
 import a.a.a.aB;
 import mod.hey.studios.util.Helper;
@@ -26,7 +25,6 @@ import mod.hey.studios.util.Helper;
 import pro.sketchware.R;
 import pro.sketchware.activities.resources.editors.ResourcesEditorActivity;
 import pro.sketchware.activities.resources.editors.utils.AttributeSuggestions;
-import pro.sketchware.databinding.PropertyPopupInputTextBinding;
 import pro.sketchware.databinding.PropertyPopupParentAttrBinding;
 import pro.sketchware.databinding.ResourcesEditorFragmentBinding;
 import pro.sketchware.databinding.StyleEditorAddAttrBinding;
@@ -57,6 +55,7 @@ public class ThemesEditor extends Fragment {
     public final StylesEditorManager themesEditorManager = new StylesEditorManager();
     private final AttributeSuggestions attributeSuggestions = new AttributeSuggestions();
 
+    public boolean hasUnsavedChanges;
     private String filePath;
 
     @Nullable
@@ -66,7 +65,8 @@ public class ThemesEditor extends Fragment {
         return binding.getRoot();
     }
 
-    public void updateThemesList(String filePath, int updateMode) {
+    public void updateThemesList(String filePath, int updateMode, boolean hasUnsavedChangesStatus) {
+        hasUnsavedChanges = hasUnsavedChangesStatus;
         this.filePath = filePath;
         boolean isSkippingMode = updateMode == 1;
         boolean isMergeAndReplace = updateMode == 2;
@@ -117,17 +117,6 @@ public class ThemesEditor extends Fragment {
         }
     }
 
-    public boolean checkForUnsavedChanges() {
-        if (!FileUtil.isExistFile(filePath) && themesList.isEmpty()) {
-            return false;
-        }
-        if (!themesEditorManager.notesMap.equals(notesMap)) {
-            return true;
-        }
-        Gson gson = new Gson();
-        return !gson.toJson(themesList).equals(gson.toJson(themesEditorManager.parseStylesFile(FileUtil.readFileIfExist(filePath))));
-    }
-
     public void showAddThemeDialog() {
         aB dialog = new aB(requireActivity());
         StyleEditorAddBinding binding = StyleEditorAddBinding.inflate(getLayoutInflater());
@@ -150,6 +139,7 @@ public class ThemesEditor extends Fragment {
             }
             adapter.notifyItemInserted(notifyPosition);
             updateNoContentLayout();
+            hasUnsavedChanges = true;
         });
         dialog.a(getString(R.string.cancel), Helper.getDialogDismissListener(dialog));
         dialog.a(binding.getRoot());
@@ -187,23 +177,23 @@ public class ThemesEditor extends Fragment {
             }
 
             adapter.notifyItemChanged(position);
+            hasUnsavedChanges = true;
         });
         dialog.setDismissOnDefaultButtonClick(false);
-        dialog.configureDefaultButton(Helper.getResString(R.string.common_word_delete), view -> {
-            new MaterialAlertDialogBuilder(requireContext())
-                    .setTitle("Warning")
-                    .setMessage("Are you sure you want to delete " + theme.getStyleName() + "?")
-                    .setPositiveButton(R.string.common_word_yes, (d, w) -> {
-                        themesList.remove(position);
-                        notesMap.remove(position);
-                        adapter.notifyItemRemoved(position);
-                        dialog.dismiss();
-                        updateNoContentLayout();
-                    })
-                    .setNegativeButton("Cancel", null)
-                    .create()
-                    .show();
-        });
+        dialog.configureDefaultButton(Helper.getResString(R.string.common_word_delete), view -> new MaterialAlertDialogBuilder(requireContext())
+                .setTitle("Warning")
+                .setMessage("Are you sure you want to delete " + theme.getStyleName() + "?")
+                .setPositiveButton(R.string.common_word_yes, (d, w) -> {
+                    themesList.remove(position);
+                    notesMap.remove(position);
+                    adapter.notifyItemRemoved(position);
+                    dialog.dismiss();
+                    updateNoContentLayout();
+                    hasUnsavedChanges = true;
+                })
+                .setNegativeButton("Cancel", null)
+                .create()
+                .show());
         dialog.a(getString(R.string.cancel), Helper.getDialogDismissListener(dialog));
         dialog.a(binding.getRoot());
         dialog.show();
@@ -235,6 +225,7 @@ public class ThemesEditor extends Fragment {
                                     attributes.remove(attr);
                                     theme.setAttributes(attributes);
                                     attributesAdapter.submitList(new ArrayList<>(attributes.keySet()));
+                                    hasUnsavedChanges = true;
                                 })
                                 .setNegativeButton("Cancel", null)
                                 .create()
@@ -253,9 +244,6 @@ public class ThemesEditor extends Fragment {
 
         binding.add.setOnClickListener(
                 v -> showAttributeDialog(theme, ""));
-        binding.sourceCode.setVisibility(View.VISIBLE);
-        binding.sourceCode.setOnClickListener(
-                v -> showAttributesEditorDialog(theme));
     }
 
     private void showAttributeDialog(StyleModel theme, String attr) {
@@ -286,37 +274,18 @@ public class ThemesEditor extends Fragment {
             theme.addAttribute(attribute, value);
             attributesAdapter.submitList(new ArrayList<>(theme.getAttributes().keySet()));
             attributesAdapter.notifyDataSetChanged();
+            hasUnsavedChanges = true;
         });
 
-        dialog.a(getString(R.string.cancel), Helper.getDialogDismissListener(dialog));
-        dialog.a(binding.getRoot());
-        dialog.show();
-    }
-
-    public void showAttributesEditorDialog(StyleModel theme) {
-        aB dialog = new aB(requireActivity());
-        PropertyPopupInputTextBinding binding = PropertyPopupInputTextBinding.inflate(getLayoutInflater());
-
-        binding.edInput.setText(themesEditorManager.getAttributesCode(theme));
-
-        dialog.b("Edit all attributes");
-        dialog.b(Helper.getResString(R.string.common_word_save), v1 -> {
-            try {
-                LinkedHashMap<String, String> attributes = themesEditorManager.convertAttributesToMap(binding.edInput.getText().toString());
-                theme.setAttributes(attributes);
-                attributesAdapter.submitList(new ArrayList<>(attributes.keySet()));
-            } catch (Exception e) {
-                SketchwareUtil.toastError("Failed to parse attributes. Please check the format");
-            }
-        });
         dialog.a(getString(R.string.cancel), Helper.getDialogDismissListener(dialog));
         dialog.a(binding.getRoot());
         dialog.show();
     }
 
     public void saveThemesFile() {
-        if (FileUtil.isExistFile(filePath) || !themesList.isEmpty()) {
+        if (hasUnsavedChanges && FileUtil.isExistFile(filePath) || !themesList.isEmpty()) {
             FileUtil.writeFile(filePath, themesEditorManager.convertStylesToXML(themesList, notesMap));
+            hasUnsavedChanges = false;
         }
     }
 

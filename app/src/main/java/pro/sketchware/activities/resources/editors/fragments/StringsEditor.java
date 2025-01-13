@@ -5,17 +5,13 @@ import static pro.sketchware.utility.UI.animateLayoutChanges;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-
-import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -45,8 +41,8 @@ public class StringsEditor extends Fragment {
     
     public final ArrayList<HashMap<String, Object>> listmap = new ArrayList<>();
     private HashMap<Integer, String> notesMap = new HashMap<>();
-    private boolean isGeneratedContent;
-    private String generatedContent;
+
+    public boolean hasUnsavedChanges;
     public String filePath;
 
     public final StringsEditorManager stringsEditorManager = new StringsEditorManager();
@@ -62,8 +58,9 @@ public class StringsEditor extends Fragment {
         stringsEditorManager.sc_id = activity.sc_id;return binding.getRoot();
     }
 
-    public void updateStringsList(String filePath, int updateMode) {
+    public void updateStringsList(String filePath, int updateMode, boolean hasUnsavedChangesStatus) {
         this.filePath = filePath;
+        hasUnsavedChanges = hasUnsavedChangesStatus;
 
         boolean isSkippingMode = updateMode == 1;
         boolean isMergeAndReplace = updateMode == 2;
@@ -71,8 +68,7 @@ public class StringsEditor extends Fragment {
 
         ArrayList<HashMap<String, Object>> defaultStrings = new ArrayList<>();
         if (activity.variant.isEmpty() && !FileUtil.isExistFile(filePath)) {
-            isGeneratedContent = true;
-            generatedContent = activity.yq.getXMLString();
+            String generatedContent = activity.yq.getXMLString();
             stringsEditorManager.convertXmlStringsToListMap(generatedContent, defaultStrings);
         } else {
             stringsEditorManager.convertXmlStringsToListMap(FileUtil.readFileIfExist(filePath), defaultStrings);
@@ -121,25 +117,6 @@ public class StringsEditor extends Fragment {
         } else {
             binding.noContentLayout.setVisibility(View.GONE);
         }
-    }
-
-    public boolean checkForUnsavedChanges() {
-        if (!FileUtil.isExistFile(filePath) && listmap.isEmpty()) {
-            return false;
-        }
-        Gson gson = new Gson();
-        ArrayList<HashMap<String, Object>> cache = new ArrayList<>();
-        if (isGeneratedContent) {
-            stringsEditorManager.convertXmlStringsToListMap(generatedContent, cache);
-        } else {
-            stringsEditorManager.convertXmlStringsToListMap(FileUtil.readFileIfExist(filePath), cache);
-        }
-        if (!stringsEditorManager.notesMap.equals(notesMap)) {
-            return true;
-        }
-        String cacheString = gson.toJson(cache);
-        String cacheListmap = gson.toJson(listmap);
-        return !cacheListmap.equals(cacheString) && !listmap.isEmpty();
     }
 
     public void addStringDialog() {
@@ -200,11 +177,13 @@ public class StringsEditor extends Fragment {
             notesMap.put(notifyPosition, note);
         }
         adapter.notifyItemInserted(notifyPosition);
+        hasUnsavedChanges = true;
     }
 
     public void saveStringsFile() {
-        if (FileUtil.isExistFile(filePath) || !listmap.isEmpty()) {
+        if (hasUnsavedChanges && FileUtil.isExistFile(filePath) || !listmap.isEmpty()) {
             XmlUtil.saveXml(filePath, stringsEditorManager.convertListMapToXmlStrings(listmap, notesMap));
+            hasUnsavedChanges = false;
         }
     }
 }

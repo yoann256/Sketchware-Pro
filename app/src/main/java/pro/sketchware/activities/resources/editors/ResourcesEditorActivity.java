@@ -11,6 +11,7 @@ import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.widget.SearchView;
 
 import com.besome.sketch.lib.base.BaseAppCompatActivity;
@@ -83,7 +84,8 @@ public class ResourcesEditorActivity extends BaseAppCompatActivity {
         setupUI();
         initializeManagers();
         initializeEditors();
-        setupFab();
+        setupListeners();
+        setupBackPressedHandler();
         initializeBackgroundTask("");
     }
 
@@ -122,7 +124,9 @@ public class ResourcesEditorActivity extends BaseAppCompatActivity {
         startBackgroundTask();
     }
 
-    private void setupFab() {
+    private void setupListeners() {
+        binding.topAppBar.setNavigationOnClickListener(Helper.getBackPressedClickListener(this));
+
         binding.fab.setOnClickListener(view -> {
             int currentItem = binding.viewPager.getCurrentItem();
             switch (currentItem) {
@@ -145,11 +149,11 @@ public class ResourcesEditorActivity extends BaseAppCompatActivity {
     }
 
     private void loadDataInBackground() {
-        stringsEditor.updateStringsList(stringsFilePath, 0);
-        colorsEditor.updateColorsList(colorsFilePath, 0);
-        stylesEditor.updateStylesList(stylesFilePath, 0);
-        themesEditor.updateThemesList(themesFilePath, 0);
-        arraysEditor.updateArraysList(arrayFilePath, 0);
+        stringsEditor.updateStringsList(stringsFilePath, 0, false);
+        colorsEditor.updateColorsList(colorsFilePath, 0, false);
+        stylesEditor.updateStylesList(stylesFilePath, 0, false);
+        themesEditor.updateThemesList(themesFilePath, 0, false);
+        arraysEditor.updateArraysList(arrayFilePath, 0, false);
     }
 
     public void checkForInvalidResources() {
@@ -190,32 +194,36 @@ public class ResourcesEditorActivity extends BaseAppCompatActivity {
         builder.setTitle(Helper.getResString(R.string.resources_manager_xml_load_failed_title))
                 .setMessage(String.format(Helper.getResString(R.string.resources_manager_xml_load_failed_message), title))
                 .setPositiveButton("Open code editor", (dialog, which) -> goToCodeEditor(title, contentPath))
-                .setNegativeButton(Helper.getResString(R.string.common_word_exit), ((dialogInterface, i) -> super.onBackPressed()))
+                .setNegativeButton(Helper.getResString(R.string.common_word_exit), ((dialogInterface, i) -> finish()))
                 .setCancelable(false)
                 .create()
                 .show();
     }
 
-    @Override
-    public void onBackPressed() {
-        if (stringsEditor.checkForUnsavedChanges()
-                || colorsEditor.checkForUnsavedChanges()
-                || stylesEditor.checkForUnsavedChanges()
-                || themesEditor.checkForUnsavedChanges()
-                || arraysEditor.checkForUnsavedChanges()
-        ) {
-            new MaterialAlertDialogBuilder(this)
-                    .setTitle("Warning")
-                    .setMessage("You have unsaved changes. Are you sure you want to exit?")
-                    .setPositiveButton("Exit", (dialog, which) -> super.onBackPressed())
-                    .setNegativeButton("Cancel", null)
-                    .create()
-                    .show();
-            return;
-        }
+    private void setupBackPressedHandler() {
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                if (stringsEditor.hasUnsavedChanges
+                        || colorsEditor.hasUnsavedChanges
+                        || stylesEditor.hasUnsavedChanges
+                        || themesEditor.hasUnsavedChanges
+                        || arraysEditor.hasUnsavedChanges
+                ) {
+                    new MaterialAlertDialogBuilder(ResourcesEditorActivity.this)
+                            .setTitle("Warning")
+                            .setMessage("You have unsaved changes. Are you sure you want to exit?")
+                            .setPositiveButton("Exit", (dialog, which) -> finish())
+                            .setNegativeButton("Cancel", null)
+                            .create()
+                            .show();
+                    return;
+                }
 
-        setResult(RESULT_OK);
-        finish();
+                setResult(RESULT_OK);
+                finish();
+            }
+        });
     }
 
     @Override
@@ -224,23 +232,23 @@ public class ResourcesEditorActivity extends BaseAppCompatActivity {
             int currentItem = binding.viewPager.getCurrentItem();
 
             if (currentItem == 0 || stringsEditor.stringsEditorManager.isDataLoadingFailed) {
-                stringsEditor.updateStringsList(stringsFilePath, 0);
+                stringsEditor.updateStringsList(stringsFilePath, 0, false);
             }
 
             if (currentItem == 1 || colorsEditor.colorsEditorManager.isDataLoadingFailed) {
-                colorsEditor.updateColorsList(colorsFilePath, 0);
+                colorsEditor.updateColorsList(colorsFilePath, 0, false);
             }
 
             if (currentItem == 2 || stylesEditor.stylesEditorManager.isDataLoadingFailed) {
-                stylesEditor.updateStylesList(stylesFilePath, 0);
+                stylesEditor.updateStylesList(stylesFilePath, 0, false);
             }
 
             if (currentItem == 3 || themesEditor.themesEditorManager.isDataLoadingFailed) {
-                themesEditor.updateThemesList(themesFilePath, 0);
+                themesEditor.updateThemesList(themesFilePath, 0, false);
             }
 
             if (currentItem == 4 || arraysEditor.arraysEditorManager.isDataLoadingFailed) {
-                arraysEditor.updateArraysList(arrayFilePath, 0);
+                arraysEditor.updateArraysList(arrayFilePath, 0, false);
             }
             checkForInvalidResources();
         }
@@ -337,8 +345,8 @@ public class ResourcesEditorActivity extends BaseAppCompatActivity {
             }
 
             for (HashMap<String, Object> map : stringsEditor.listmap) {
-                if (map.get("key").toString().equals("app_name")) {
-                    metadata.put("my_app_name", map.get("text").toString());
+                if (Objects.requireNonNull(map.get("key")).toString().equals("app_name")) {
+                    metadata.put("my_app_name", Objects.requireNonNull(map.get("text")).toString());
                 }
             }
 
@@ -482,7 +490,8 @@ public class ResourcesEditorActivity extends BaseAppCompatActivity {
                 "strings.xml",
                 "colors.xml",
                 "styles.xml",
-                "themes.xml"
+                "themes.xml",
+                "arrays.xml"
         ));
 
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_multiple_choice, resourcesFileNames);
@@ -498,11 +507,11 @@ public class ResourcesEditorActivity extends BaseAppCompatActivity {
             int updateMode = isMergeAndReplace ? 2 : isSkippingMode ? 1 : 0;
             for (int i = 0; i < resourcesFileNames.size(); i++) {
                 if (selectedItems.get(i)) {
-                    if (i == 0) stringsEditor.updateStringsList(stringsFilePath.replace(variant, ""), updateMode);
-                    if (i == 1) colorsEditor.updateColorsList(colorsFilePath.replace(variant, ""), updateMode);
-                    if (i == 2) stylesEditor.updateStylesList(stylesFilePath.replace(variant, ""), updateMode);
-                    if (i == 3) themesEditor.updateThemesList(themesFilePath.replace(variant, ""), updateMode);
-                    if (i == 4) arraysEditor.updateArraysList(arrayFilePath.replace(variant, ""), updateMode);
+                    if (i == 0) stringsEditor.updateStringsList(stringsFilePath.replace(variant, ""), updateMode, true);
+                    if (i == 1) colorsEditor.updateColorsList(colorsFilePath.replace(variant, ""), updateMode, true);
+                    if (i == 2) stylesEditor.updateStylesList(stylesFilePath.replace(variant, ""), updateMode, true);
+                    if (i == 3) themesEditor.updateThemesList(themesFilePath.replace(variant, ""), updateMode, true);
+                    if (i == 4) arraysEditor.updateArraysList(arrayFilePath.replace(variant, ""), updateMode, true);
                 }
             }
         });

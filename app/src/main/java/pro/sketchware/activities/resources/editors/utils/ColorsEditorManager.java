@@ -4,11 +4,8 @@ import static com.besome.sketch.design.DesignActivity.sc_id;
 import static mod.hey.studios.util.ProjectFile.getDefaultColor;
 
 import android.content.Context;
-import android.util.Log;
 
 import androidx.core.content.ContextCompat;
-
-import com.google.gson.Gson;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

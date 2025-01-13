@@ -1,5 +1,7 @@
 package pro.sketchware.activities.resources.editors.utils;
 
+import androidx.annotation.NonNull;
+
 import org.w3c.dom.Comment;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -23,42 +25,6 @@ public class StylesEditorManager {
 
     public boolean isDataLoadingFailed;
     public LinkedHashMap<Integer, String> notesMap = new LinkedHashMap<>();
-
-    public String getAttributesCode(StyleModel style) {
-        StringBuilder attributesCode = new StringBuilder();
-
-        for (Map.Entry<String, String> entry : style.getAttributes().entrySet()) {
-            attributesCode
-                    .append("<item name=\"")
-                    .append(entry.getKey())
-                    .append("\">")
-                    .append(entry.getValue())
-                    .append("</item>\n");
-        }
-
-        return attributesCode.toString().trim();
-    }
-
-    public LinkedHashMap<String, String> convertAttributesToMap(String attributesCode) {
-        LinkedHashMap<String, String> attributesMap = new LinkedHashMap<>();
-
-        String[] lines = attributesCode.split("\n");
-        for (String line : lines) {
-            if (line.startsWith("<item name=\"") && line.endsWith("</item>")) {
-                int nameStart = line.indexOf("\"") + 1;
-                int nameEnd = line.indexOf("\"", nameStart);
-                String name = line.substring(nameStart, nameEnd);
-
-                int valueStart = line.indexOf(">", nameEnd) + 1;
-                int valueEnd = line.lastIndexOf("</item>");
-                String value = line.substring(valueStart, valueEnd).trim();
-
-                attributesMap.put(name, value);
-            }
-        }
-
-        return attributesMap;
-    }
 
     public String convertStylesToXML(ArrayList<StyleModel> stylesList, HashMap<Integer, String> notesMap) {
         XmlBuilderHelper stylesFileBuilder = new XmlBuilderHelper();
@@ -107,17 +73,7 @@ public class StylesEditorManager {
                     String styleName = element.getAttribute("name");
                     String parent = element.hasAttribute("parent") ? element.getAttribute("parent") : null;
 
-                    LinkedHashMap<String, String> attributes = new LinkedHashMap<>();
-                    NodeList childNodes = element.getChildNodes();
-                    for (int j = 0; j < childNodes.getLength(); j++) {
-                        Node childNode = childNodes.item(j);
-                        if (childNode.getNodeType() == Node.ELEMENT_NODE) {
-                            Element childElement = (Element) childNode;
-                            String attrName = childElement.getAttribute("name");
-                            String attrValue = childElement.getTextContent().trim();
-                            attributes.put(attrName, attrValue);
-                        }
-                    }
+                    LinkedHashMap<String, String> attributes = getAttributes(element);
 
                     styles.add(new StyleModel(styleName, parent, attributes));
                 }
@@ -128,5 +84,20 @@ public class StylesEditorManager {
         }
 
         return styles;
+    }
+
+    private static @NonNull LinkedHashMap<String, String> getAttributes(Element element) {
+        LinkedHashMap<String, String> attributes = new LinkedHashMap<>();
+        NodeList childNodes = element.getChildNodes();
+        for (int j = 0; j < childNodes.getLength(); j++) {
+            Node childNode = childNodes.item(j);
+            if (childNode.getNodeType() == Node.ELEMENT_NODE) {
+                Element childElement = (Element) childNode;
+                String attrName = childElement.getAttribute("name");
+                String attrValue = childElement.getTextContent().trim();
+                attributes.put(attrName, attrValue);
+            }
+        }
+        return attributes;
     }
 }
