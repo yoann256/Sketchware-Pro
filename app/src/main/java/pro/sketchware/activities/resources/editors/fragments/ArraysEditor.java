@@ -60,7 +60,7 @@ public class ArraysEditor extends Fragment {
     }
 
     public enum ARRAYS_TYPES {
-        STRING, INTEGER, FLOAT, REFERENCES
+        STRING, INTEGER, OBJECT
     }
 
     @Nullable
@@ -138,10 +138,10 @@ public class ArraysEditor extends Fragment {
         dialog.b("Create new array");
 
         binding.arrayType.setOnClickListener(view -> {
-            String[] arrayTypes = {"STRING", "INTEGER", "FLOAT", "REFERENCES"};
+            String[] arrayTypes = {"STRING", "INTEGER", "OBJECT"};
             new MaterialAlertDialogBuilder(requireContext())
                     .setTitle("Select Array Type")
-                    .setSingleChoiceItems(arrayTypes, 0, (dialogInterface, which) -> {
+                    .setSingleChoiceItems(arrayTypes, -1, (dialogInterface, which) -> {
                         binding.arrayType.setText(arrayTypes[which]);
                         dialogInterface.dismiss();
                     })
@@ -291,28 +291,22 @@ public class ArraysEditor extends Fragment {
         aB dialog = new aB(requireActivity());
         ArraysEditorAddAttrBinding binding = ArraysEditorAddAttrBinding.inflate(getLayoutInflater());
 
-        switch (array.getArrayType()) {
-            case INTEGER:
-                binding.attrValue.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_SIGNED);
-                break;
-            case FLOAT:
-                binding.attrValue.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
-                break;
-            default:
-                binding.attrValue.setInputType(InputType.TYPE_CLASS_TEXT);
-                break;
+        if (array.getArrayType() == ARRAYS_TYPES.INTEGER) {
+            binding.itemValue.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_SIGNED);
+        } else {
+            binding.itemValue.setInputType(InputType.TYPE_CLASS_TEXT);
         }
 
         if (isEditing) {
-            binding.attrName.setText(attr);
-            binding.attrValue.setText(array.getAttribute(attr));
+            binding.itemName.setText(attr);
+            binding.itemValue.setText(array.getAttribute(attr));
         }
 
-        dialog.b(isEditing ? "Edit attribute" : "Create new attribute");
+        dialog.b(isEditing ? "Edit item" : "Create new item");
 
         dialog.b(Helper.getResString(R.string.common_word_save), v1 -> {
-            String attribute = Objects.requireNonNull(binding.attrName.getText()).toString();
-            String value = Objects.requireNonNull(binding.attrValue.getText()).toString();
+            String attribute = Objects.requireNonNull(binding.itemName.getText()).toString();
+            String value = Objects.requireNonNull(binding.itemValue.getText()).toString();
 
             if (attribute.isEmpty() || value.isEmpty()) {
                 SketchwareUtil.toastError("Please fill in all fields");

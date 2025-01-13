@@ -40,7 +40,7 @@ public class ArraysEditorManager {
             xml.append("    <").append(arrayTag).append(" name=\"").append(array.getArrayName()).append("\">\n");
 
             for (Map.Entry<String, String> entry : array.getAttributes().entrySet()) {
-                xml.append("        <item name=\"").append(entry.getKey()).append("\">").append(entry.getValue()).append("</item>\n");
+                xml.append("        <item>").append(entry.getValue()).append("</item>\n");
             }
 
             xml.append("    </").append(arrayTag).append(">\n");
@@ -53,10 +53,9 @@ public class ArraysEditorManager {
 
     private String getArrayTag(ARRAYS_TYPES arraysType) {
         return switch (arraysType) {
-            case STRING -> "array-string";
-            case INTEGER -> "array-integer";
-            case FLOAT -> "array-float";
-            case REFERENCES -> "array-references";
+            case STRING -> "string-array";
+            case INTEGER -> "integer-array";
+            case OBJECT -> "array";
         };
     }
 
@@ -80,7 +79,7 @@ public class ArraysEditorManager {
                     Comment comment = (Comment) node;
                     String commentText = comment.getTextContent().trim();
                     notesMap.put(arrays.size(), commentText);
-                } else if (node.getNodeType() == Node.ELEMENT_NODE && node.getNodeName().startsWith("array-")) {
+                } else if (node.getNodeType() == Node.ELEMENT_NODE && node.getNodeName().endsWith("array")) {
                     Element element = (Element) node;
                     String arrayName = element.getAttribute("name");
                     ARRAYS_TYPES arrayType = getArrayType(node.getNodeName());
@@ -118,10 +117,9 @@ public class ArraysEditorManager {
 
     private ARRAYS_TYPES getArrayType(String nodeName) {
         return switch (nodeName) {
-            case "array-string" -> ARRAYS_TYPES.STRING;
-            case "array-integer" -> ARRAYS_TYPES.INTEGER;
-            case "array-float" -> ARRAYS_TYPES.FLOAT;
-            default -> ARRAYS_TYPES.REFERENCES;
+            case "string-array" -> ARRAYS_TYPES.STRING;
+            case "integer-array" -> ARRAYS_TYPES.INTEGER;
+            default -> ARRAYS_TYPES.OBJECT;
         };
     }
 }
