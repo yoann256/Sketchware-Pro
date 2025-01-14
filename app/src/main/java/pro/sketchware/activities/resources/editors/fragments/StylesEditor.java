@@ -67,7 +67,6 @@ public class StylesEditor extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = ResourcesEditorFragmentBinding.inflate(inflater, container, false);
-        activity.checkForInvalidResources();
         return binding.getRoot();
     }
 
@@ -115,6 +114,7 @@ public class StylesEditor extends Fragment {
             notesMap = new HashMap<>(stylesEditorManager.notesMap);
             adapter = new StylesAdapter(stylesList, this, notesMap);
             binding.recyclerView.setAdapter(adapter);
+            activity.checkForInvalidResources();
             updateNoContentLayout();
         });
     }

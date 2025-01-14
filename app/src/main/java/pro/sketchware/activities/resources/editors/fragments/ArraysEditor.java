@@ -67,7 +67,6 @@ public class ArraysEditor extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = ResourcesEditorFragmentBinding.inflate(inflater, container, false);
-        activity.checkForInvalidResources();
         return binding.getRoot();
     }
 
@@ -108,6 +107,7 @@ public class ArraysEditor extends Fragment {
             notesMap = new HashMap<>(arraysEditorManager.notesMap);
             adapter = new ArraysAdapter(arraysList, this, notesMap);
             binding.recyclerView.setAdapter(adapter);
+            activity.checkForInvalidResources();
             updateNoContentLayout();
         });
     }
@@ -294,6 +294,9 @@ public class ArraysEditor extends Fragment {
         if (isEditing) {
             binding.itemName.setText(attr);
             binding.itemValue.setText(array.getAttribute(attr));
+        } else {
+            binding.itemName.setText("item" + (array.getAttributes().keySet().size() + 1));
+            binding.itemValue.requestFocus();
         }
 
         dialog.b(isEditing ? "Edit item" : "Create new item");

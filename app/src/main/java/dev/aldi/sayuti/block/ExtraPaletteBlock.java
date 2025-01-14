@@ -405,7 +405,7 @@ public class ExtraPaletteBlock {
 
                 logicEditor.b("Add new String", "XmlString.Add");
                 logicEditor.b("Remove String(s)", "XmlString.remove");
-                logicEditor.b("Open String editor", "openStringEditor");
+                logicEditor.b("Open Resources editor", "openResourcesEditor");
 
                 logicEditor.a("s", "getResString");
                 logicEditor.a("Saved Res Strings :", 0xff555555);

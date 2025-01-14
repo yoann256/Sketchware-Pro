@@ -324,14 +324,7 @@ public class ManageResourceActivity extends BaseAppCompatActivity {
     }
 
     private void goEdit(int position) {
-        String filePath = frc.listFileResource.get(position);
-        if (filePath.endsWith("strings.xml") || filePath.endsWith("colors.xml") || filePath.endsWith("styles.xml") || filePath.endsWith("themes.xml")) {
-            Intent intent = new Intent();
-            intent.setClass(getApplicationContext(), ResourcesEditorActivity.class);
-            intent.putExtra("sc_id", numProj);
-            intent.putExtra("variant", extractVariant(frc.listFileResource.get(position)));
-            startActivity(intent);
-        } else if (filePath.endsWith("xml")) {
+        if (frc.listFileResource.get(position).endsWith("xml")) {
             Intent intent = new Intent();
             intent.setClass(getApplicationContext(), SrcCodeEditor.class);
             intent.putExtra("title", Uri.parse(frc.listFileResource.get(position)).getLastPathSegment());
@@ -345,18 +338,6 @@ public class ManageResourceActivity extends BaseAppCompatActivity {
             SketchwareUtil.toast("Only XML files can be edited");
         }
     }
-
-    public String extractVariant(String fullPath) {
-        String regex = "values(-[^/]+)";
-        Pattern pattern = Pattern.compile(regex);
-        Matcher matcher = pattern.matcher(fullPath);
-
-        if (matcher.find()) {
-            return matcher.group(1);
-        }
-        return "";
-    }
-
 
     private void goEdit2(int position) {
         if (frc.listFileResource.get(position).endsWith("xml")) {

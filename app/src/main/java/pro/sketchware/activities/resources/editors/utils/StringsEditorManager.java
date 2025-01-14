@@ -18,6 +18,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import a.a.a.lC;
 import a.a.a.wq;
 import a.a.a.yB;
+import pro.sketchware.activities.resources.editors.ResourcesEditorActivity;
 import pro.sketchware.utility.XmlUtil;
 
 public class StringsEditorManager {
@@ -65,7 +66,7 @@ public class StringsEditorManager {
     private void addToListMap(ArrayList<HashMap<String, Object>> list, Element node) {
         HashMap<String, Object> map = new HashMap<>();
         String key = node.getAttribute("name");
-        String value = node.getTextContent();
+        String value = node.getTextContent().replace("\\", "");
         map.put("key", key);
         map.put("text", value);
         if (key.equals("app_name")) {
@@ -97,7 +98,7 @@ public class StringsEditorManager {
             Object textObj = map.get("text");
             assert textObj != null;
             String text = textObj instanceof String ? (String) textObj : textObj.toString();
-            String escapedText = escapeXml(text);
+            String escapedText = ResourcesEditorActivity.escapeXml(text);
             xmlString.append("    <string name=\"").append(key).append("\"");
             if (map.containsKey("translatable")) {
                 String translatable = (String) map.get("translatable");
@@ -109,14 +110,4 @@ public class StringsEditorManager {
         return xmlString.toString();
     }
 
-    private String escapeXml(String text) {
-        if (text == null) return "";
-        return text.replace("&", "&amp;")
-                .replace("<", "&lt;")
-                .replace(">", "&gt;")
-                .replace("\"", "&quot;")
-                .replace("'", "&apos;")
-                .replace("\n", "&#10;")
-                .replace("\r", "&#13;");
-    }
 }

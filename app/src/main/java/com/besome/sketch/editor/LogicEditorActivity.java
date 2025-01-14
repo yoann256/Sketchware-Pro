@@ -168,7 +168,7 @@ public class LogicEditorActivity extends BaseAppCompatActivity implements View.O
     private ArrayList<BlockBean> savedBlockBean = new ArrayList<>();
     private Boolean isViewBindingEnabled;
 
-    private final ActivityResultLauncher<Intent> openStringEditor = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+    private final ActivityResultLauncher<Intent> openResourcesEditor = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
         if (result.getResultCode() == RESULT_OK) {
             paletteSelector.performClickPalette(-1);
         }
@@ -444,7 +444,7 @@ public class LogicEditorActivity extends BaseAppCompatActivity implements View.O
 
     private boolean isXmlStringUsed(String projectScId, String key) {
         if ("app_name".equals(key)) {
-            return false;
+            return true;
         }
         eC projectDataManager = jC.a(projectScId);
 
@@ -548,11 +548,11 @@ public class LogicEditorActivity extends BaseAppCompatActivity implements View.O
         return xmlFileNames;
     }
 
-    public void openStringEditor() {
+    public void openResourcesEditor() {
         Intent intent = new Intent();
         intent.setClass(getApplicationContext(), ResourcesEditorActivity.class);
         intent.putExtra("sc_id", B);
-        openStringEditor.launch(intent);
+        openResourcesEditor.launch(intent);
     }
 
     public void I() {
@@ -2142,8 +2142,8 @@ public class LogicEditorActivity extends BaseAppCompatActivity implements View.O
                     showAddNewXmlStringDialog();
                 } else if (tag.equals("XmlString.remove")) {
                     showRemoveXmlStringDialog();
-                } else if (tag.equals("openStringEditor")) {
-                    openStringEditor();
+                } else if (tag.equals("openResourcesEditor")) {
+                    openResourcesEditor();
                 } else if (tag.equals("listAdd")) {
                     G();
                 } else if (tag.equals("listRemove")) {

@@ -121,7 +121,7 @@ public class StringsAdapter extends RecyclerView.Adapter<StringsAdapter.ViewHold
             });
 
             String keyInput = Objects.requireNonNull(dialogBinding.stringKeyInput.getText()).toString();
-            if (keyInput.equals("app_name")) {
+            if (!keyInput.equals("app_name")) {
                 dialog.configureDefaultButton(Helper.getResString(R.string.common_word_delete), v1 -> {
                     if (isXmlStringUsed(key)) {
                         SketchwareUtil.toastError(Helper.getResString(R.string.logic_editor_title_remove_xml_string_error));
