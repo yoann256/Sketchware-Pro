@@ -18,7 +18,6 @@ import java.util.Map;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import a.a.a.XmlBuilderHelper;
 import pro.sketchware.activities.resources.editors.models.StyleModel;
 
 public class StylesEditorManager {
@@ -27,25 +26,34 @@ public class StylesEditorManager {
     public LinkedHashMap<Integer, String> notesMap = new LinkedHashMap<>();
 
     public String convertStylesToXML(ArrayList<StyleModel> stylesList, HashMap<Integer, String> notesMap) {
-        XmlBuilderHelper stylesFileBuilder = new XmlBuilderHelper();
+        StringBuilder xmlBuilder = new StringBuilder();
+        xmlBuilder.append("<resources>\n");
 
         int styleIndex = 0;
         for (StyleModel style : stylesList) {
-            String parentStyle = (style.getParent() != null && !style.getParent().isEmpty()) ? style.getParent() : null;
-            stylesFileBuilder.addStyle(style.getStyleName(), parentStyle);
 
             if (notesMap.containsKey(styleIndex)) {
-                stylesFileBuilder.addComment(notesMap.get(styleIndex), styleIndex);
+                xmlBuilder.append("    <!--").append(notesMap.get(styleIndex)).append("-->\n");
+            }
+
+            String parentStyle = (style.getParent() != null && !style.getParent().isEmpty()) ? style.getParent() : null;
+            if (parentStyle == null || parentStyle.isEmpty()) {
+                xmlBuilder.append("    <style name=\"").append(style.getStyleName()).append("\">\n");
+            } else {
+                xmlBuilder.append("    <style name=\"").append(style.getStyleName()).append("\" parent=\"").append(parentStyle).append("\">\n");
             }
 
             Map<String, String> attributes = style.getAttributes();
             for (Map.Entry<String, String> entry : attributes.entrySet()) {
-                stylesFileBuilder.addItemToStyle(style.getStyleName(), entry.getKey(), entry.getValue());
+                xmlBuilder.append("        <item name=\"").append(entry.getKey()).append("\">").append(entry.getValue()).append("</item>\n");
             }
+
+            xmlBuilder.append("    </style>\n");
             styleIndex++;
         }
 
-        return stylesFileBuilder.toCode();
+        xmlBuilder.append("</resources>");
+        return xmlBuilder.toString();
     }
 
     public ArrayList<StyleModel> parseStylesFile(String content) {

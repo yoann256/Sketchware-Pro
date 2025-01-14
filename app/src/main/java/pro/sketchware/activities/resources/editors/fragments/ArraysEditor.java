@@ -181,10 +181,10 @@ public class ArraysEditor extends Fragment {
             binding.arrayHeaderInput.setText(notesMap.get(position));
         }
         binding.arrayType.setOnClickListener(view -> {
-            String[] arrayTypes = {"STRING", "INTEGER", "FLOAT", "REFERENCES"};
+            String[] arrayTypes = {"STRING", "INTEGER", "OBJECT"};
             new MaterialAlertDialogBuilder(requireContext())
                     .setTitle("Select Array Type")
-                    .setSingleChoiceItems(arrayTypes, 0, (dialogInterface, which) -> {
+                    .setSingleChoiceItems(arrayTypes, -1, (dialogInterface, which) -> {
                         binding.arrayType.setText(arrayTypes[which]);
                         dialogInterface.dismiss();
                     })

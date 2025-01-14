@@ -10,7 +10,6 @@ public class XmlBuilder {
     public int b;
     public String c;
     public boolean d;
-    public boolean isComment;
     public ArrayList<AttributeBuilder> e;
     public ArrayList<XmlBuilder> f;
     public String g;
@@ -63,47 +62,41 @@ public class XmlBuilder {
     public String toCode() {
         StringBuilder resultCode = new StringBuilder();
 
-        if (isComment) {
-            resultCode.append("\t<!-- ");
-            resultCode.append(c);
-            resultCode.append(" -->");
-        } else {
-            resultCode.append(addZeroIndent());
-            resultCode.append("<");
-            resultCode.append(a);
+        resultCode.append(addZeroIndent());
+        resultCode.append("<");
+        resultCode.append(a);
 
-            for (AttributeBuilder attr : e) {
-                if (e.size() <= 1 || d) {
-                    resultCode.append(" ");
-                } else {
-                    resultCode.append("\r\n");
-                    resultCode.append(addIndent(1));
-                    g = "\r\n" + addIndent(1);
-                }
-                resultCode.append(attr.toCode());
+        for (AttributeBuilder attr : e) {
+            if (e.size() <= 1 || d) {
+                resultCode.append(" ");
+            } else {
+                resultCode.append("\r\n");
+                resultCode.append(addIndent(1));
+                g = "\r\n" + addIndent(1);
             }
+            resultCode.append(attr.toCode());
+        }
 
-            if (f.size() <= 0) {
-                if (c == null || c.length() <= 0) {
-                    resultCode.append(" />");
-                } else {
-                    resultCode.append(">");
-                    resultCode.append(c);
-                    resultCode.append("</");
-                    resultCode.append(a);
-                    resultCode.append(">");
-                }
+        if (f.size() <= 0) {
+            if (c == null || c.length() <= 0) {
+                resultCode.append(" />");
             } else {
                 resultCode.append(">");
-                resultCode.append("\r\n");
-                for (XmlBuilder xmlBuilder : f) {
-                    resultCode.append(xmlBuilder.toCode());
-                }
-                resultCode.append(addZeroIndent());
+                resultCode.append(c);
                 resultCode.append("</");
                 resultCode.append(a);
                 resultCode.append(">");
             }
+        } else {
+            resultCode.append(">");
+            resultCode.append("\r\n");
+            for (XmlBuilder xmlBuilder : f) {
+                resultCode.append(xmlBuilder.toCode());
+            }
+            resultCode.append(addZeroIndent());
+            resultCode.append("</");
+            resultCode.append(a);
+            resultCode.append(">");
         }
 
         resultCode.append("\r\n");

@@ -24,7 +24,6 @@ import java.util.Set;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import a.a.a.XmlBuilderHelper;
 import a.a.a.lC;
 import a.a.a.wq;
 import a.a.a.yB;
@@ -179,23 +178,21 @@ public class ColorsEditorManager {
     }
 
     public String convertListToXml(ArrayList<ColorModel> colorList, HashMap<Integer, String> notesMap) {
-        try {
-            XmlBuilderHelper colorsFileBuilder = new XmlBuilderHelper();
+        StringBuilder xmlBuilder = new StringBuilder();
+        xmlBuilder.append("<resources>\n");
 
-            for (int i = 0; i < colorList.size(); i++) {
-                if (notesMap.containsKey(i)) {
-                    colorsFileBuilder.addComment(notesMap.get(i), i);
-                }
-
-                ColorModel colorModel = colorList.get(i);
-                colorsFileBuilder.addColor(colorModel.getColorName(), colorModel.getColorValue());
+        for (int i = 0; i < colorList.size(); i++) {
+            if (notesMap.containsKey(i)) {
+                xmlBuilder.append("    <!--").append(notesMap.get(i)).append("-->\n");
             }
 
-            return colorsFileBuilder.toCode();
-
-        } catch (Exception ignored) {
+            ColorModel colorModel = colorList.get(i);
+            xmlBuilder.append("    <color name=\"").append(colorModel.getColorName()).append("\">")
+                    .append(colorModel.getColorValue()).append("</color>\n");
         }
-        return null;
+
+        xmlBuilder.append("</resources>");
+        return xmlBuilder.toString();
     }
 
 }
