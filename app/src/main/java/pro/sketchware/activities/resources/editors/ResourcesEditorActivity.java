@@ -204,17 +204,21 @@ public class ResourcesEditorActivity extends BaseAppCompatActivity {
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
-                if (stringsEditor.hasUnsavedChanges
-                        || colorsEditor.hasUnsavedChanges
-                        || stylesEditor.hasUnsavedChanges
-                        || themesEditor.hasUnsavedChanges
-                        || arraysEditor.hasUnsavedChanges
-                ) {
+                ArrayList<String> unsavedFiles = getUnsavedFilesList();
+
+                if (!unsavedFiles.isEmpty()) {
+                    String files = formatUnsavedFilesList(unsavedFiles);
+                    String message = String.format(Helper.getResString(R.string.resources_editor_unsaved_changes_message), files);
+
                     new MaterialAlertDialogBuilder(ResourcesEditorActivity.this)
-                            .setTitle("Warning")
-                            .setMessage("You have unsaved changes. Are you sure you want to exit?")
-                            .setPositiveButton("Exit", (dialog, which) -> finish())
-                            .setNegativeButton("Cancel", null)
+                            .setTitle(Helper.getResString(R.string.common_word_warning))
+                            .setMessage(message)
+                            .setPositiveButton(Helper.getResString(R.string.design_quit_button_save_and_exit), (dialog, which) -> {
+                                saveEditorsChanges();
+                                finish();
+                            })
+                            .setNegativeButton(Helper.getResString(R.string.common_word_exit), (dialog, which) -> finish())
+                            .setNeutralButton(Helper.getResString(R.string.common_word_cancel), null)
                             .create()
                             .show();
                     return;
@@ -226,6 +230,37 @@ public class ResourcesEditorActivity extends BaseAppCompatActivity {
         });
     }
 
+    private String formatUnsavedFilesList(ArrayList<String> unsavedFiles) {
+        if (unsavedFiles.size() == 1) {
+            return unsavedFiles.get(0);
+        } else if (unsavedFiles.size() == 2) {
+            return String.join(" and ", unsavedFiles);
+        } else {
+            String lastFile = unsavedFiles.remove(unsavedFiles.size() - 1);
+            return String.join(", ", unsavedFiles) + ", and " + lastFile;
+        }
+    }
+
+    private ArrayList<String> getUnsavedFilesList() {
+        ArrayList<String> unsavedFiles = new ArrayList<>();
+
+        if (stringsEditor.hasUnsavedChanges) {
+            unsavedFiles.add("strings.xml");
+        }
+        if (colorsEditor.hasUnsavedChanges) {
+            unsavedFiles.add("colors.xml");
+        }
+        if (stylesEditor.hasUnsavedChanges) {
+            unsavedFiles.add("styles.xml");
+        }
+        if (themesEditor.hasUnsavedChanges) {
+            unsavedFiles.add("themes.xml");
+        }
+        if (arraysEditor.hasUnsavedChanges) {
+            unsavedFiles.add("arrays.xml");
+        }
+        return unsavedFiles;
+    }
     @Override
     public void onResume() {
         if (isComingFromSrcCodeEditor) {
@@ -301,13 +336,7 @@ public class ResourcesEditorActivity extends BaseAppCompatActivity {
     public boolean onOptionsItemSelected(android.view.MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.action_save) {
-            stringsEditor.saveStringsFile();
-            colorsEditor.saveColorsFile();
-            stylesEditor.saveStylesFile();
-            themesEditor.saveThemesFile();
-            arraysEditor.saveArraysFile();
-            updateProjectMetadata();
-            SketchwareUtil.toast("Save completed");
+            saveEditorsChanges();
         } else if (id == R.id.action_select_variant) {
             changeTheVariantDialog();
         } else if (id == R.id.action_get_from_variant) {
@@ -332,6 +361,16 @@ public class ResourcesEditorActivity extends BaseAppCompatActivity {
             }
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void saveEditorsChanges() {
+        stringsEditor.saveStringsFile();
+        colorsEditor.saveColorsFile();
+        stylesEditor.saveStylesFile();
+        themesEditor.saveThemesFile();
+        arraysEditor.saveArraysFile();
+        updateProjectMetadata();
+        SketchwareUtil.toast("Save completed");
     }
 
     private void updateProjectMetadata() {
@@ -468,7 +507,7 @@ public class ResourcesEditorActivity extends BaseAppCompatActivity {
 
     public ArrayList<String> extractVariants(ArrayList<String> resourcesDir) {
         ArrayList<String> variants = new ArrayList<>();
-        for (String dir :  resourcesDir) {
+        for (String dir : resourcesDir) {
             String regex = "(values(-[^/]+)*)";
             Pattern pattern = Pattern.compile(regex);
             Matcher matcher = pattern.matcher(dir);
@@ -507,11 +546,16 @@ public class ResourcesEditorActivity extends BaseAppCompatActivity {
             int updateMode = isMergeAndReplace ? 2 : isSkippingMode ? 1 : 0;
             for (int i = 0; i < resourcesFileNames.size(); i++) {
                 if (selectedItems.get(i)) {
-                    if (i == 0) stringsEditor.updateStringsList(stringsFilePath.replace(variant, ""), updateMode, true);
-                    if (i == 1) colorsEditor.updateColorsList(colorsFilePath.replace(variant, ""), updateMode, true);
-                    if (i == 2) stylesEditor.updateStylesList(stylesFilePath.replace(variant, ""), updateMode, true);
-                    if (i == 3) themesEditor.updateThemesList(themesFilePath.replace(variant, ""), updateMode, true);
-                    if (i == 4) arraysEditor.updateArraysList(arrayFilePath.replace(variant, ""), updateMode, true);
+                    if (i == 0)
+                        stringsEditor.updateStringsList(stringsFilePath.replace(variant, ""), updateMode, true);
+                    if (i == 1)
+                        colorsEditor.updateColorsList(colorsFilePath.replace(variant, ""), updateMode, true);
+                    if (i == 2)
+                        stylesEditor.updateStylesList(stylesFilePath.replace(variant, ""), updateMode, true);
+                    if (i == 3)
+                        themesEditor.updateThemesList(themesFilePath.replace(variant, ""), updateMode, true);
+                    if (i == 4)
+                        arraysEditor.updateArraysList(arrayFilePath.replace(variant, ""), updateMode, true);
                 }
             }
         });

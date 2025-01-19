@@ -2260,5 +2260,6 @@ Please try again later"</string>
     <string name="resources_manager_xml_important_note_title">Important Note :</string>
     <string name="resources_manager_xml_important_note_message_strings">Changing the `app_name` value will directly affect this project\'s application name</string>
     <string name="resources_manager_xml_important_note_message_colors">Changing primary colors will affect the app\'s visual theme, including buttons and highlights</string>
+    <string name="resources_editor_unsaved_changes_message">You have unsaved changes in \"%s\"\nDo you want to save your changes before quitting?</string>
 
 </resources>
