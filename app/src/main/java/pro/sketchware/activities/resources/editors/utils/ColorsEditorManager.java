@@ -3,7 +3,12 @@ package pro.sketchware.activities.resources.editors.utils;
 import static com.besome.sketch.design.DesignActivity.sc_id;
 import static mod.hey.studios.util.ProjectFile.getDefaultColor;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.res.Resources;
+import android.util.Log;
+import android.util.TypedValue;
+import android.view.View;
 
 import androidx.core.content.ContextCompat;
 
@@ -31,35 +36,59 @@ import pro.sketchware.SketchApplication;
 import pro.sketchware.activities.resources.editors.models.ColorModel;
 import pro.sketchware.utility.FileUtil;
 import pro.sketchware.utility.PropertiesUtil;
+import pro.sketchware.utility.ThemeUtils;
 import pro.sketchware.utility.XmlUtil;
 
+@SuppressLint("DiscouragedApi")
 public class ColorsEditorManager {
 
     public String contentPath;
     public boolean isDataLoadingFailed;
     public boolean isDefaultVariant = true;
+    public final String defaultHexColor = "#00000000";
 
     public HashMap<String, String> defaultColors;
     public HashMap<Integer, String> notesMap = new HashMap<>();
 
+    private final View view = null;
+
     public String getColorValue(Context context, String colorValue, int referencingLimit) {
         if (colorValue == null || referencingLimit <= 0) {
-            return null;
+            return defaultHexColor;
         }
 
         if (colorValue.startsWith("#")) {
             return colorValue;
         }
-        if (colorValue.startsWith("?attr/")) {
-            return getColorValueFromXml(context, colorValue.substring(6), referencingLimit - 1);
+        if (colorValue.startsWith("?attr/") || colorValue.startsWith("?")) {
+            String attrName = colorValue.startsWith("?attr/") ? colorValue.substring(6) : colorValue.substring(1);
+            return getColorValueFromAttrs(context, attrName, referencingLimit - 1);
         }
         if (colorValue.startsWith("@color/")) {
             return getColorValueFromXml(context, colorValue.substring(7), referencingLimit - 1);
-
         } else if (colorValue.startsWith("@android:color/")) {
             return getColorValueFromSystem(colorValue, context);
         }
-        return "#ffffff";
+        return defaultHexColor;
+    }
+
+    public String getColorValueFromAttrs(Context context, String attrName, int referencingLimit) {
+        String TAG = "ABCD";
+        try {
+            int attrId = context.getResources().getIdentifier(attrName, "attr", context.getPackageName());
+            Log.d(TAG, "Attribute ID for " + attrName + ": " + attrId);
+
+            if (attrId != 0 && referencingLimit > 0) {
+                String hexColor = String.format("#%06X", (0xFFFFFF & ThemeUtils.getColor(view, attrId)));
+                Log.e(TAG, "collected : " + hexColor);
+                return hexColor;
+            }
+        } catch (Resources.NotFoundException e) {
+            Log.e(TAG, "Resource not found: " + attrName, e);
+        } catch (Exception e) {
+            Log.e(TAG, "Error retrieving color value for attribute: " + attrName, e);
+        }
+        return defaultHexColor;
     }
 
     private String getColorValueFromSystem(String colorValue, Context context) {
@@ -69,7 +98,7 @@ public class ColorsEditorManager {
             int colorInt = ContextCompat.getColor(context, colorId);
             return String.format("#%06X", (0xFFFFFF & colorInt));
         } catch (Exception e) {
-            return "#ffffff";
+            return defaultHexColor;
         }
     }
 

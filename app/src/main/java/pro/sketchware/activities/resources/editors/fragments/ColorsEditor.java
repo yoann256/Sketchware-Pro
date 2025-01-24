@@ -144,27 +144,16 @@ public class ColorsEditor extends Fragment {
     public void showColorEditDialog(ColorModel colorModel, int position) {
         aB dialog = new aB(activity);
         ColorEditorAddBinding dialogBinding = ColorEditorAddBinding.inflate(getLayoutInflater());
-        new XB(activity, dialogBinding.colorValueInputLayout, dialogBinding.colorPreview);
 
         if (colorModel != null) {
             dialogBinding.colorKeyInput.setText(colorModel.getColorName());
+            dialogBinding.colorValueInput.setText(colorModel.getColorValue());
             if (defaultColors.containsKey(colorModel.getColorName())) {
                 dialogBinding.colorKeyInput.setEnabled(false);
             }
             dialogBinding.stringHeaderInput.setText(notesMap.getOrDefault(position, ""));
             dialogBinding.colorPreview.setBackgroundColor(PropertiesUtil.parseColor(colorsEditorManager.getColorValue(activity.getApplicationContext(), colorModel.getColorValue(), 3)));
             dialogBinding.importantNote.setVisibility(defaultColors.containsKey(colorModel.getColorName()) ? View.VISIBLE : View.GONE);
-
-            if (colorModel.getColorValue().startsWith("@")) {
-                dialogBinding.colorValueInput.setText(colorModel.getColorValue().replace("@", ""));
-                dialogBinding.hash.setText("@");
-                dialogBinding.colorValueInput.setEnabled(false);
-                dialogBinding.hash.setEnabled(false);
-                dialogBinding.colorValueInputLayout.setError(null);
-            } else {
-                dialogBinding.colorValueInput.setText(colorModel.getColorValue().replace("#", ""));
-                dialogBinding.hash.setText("#");
-            }
 
             dialog.b("Edit color");
 
@@ -176,6 +165,21 @@ public class ColorsEditor extends Fragment {
         dialogBinding.importantNote.setOnClickListener(view -> {
             animateLayoutChanges(dialogBinding.getRoot());
             dialogBinding.imgColorGuide.setVisibility(dialogBinding.imgColorGuide.getVisibility() == View.GONE ? View.VISIBLE : View.GONE);
+        });
+
+        dialogBinding.colorValueInput.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                dialogBinding.colorPreview.setBackgroundColor(PropertiesUtil.parseColor(colorsEditorManager.getColorValue(activity.getApplicationContext(), s.toString(), 3)));
+            }
         });
 
         dialogBinding.colorKeyInput.addTextChangedListener(new TextWatcher() {
@@ -212,12 +216,7 @@ public class ColorsEditor extends Fragment {
 
             if (colorModel != null) {
                 colorModel.setColorName(key);
-
-                if (dialogBinding.hash.getText().equals("@")) {
-                    colorModel.setColorValue("@" + value);
-                } else {
-                    colorModel.setColorValue("#" + value);
-                }
+                colorModel.setColorValue(value);
 
                 String headerInput = Objects.requireNonNull(dialogBinding.stringHeaderInput.getText()).toString();
                 if (headerInput.isEmpty()) {
@@ -240,10 +239,7 @@ public class ColorsEditor extends Fragment {
                 public void a(int colorInt) {
                     String selectedColorHex = "#" + String.format("%06X", colorInt & 0x00FFFFFF);
                     dialogBinding.colorPreviewCard.setCardBackgroundColor(PropertiesUtil.parseColor(selectedColorHex));
-                    dialogBinding.colorValueInput.setText(selectedColorHex.replace("#", ""));
-                    dialogBinding.colorValueInput.setEnabled(true);
-                    dialogBinding.hash.setEnabled(true);
-                    dialogBinding.hash.setText("#");
+                    dialogBinding.colorValueInput.setText(selectedColorHex);
                 }
 
                 @Override
@@ -270,7 +266,7 @@ public class ColorsEditor extends Fragment {
     }
 
     private void addColor(String name, String value, String note) {
-        ColorModel newItem = new ColorModel(name, "#" + value);
+        ColorModel newItem = new ColorModel(name, value);
         for (int i = 0; i < colorList.size(); i++) {
             if (colorList.get(i).getColorName().equals(name)) {
                 colorList.set(i, newItem);
