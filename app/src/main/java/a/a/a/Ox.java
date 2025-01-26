@@ -188,32 +188,31 @@ public class Ox {
         if (backgroundResource == null || "NONE".equalsIgnoreCase(backgroundResource)) {
             int backgroundColor = viewBean.layout.backgroundColor;
             String backgroundResColor = viewBean.layout.backgroundResColor;
-            String colorPath = "@color/" + backgroundResColor;
 
             if (backgroundColor != 0xffffff) {
                 if (backgroundColor != 0) {
                     int color = backgroundColor & 0xffffff;
                     if (nx.c().equals("BottomAppBar")) {
                         if (!toNotAdd.contains("app:backgroundTint") && !injectHandler.contains("backgroundTint") && (backgroundResColor != null)) {
-                            nx.addAttribute("app", "backgroundTint", colorPath);
+                            nx.addAttribute("app", "backgroundTint", backgroundResColor);
                         } else if (!toNotAdd.contains("app:backgroundTint") && !injectHandler.contains("backgroundTint")) {
                             nx.addAttribute("app", "backgroundTint", formatColor(color));
                         }
                     } else if (nx.c().equals("CardView") || nx.c().equals("MaterialCardView")) {
                         if (!toNotAdd.contains("app:cardBackgroundColor") && !injectHandler.contains("cardBackgroundColor") && backgroundResColor != null) {
-                            nx.addAttribute("app", "cardBackgroundColor", colorPath);
+                            nx.addAttribute("app", "cardBackgroundColor", backgroundResColor);
                         } else if (!toNotAdd.contains("app:cardBackgroundColor") && !injectHandler.contains("cardBackgroundColor")) {
                             nx.addAttribute("app", "cardBackgroundColor", formatColor(color));
                         }
                     } else if (nx.c().equals("CollapsingToolbarLayout")) {
                         if (!toNotAdd.contains("app:contentScrim") && !injectHandler.contains("contentScrim") && backgroundResColor != null) {
-                            nx.addAttribute("app", "contentScrim", colorPath);
+                            nx.addAttribute("app", "contentScrim", backgroundResColor);
                         } else if (!toNotAdd.contains("app:contentScrim") && !injectHandler.contains("contentScrim")) {
                             nx.addAttribute("app", "contentScrim", formatColor(color));
                         }
                     } else {
                         if (!hasAttr("background", viewBean) && !toNotAdd.contains("android:background") && !injectHandler.contains("background") && backgroundResColor != null) {
-                            nx.addAttribute("android", "background", colorPath);
+                            nx.addAttribute("android", "background", backgroundResColor);
                         } else if (!hasAttr("background", viewBean) && !toNotAdd.contains("android:background") && !injectHandler.contains("background")) {
                             nx.addAttribute("android", "background", formatColor(color));
                         }

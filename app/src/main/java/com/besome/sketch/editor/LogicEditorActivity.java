@@ -1542,6 +1542,9 @@ public class LogicEditorActivity extends BaseAppCompatActivity implements View.O
                 LogicEditorActivity.this.a(ss, "getResources().getColor(R.color." + var1 + ")");
             }
         });
+        zx.materialColorAttr((attr, attrId) -> {
+            LogicEditorActivity.this.a(ss, "getMaterialColor(R.attr." + attr + ")");
+        });
         zx.showAtLocation(ss, Gravity.CENTER, 0, 0);
     }
 

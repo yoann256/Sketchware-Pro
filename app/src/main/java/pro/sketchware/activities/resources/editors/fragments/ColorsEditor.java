@@ -129,7 +129,7 @@ public class ColorsEditor extends Fragment {
 
     private void initialize() {
 
-        colorpicker = new Zx(activity, 0xFFFFFFFF, false, false);
+        colorpicker = new Zx(activity, 0xFFFFFFFF, false, false, activity.sc_id);
 
         defaultColors.put("colorAccent", ProjectFile.COLOR_ACCENT);
         defaultColors.put("colorPrimary", ProjectFile.COLOR_PRIMARY);
@@ -243,7 +243,7 @@ public class ColorsEditor extends Fragment {
             colorpicker.a(new Zx.b() {
                 @Override
                 public void a(int colorInt) {
-                    String selectedColorHex = "#" + String.format("%06X", colorInt & 0x00FFFFFF);
+                    String selectedColorHex = String.format("#%06X", colorInt & 0x00FFFFFF);
                     dialogBinding.colorPreviewCard.setCardBackgroundColor(PropertiesUtil.parseColor(selectedColorHex));
                     dialogBinding.colorValueInput.setText(selectedColorHex);
                 }
@@ -252,6 +252,7 @@ public class ColorsEditor extends Fragment {
                 public void a(String var1, int var2) {
                 }
             });
+            colorpicker.materialColorAttr((attr, attrId) -> dialogBinding.colorValueInput.setText("?" + attr));
             colorpicker.showAtLocation(v, Gravity.CENTER, 0, 0);
         });
 
