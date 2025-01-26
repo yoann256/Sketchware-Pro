@@ -46,7 +46,7 @@ public class ManageLibraryActivity extends BaseAppCompatActivity implements View
     private static final int REQUEST_CODE_APPCOMPAT_ACTIVITY = 231;
     private static final int REQUEST_CODE_FIREBASE_ACTIVITY = 230;
     private static final int REQUEST_CODE_GOOGLE_MAPS_ACTIVITY = 241;
-    private static final int REQUEST_CODE_EXCLUDE_BUILTIN_LIBRARIES_ACTIVITY = 242;
+    private static final int REQUEST_CODE_CUSTOM_ITEM_LIBRARY_ACTIVITY = 242;
     private final int PROJECT_LIB_TYPE_EXCLUDE_BUILTIN_LIBRARIES = 6;
     private final int PROJECT_LIB_TYPE_MATERIAL3 = 7;
 
@@ -169,11 +169,11 @@ public class ManageLibraryActivity extends BaseAppCompatActivity implements View
         startActivityForResult(intent, REQUEST_CODE_GOOGLE_MAPS_ACTIVITY);
     }
 
-    private void toExcludeBuiltinLibrariesActivity() {
-        Intent intent = new Intent(getApplicationContext(), ExcludeBuiltInLibrariesActivity.class);
+    private void launchCustomActivity(Class<? extends Activity> toLaunch) {
+        Intent intent = new Intent(getApplicationContext(), toLaunch);
         intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
         intent.putExtra("sc_id", sc_id);
-        startActivityForResult(intent, REQUEST_CODE_EXCLUDE_BUILTIN_LIBRARIES_ACTIVITY);
+        startActivityForResult(intent, REQUEST_CODE_CUSTOM_ITEM_LIBRARY_ACTIVITY);
     }
 
     private void launchActivity(Class<? extends Activity> toLaunch) {
@@ -224,7 +224,7 @@ public class ManageLibraryActivity extends BaseAppCompatActivity implements View
                     initializeLibrary(data.getParcelableExtra("google_map"));
                     break;
 
-                case REQUEST_CODE_EXCLUDE_BUILTIN_LIBRARIES_ACTIVITY:
+                case REQUEST_CODE_CUSTOM_ITEM_LIBRARY_ACTIVITY:
                     initializeLibrary(null);
                     break;
 
@@ -274,10 +274,10 @@ public class ManageLibraryActivity extends BaseAppCompatActivity implements View
                         launchActivity(ManageNativelibsActivity.class);
                         break;
                     case PROJECT_LIB_TYPE_EXCLUDE_BUILTIN_LIBRARIES:
-                        toExcludeBuiltinLibrariesActivity();
+                        launchCustomActivity(ExcludeBuiltInLibrariesActivity.class);
                         break;
                     case PROJECT_LIB_TYPE_MATERIAL3:
-                        launchActivity(Material3LibraryActivity.class);
+                        launchCustomActivity(Material3LibraryActivity.class);
                 }
             }
         }
