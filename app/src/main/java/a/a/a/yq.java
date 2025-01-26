@@ -15,6 +15,7 @@ import com.besome.sketch.beans.ProjectLibraryBean;
 import com.besome.sketch.beans.SrcCodeBean;
 import com.besome.sketch.beans.ViewBean;
 import com.besome.sketch.editor.manage.library.material3.Material3LibraryActivity;
+import com.besome.sketch.editor.manage.library.material3.Material3LibraryManager;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -416,7 +417,7 @@ public class yq {
                                 "                    Process.killProcess(Process.myPid());"
                 );
             }
-            if (Material3LibraryActivity.isDynamicColorsEnabled(sc_id)) {
+            if (new Material3LibraryManager(sc_id).isMaterial3Enabled()) {
                 sketchApplicationFileContent = sketchApplicationFileContent.replace(
                         "mApplicationContext = getApplicationContext();", "mApplicationContext = getApplicationContext();\n" +
                                         "        DynamicColors.applyToActivitiesIfAvailable(this);")
@@ -965,7 +966,7 @@ public class yq {
         if (FileUtil.isExistFile(filePath)) {
             return FileUtil.readFile(filePath);
         }
-        if (Material3LibraryActivity.isMaterial3Enabled(sc_id)) {
+        if (new Material3LibraryManager(sc_id).isMaterial3Enabled()) {
             XmlBuilderHelper stylesFileBuilder = new XmlBuilderHelper();
             stylesFileBuilder.addStyle("AppTheme", "Theme.Material3.DayNight.NoActionBar");
             stylesFileBuilder.addItemToStyle("AppTheme", "android:statusBarColor", "@android:color/transparent");

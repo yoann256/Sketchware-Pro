@@ -25,7 +25,7 @@ public class Material3LibraryItemView extends LibraryItemView {
         icon.setImageResource(R.drawable.ic_mtrl_material3);
         title.setText(Helper.getResString(R.string.design_library_title_material3));
         description.setText("Modern Material design with adaptive dynamic theming");
-        boolean isEnabled = Material3LibraryActivity.isMaterial3Enabled(sc_id);
+        boolean isEnabled = new Material3LibraryManager(sc_id).isMaterial3Enabled();
         enabled.setText(isEnabled ? "ON" : "OFF");
         enabled.setSelected(isEnabled);
     }
