@@ -416,6 +416,12 @@ public class yq {
                                 "                    Process.killProcess(Process.myPid());"
                 );
             }
+            if (Material3LibraryActivity.isDynamicColorsEnabled(sc_id)) {
+                sketchApplicationFileContent = sketchApplicationFileContent.replace(
+                        "mApplicationContext = getApplicationContext();", "mApplicationContext = getApplicationContext();\n" +
+                                        "        DynamicColors.applyToActivitiesIfAvailable(this);")
+                        .replace("import android.util.Log;", "import android.util.Log;\nimport com.google.android.material.color.DynamicColors;");
+            }
 
             fileUtil.b(javaFilesPath + File.separator
                             + packageNameAsFolders + File.separator
