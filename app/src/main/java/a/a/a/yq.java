@@ -14,6 +14,7 @@ import com.besome.sketch.beans.ProjectFileBean;
 import com.besome.sketch.beans.ProjectLibraryBean;
 import com.besome.sketch.beans.SrcCodeBean;
 import com.besome.sketch.beans.ViewBean;
+import com.besome.sketch.editor.manage.library.material3.Material3LibraryActivity;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -958,7 +959,22 @@ public class yq {
         if (FileUtil.isExistFile(filePath)) {
             return FileUtil.readFile(filePath);
         }
-        if (N.g) {
+        if (Material3LibraryActivity.isMaterial3Enabled(sc_id)) {
+            XmlBuilderHelper stylesFileBuilder = new XmlBuilderHelper();
+            stylesFileBuilder.addStyle("AppTheme", "Theme.Material3.DayNight.NoActionBar");
+            stylesFileBuilder.addItemToStyle("AppTheme", "android:statusBarColor", "@android:color/transparent");
+            stylesFileBuilder.addItemToStyle("AppTheme", "android:navigationBarColor", "@android:color/transparent");
+            stylesFileBuilder.addItemToStyle("AppTheme", "android:windowLightStatusBar", "?attr/isLightTheme");
+            stylesFileBuilder.addStyle("AppTheme.FullScreen", "AppTheme");
+            stylesFileBuilder.addItemToStyle("AppTheme.FullScreen", "android:windowFullscreen", "true");
+            stylesFileBuilder.addItemToStyle("AppTheme.FullScreen", "android:windowContentOverlay", "@null");
+            stylesFileBuilder.addStyle("AppTheme.AppBarOverlay", "ThemeOverlay.Material3");
+            stylesFileBuilder.addStyle("AppTheme.PopupOverlay", "ThemeOverlay.Material3");
+            stylesFileBuilder.addStyle("AppTheme.DebugActivity", "AppTheme");
+            stylesFileBuilder.addItemToStyle("AppTheme.DebugActivity", "windowActionBar", "true");
+            stylesFileBuilder.addItemToStyle("AppTheme.DebugActivity", "windowNoTitle", "false");
+            return CommandBlock.applyCommands("styles.xml", stylesFileBuilder.toCode());
+        } else if (N.g) {
             boolean useNewMaterialComponentsTheme = projectSettings.getValue(ProjectSettings.SETTING_ENABLE_BRIDGELESS_THEMES,
                     BuildSettings.SETTING_GENERIC_VALUE_FALSE).equals(BuildSettings.SETTING_GENERIC_VALUE_TRUE);
             XmlBuilderHelper stylesFileBuilder = new XmlBuilderHelper();
