@@ -1136,6 +1136,10 @@ ex)\"*/*\", \"image/*\", \"audio/*\", \"text/*\""</string>
     <string name="design_library_admob_title_interstitial">Interstitial AD</string>
     <string name="design_library_admob_widget_setup_first">In order to use this widget, you have to setup the settings in the Library Manager first.</string>
     <string name="design_library_appcompat_description">Activating App Compat library will let you add Drawer Layout and Floating Action Button to the Activities.</string>
+    <string name="design_library_material_3_description">Enabling Material 3 will enable the latest Material You design principles in your app, providing a more modern and visually appealing interface with customizable components and advanced theming options.</string>
+    <string name="design_library_material_3_enable_warning">Please note that enabling this library may have an impact on the overall design and appearance of the app, particularly if it’s an older project. It’s recommended to verify the changes and ensure compatibility with your current setup before activation.</string>
+    <string name="design_library_dynamic_colors_description">Enabling Dynamic Colors allows your app to adapt its color scheme based on the user\'s system preferences, creating a seamless and personalized experience that reflects the user\'s chosen theme and appearance.</string>
+    <string name="design_library_title_material3">"Material 3 and Dynamic Colors"</string>
     <string name="design_library_appcompat_need_firebase_disable">You can not disable the AppCompat Library when Firebase is in use.</string>
     <string name="design_library_button_import_from_other_project">Import from the other project</string>
     <string name="design_library_description_admob">Use Google AdMob</string>
