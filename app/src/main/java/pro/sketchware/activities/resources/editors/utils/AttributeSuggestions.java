@@ -144,7 +144,7 @@ public class AttributeSuggestions {
 
         ArrayList<ColorModel> colorList = new ArrayList<>();
 
-        new ColorsEditorManager(view).parseColorsXML(colorList, FileUtil.readFileIfExist(filePath));
+        new ColorsEditorManager().parseColorsXML(colorList, FileUtil.readFileIfExist(filePath));
 
         return colorList.stream().map(colorModel -> "@color/" + colorModel.getColorName()).collect(Collectors.toList());
 

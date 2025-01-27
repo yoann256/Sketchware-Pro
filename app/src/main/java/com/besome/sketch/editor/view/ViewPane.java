@@ -470,7 +470,7 @@ public class ViewPane extends RelativeLayout {
                             ((ImageView) view).setImageBitmap(Bitmap.createScaledBitmap(decodeFile3, decodeFile3.getWidth() * round3, decodeFile3.getHeight() * round3, true));
                         }
                     } else {
-                        XmlToSvgConverter xmlToSvgConverter = new XmlToSvgConverter(rootLayout);
+                        XmlToSvgConverter xmlToSvgConverter = new XmlToSvgConverter();
                         xmlToSvgConverter.setImageVectorFromFile(((ImageView) view), xmlToSvgConverter.getVectorFullPath(DesignActivity.sc_id, viewBean.image.resName));
                     }
                 } catch (Exception unused2) {
@@ -961,7 +961,7 @@ public class ViewPane extends RelativeLayout {
         if (viewBean.layout.backgroundResColor == null) {
             view.setBackgroundColor(viewBean.layout.backgroundColor);
         } else {
-            view.setBackgroundColor(PropertiesUtil.parseColor(new ColorsEditorManager(view).getColorValue(context, viewBean.layout.backgroundResColor, 3)));
+            view.setBackgroundColor(PropertiesUtil.parseColor(new ColorsEditorManager().getColorValue(context, viewBean.layout.backgroundResColor, 3)));
         }
 
         if (viewBean.id.equals("root")) {
@@ -1223,7 +1223,7 @@ public class ViewPane extends RelativeLayout {
         if (viewBean.text.resTextColor == null) {
             textView.setTextColor(viewBean.text.textColor);
         } else {
-            textView.setTextColor(PropertiesUtil.parseColor(new ColorsEditorManager(textView).getColorValue(context, viewBean.text.resTextColor, 3)));
+            textView.setTextColor(PropertiesUtil.parseColor(new ColorsEditorManager().getColorValue(context, viewBean.text.resTextColor, 3)));
         }
         textView.setTextSize(viewBean.text.textSize);
         textView.setLines(viewBean.text.line);
@@ -1261,7 +1261,7 @@ public class ViewPane extends RelativeLayout {
         if (viewBean.text.resHintColor == null) {
             editText.setHintTextColor(viewBean.text.hintColor);
         } else {
-            editText.setHintTextColor(PropertiesUtil.parseColor(new ColorsEditorManager(editText).getColorValue(context, viewBean.text.resHintColor, 3)));
+            editText.setHintTextColor(PropertiesUtil.parseColor(new ColorsEditorManager().getColorValue(context, viewBean.text.resHintColor, 3)));
         }
     }
 
@@ -1277,7 +1277,7 @@ public class ViewPane extends RelativeLayout {
         if (PropertiesUtil.isHexColor(cardBackgroundColor)) {
             cardView.setBackgroundColor(PropertiesUtil.parseColor(cardBackgroundColor));
         } else {
-            cardView.setBackgroundColor(PropertiesUtil.parseColor(new ColorsEditorManager(cardView).getColorValue(context, bean.layout.backgroundResColor, 3)));
+            cardView.setBackgroundColor(PropertiesUtil.parseColor(new ColorsEditorManager().getColorValue(context, bean.layout.backgroundResColor, 3)));
         }
         cardView.setCardElevation(PropertiesUtil.resolveSize(cardElevation, 4));
         cardView.setRadius(PropertiesUtil.resolveSize(cardCornerRadius, 8));

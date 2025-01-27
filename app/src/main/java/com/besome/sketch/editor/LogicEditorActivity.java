@@ -741,7 +741,7 @@ public class LogicEditorActivity extends BaseAppCompatActivity implements View.O
                     }
                 } else {
                     try {
-                        XmlToSvgConverter xmlToSvgConverter = new XmlToSvgConverter(n);
+                        XmlToSvgConverter xmlToSvgConverter = new XmlToSvgConverter();
                         xmlToSvgConverter.setImageVectorFromFile(imageView, xmlToSvgConverter.getVectorFullPath(DesignActivity.sc_id, str));
                     } catch (Exception e) {
                         imageView.setImageResource(R.drawable.ic_remove_grey600_24dp);
@@ -909,7 +909,7 @@ public class LogicEditorActivity extends BaseAppCompatActivity implements View.O
         binding.recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         ArrayList<String> images = jC.d(B).m();
-        images.addAll(new XmlToSvgConverter(n).getVectorDrawables(DesignActivity.sc_id));
+        images.addAll(new XmlToSvgConverter().getVectorDrawables(DesignActivity.sc_id));
         if (selectingImage) {
             images.add(0, "default_image");
         } else if (selectingBackgroundImage) {

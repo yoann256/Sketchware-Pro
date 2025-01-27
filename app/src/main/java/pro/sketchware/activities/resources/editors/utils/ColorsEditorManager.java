@@ -5,17 +5,18 @@ import static mod.hey.studios.util.ProjectFile.getDefaultColor;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.view.ContextThemeWrapper;
 import android.view.View;
 
 import androidx.core.content.ContextCompat;
+
+import com.besome.sketch.editor.manage.library.material3.Material3LibraryManager;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
-import org.xmlpull.v1.XmlPullParser;
-import org.xmlpull.v1.XmlPullParserFactory;
 
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -29,6 +30,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import a.a.a.lC;
 import a.a.a.wq;
 import a.a.a.yB;
+import pro.sketchware.R;
 import pro.sketchware.SketchApplication;
 import pro.sketchware.activities.resources.editors.models.ColorModel;
 import pro.sketchware.utility.FileUtil;
@@ -42,15 +44,16 @@ public class ColorsEditorManager {
     public String contentPath;
     public boolean isDataLoadingFailed;
     public boolean isDefaultVariant = true;
+    public boolean isNightVariant;
     public final String defaultHexColor = "#00000000";
 
     public HashMap<String, String> defaultColors;
     public HashMap<Integer, String> notesMap = new HashMap<>();
 
-    private final View view;
+    private final Material3LibraryManager material3LibraryManager;
 
-    public ColorsEditorManager(View view) {
-        this.view = view;
+    public ColorsEditorManager() {
+        material3LibraryManager = new Material3LibraryManager(sc_id);
     }
 
     public String getColorValue(Context context, String colorValue, int referencingLimit) {
@@ -78,7 +81,21 @@ public class ColorsEditorManager {
             int attrId = context.getResources().getIdentifier(attrName, "attr", context.getPackageName());
 
             if (attrId != 0 && referencingLimit > 0) {
-                return String.format("#%06X", (0xFFFFFF & ThemeUtils.getColor(view, attrId)));
+                Context themedContext;
+                if (isNightVariant) {
+                    if (material3LibraryManager.isDynamicColorsEnabled()) {
+                        themedContext = new ContextThemeWrapper(context, R.style.ThemeOverlay_SketchwarePro_ViewEditor_Material3_Dark);
+                    } else {
+                        themedContext = new ContextThemeWrapper(context, R.style.ThemeOverlay_SketchwarePro_ViewEditor_Material3_NON_DYNAMIC_Dark);
+                    }
+                } else {
+                    if (material3LibraryManager.isDynamicColorsEnabled()) {
+                        themedContext = new ContextThemeWrapper(context, R.style.ThemeOverlay_SketchwarePro_ViewEditor_Material3_Light);
+                    } else {
+                        themedContext = new ContextThemeWrapper(context, R.style.ThemeOverlay_SketchwarePro_ViewEditor_Material3_NON_DYNAMIC_Light);
+                    }
+                }
+                return String.format("#%06X", (0xFFFFFF & ThemeUtils.getColor(new View(themedContext), attrId)));
             }
         } catch (Exception ignored) {
         }
@@ -97,29 +114,17 @@ public class ColorsEditorManager {
     }
 
     private String getColorValueFromXml(Context context, String colorName, int referencingLimit) {
-        try {
-            String clrXml = FileUtil.readFileIfExist(contentPath);
-            XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
-            XmlPullParser parser = factory.newPullParser();
-            parser.setInput(new StringReader(clrXml));
-            int eventType = parser.getEventType();
-            while (eventType != XmlPullParser.END_DOCUMENT) {
-                if (eventType == XmlPullParser.START_TAG && "color".equals(parser.getName())) {
-                    String nameAttribute = parser.getAttributeValue(null, "name");
-                    if (colorName.equals(nameAttribute)) {
-                        String colorValue = parser.nextText().trim();
-                        if (colorValue.startsWith("@")) {
-                            return getColorValue(context, colorValue, referencingLimit - 1);
-                        } else {
-                            return colorValue;
-                        }
-                    }
-                }
-                eventType = parser.next();
-            }
+        String filePath = wq.b(sc_id) + "/files/resource/values/colors.xml";
 
-        } catch (Exception ignored) {}
-        return null;
+        ArrayList<ColorModel> colorList = new ArrayList<>();
+
+        parseColorsXML(colorList, FileUtil.readFileIfExist(filePath));
+        for (ColorModel colorModel : colorList) {
+            if (colorModel.getColorName().equals(colorName)) {
+                return getColorValue(context, colorModel.getColorValue(), referencingLimit);
+            }
+        }
+        return defaultHexColor;
     }
 
     public void parseColorsXML(ArrayList<ColorModel> colorList, String colorXml) {

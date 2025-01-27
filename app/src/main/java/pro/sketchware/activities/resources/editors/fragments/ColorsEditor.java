@@ -73,6 +73,7 @@ public class ColorsEditor extends Fragment {
         boolean isSkippingMode = updateMode == 1;
         boolean isMergeAndReplace = updateMode == 2;
         colorsEditorManager.isDefaultVariant = activity.variant.isEmpty();
+        colorsEditorManager.isNightVariant = activity.variant.contains("night");
 
         ArrayList<ColorModel> defaultColors = new ArrayList<>();
 
@@ -137,7 +138,7 @@ public class ColorsEditor extends Fragment {
         defaultColors.put("colorControlHighlight", ProjectFile.COLOR_CONTROL_HIGHLIGHT);
         defaultColors.put("colorControlNormal", ProjectFile.COLOR_CONTROL_NORMAL);
 
-        colorsEditorManager = new ColorsEditorManager(binding.getRoot());
+        colorsEditorManager = new ColorsEditorManager();
         colorsEditorManager.defaultColors = defaultColors;
     }
 

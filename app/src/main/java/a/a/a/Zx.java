@@ -379,7 +379,7 @@ public class Zx extends PopupWindow {
     }
 
     private void parseColorsXML(String colorXml) {
-        ColorsEditorManager colorsEditorManager = new ColorsEditorManager(binding.getRoot());
+        ColorsEditorManager colorsEditorManager = new ColorsEditorManager();
         try {
             XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
             XmlPullParser parser = factory.newPullParser();

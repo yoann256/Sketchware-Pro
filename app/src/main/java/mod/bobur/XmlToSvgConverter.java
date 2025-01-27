@@ -5,7 +5,6 @@ import static com.besome.sketch.design.DesignActivity.sc_id;
 import android.graphics.Picture;
 import android.graphics.drawable.PictureDrawable;
 import android.net.Uri;
-import android.view.View;
 import android.widget.ImageView;
 
 import com.bobur.androidsvg.SVG;
@@ -30,12 +29,6 @@ import pro.sketchware.utility.FileUtil;
  **/
 
 public class XmlToSvgConverter {
-
-    private final View view;
-
-    public XmlToSvgConverter(View view) {
-        this.view = view;
-    }
 
     public String xml2svg(String xmlContent) {
         try {
@@ -153,7 +146,7 @@ public class XmlToSvgConverter {
     }
 
     private void handlePath(Element path, StringWriter svg) {
-        ColorsEditorManager colorsEditorManager = new ColorsEditorManager(view);
+        ColorsEditorManager colorsEditorManager = new ColorsEditorManager();
 
         String pathData = path.getAttribute("android:pathData");
         String fillColor = getVectorColor(path);
@@ -227,7 +220,7 @@ public class XmlToSvgConverter {
     }
 
     public String getVectorColor(Element vectorElement) {
-        ColorsEditorManager colorsEditorManager = new ColorsEditorManager(view);
+        ColorsEditorManager colorsEditorManager = new ColorsEditorManager();
 
         Element root = vectorElement.getOwnerDocument().getDocumentElement();
         String tint = root.getAttribute("android:tint");

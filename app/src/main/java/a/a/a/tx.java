@@ -171,7 +171,7 @@ public class tx extends RelativeLayout implements View.OnClickListener {
         this.i = a3.findViewById(R.id.rg);
         this.j = a3.findViewById(R.id.content);
         ArrayList<String> m = jC.d(this.a).m();
-        ArrayList<String> vectors = new XmlToSvgConverter(this.j).getVectorDrawables(DesignActivity.sc_id);
+        ArrayList<String> vectors = new XmlToSvgConverter().getVectorDrawables(DesignActivity.sc_id);
         m.addAll(vectors);
         m.add(0, this.d ? "default_image" : "NONE");
         RadioButton radioButton = null;
@@ -259,7 +259,7 @@ public class tx extends RelativeLayout implements View.OnClickListener {
                     }
                 } else {
                     try {
-                        XmlToSvgConverter xmlToSvgConverter = new XmlToSvgConverter(this.j);
+                        XmlToSvgConverter xmlToSvgConverter = new XmlToSvgConverter();
                         xmlToSvgConverter.setImageVectorFromFile(imageView, xmlToSvgConverter.getVectorFullPath(DesignActivity.sc_id, str));
                     } catch (Exception e) {
                         imageView.setImageResource(R.drawable.ic_remove_grey600_24dp);
