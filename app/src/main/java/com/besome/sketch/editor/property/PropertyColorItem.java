@@ -165,7 +165,7 @@ public class PropertyColorItem extends RelativeLayout implements View.OnClickLis
                 }
             }
         });
-        colorPicker.materialLightColorAttr((attr, attrId) -> {
+        colorPicker.materialColorAttr((attr, attrId) -> {
             setValue(ThemeUtils.getColor(viewColor, attrId), "?" + attr);
             if (valueChangeListener != null) {
                 valueChangeListener.a(key, value);

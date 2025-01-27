@@ -1,7 +1,9 @@
 package a.a.a;
 
 import android.app.Activity;
+import android.content.Context;
 import android.graphics.Color;
+import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +18,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.besome.sketch.beans.ColorBean;
+import com.besome.sketch.editor.manage.library.material3.Material3LibraryManager;
 import com.besome.sketch.editor.view.ColorGroupItem;
 
 import pro.sketchware.R;
@@ -46,7 +49,6 @@ public class Zx extends PopupWindow {
     private final ColorPickerBinding binding;
     private b colorPickerCallback;
     private materialColorAttr materialColorAttr;
-    private materialLightColorAttr materialLightColorAttr;
     private XB colorValidator;
     private int k;
     private int l;
@@ -55,8 +57,8 @@ public class Zx extends PopupWindow {
     private Activity activity;
     private static String sc_id;
     private boolean hasMaterialColors;
-    private boolean isAppCompatEnabled;
     private final ColorsAdapter colorsAdapter = new ColorsAdapter();
+    private Material3LibraryManager material3LibraryManager;
 
     public Zx(Activity activity, int var3, boolean isTransparentColor, boolean isNoneColor) {
         super(activity);
@@ -68,6 +70,7 @@ public class Zx extends PopupWindow {
         super(activity);
         binding = ColorPickerBinding.inflate(activity.getLayoutInflater());
         sc_id = scId;
+        material3LibraryManager = new Material3LibraryManager(scId);
         hasMaterialColors = true;
         initialize(activity, var3, isTransparentColor, isNoneColor);
     }
@@ -93,10 +96,6 @@ public class Zx extends PopupWindow {
 
     public void materialColorAttr(materialColorAttr callback) {
         materialColorAttr = callback;
-    }
-
-    public void materialLightColorAttr(materialLightColorAttr callback) {
-        materialLightColorAttr = callback;
     }
 
     public void initialize(Activity activity, int var3, boolean isTransparentColor, boolean isNoneColor) {
@@ -152,12 +151,14 @@ public class Zx extends PopupWindow {
                 l = finalJ;
                 if (finalJ == 0 && colorGroups.get(finalJ).length == 0) {
                     bB.b(activity, xB.b().a(activity, R.string.picker_color_custom_color_not_found), 1).show();
+                    return;
                 }
                 if (finalJ == 1 && colorGroups.get(finalJ).length == 0) {
                     bB.b(activity, xB.b().a(activity, R.string.picker_color_xml_is_empty), 1).show();
+                    return;
                 }
-                if (finalJ == 2 && !isAppCompatEnabled) {
-                    SketchwareUtil.toastError("Please enable AppCompat in the Library Manager first");
+                if (finalJ == 2 && !material3LibraryManager.isMaterial3Enabled()) {
+                    SketchwareUtil.toastError("Please enable Material3 in the Library Manager first");
                     return;
                 }
                 if (hasMaterialColors) {
@@ -206,7 +207,6 @@ public class Zx extends PopupWindow {
                 }
             });
         }
-        isAppCompatEnabled = jC.c(sc_id).c().isEnabled();
         initializeAttrsList();
 
     }
@@ -230,7 +230,7 @@ public class Zx extends PopupWindow {
         if (sc_id != null)
             colorList.add(new ColorBean("#FFF6F6F6", "colors.xml", "#212121", R.drawable.checked_grey_32));
         if (hasMaterialColors)
-            colorList.add(new ColorBean("#FFF6F6F6", "Material Colors", "#212121", R.drawable.checked_grey_32));
+            colorList.add(new ColorBean("#FFF6F6F6", "Material 3 Colors", "#212121", R.drawable.checked_grey_32));
         colorList.add(sq.p[0]);
         colorList.add(sq.q[0]);
         colorList.add(sq.r[0]);
@@ -545,39 +545,47 @@ public class Zx extends PopupWindow {
 
     public void initializeAttrsList() {
         if (!hasMaterialColors) return;
-        ArrayList<Attribute> mainAttributes = new ArrayList<>();
         attributes = new ArrayList<>();
 
-        mainAttributes.add(new Attribute("colorSurface", R.attr.colorSurface, R.attr.colorOnSurface));
-        mainAttributes.add(new Attribute("colorPrimary", R.attr.colorPrimary, R.attr.colorOnPrimary));
-        mainAttributes.add(new Attribute("colorPrimaryContainer", R.attr.colorPrimaryContainer, R.attr.colorOnPrimaryContainer));
-        mainAttributes.add(new Attribute("colorSecondary", R.attr.colorSecondary, R.attr.colorOnSecondary));
-        mainAttributes.add(new Attribute("colorSecondaryContainer", R.attr.colorSecondaryContainer, R.attr.colorOnSecondaryContainer));
-        mainAttributes.add(new Attribute("colorTertiary", R.attr.colorTertiary, R.attr.colorOnTertiary));
-        mainAttributes.add(new Attribute("colorTertiaryContainer", R.attr.colorTertiaryContainer, R.attr.colorOnTertiaryContainer));
-        mainAttributes.add(new Attribute("colorSurfaceVariant", R.attr.colorSurfaceVariant, R.attr.colorOnSurfaceVariant));
-        mainAttributes.add(new Attribute("colorSurfaceInverse", R.attr.colorSurfaceInverse, R.attr.colorOnSurfaceInverse));
-        mainAttributes.add(new Attribute("colorError", R.attr.colorError, R.attr.colorOnError));
-        mainAttributes.add(new Attribute("colorErrorContainer", R.attr.colorErrorContainer, R.attr.colorOnErrorContainer));
-
-        for (Attribute attribute : mainAttributes) {
-            attributes.add(new Attribute(attribute.attrName(), attribute.attr(), attribute.reversedAttr()));
-            attributes.add(new Attribute(
-                    attribute.attrName().replace("color", "colorOn"),
-                    attribute.reversedAttr(),
-                    attribute.attr())
-            );
-        }
+        attributes.add(new Attribute("colorSurface", R.attr.colorSurface));
+        attributes.add(new Attribute("colorOnSurface", R.attr.colorOnSurface));
+        attributes.add(new Attribute("colorPrimary", R.attr.colorPrimary));
+        attributes.add(new Attribute("colorOnPrimary", R.attr.colorOnPrimary));
+        attributes.add(new Attribute("colorPrimaryContainer", R.attr.colorPrimaryContainer));
+        attributes.add(new Attribute("colorOnPrimaryContainer", R.attr.colorOnPrimaryContainer));
+        attributes.add(new Attribute("colorSecondary", R.attr.colorSecondary));
+        attributes.add(new Attribute("colorOnSecondary", R.attr.colorOnSecondary));
+        attributes.add(new Attribute("colorSecondaryContainer", R.attr.colorSecondaryContainer));
+        attributes.add(new Attribute("colorOnSecondaryContainer", R.attr.colorOnSecondaryContainer));
+        attributes.add(new Attribute("colorTertiary", R.attr.colorTertiary));
+        attributes.add(new Attribute("colorOnTertiary", R.attr.colorOnTertiary));
+        attributes.add(new Attribute("colorTertiaryContainer", R.attr.colorTertiaryContainer));
+        attributes.add(new Attribute("colorOnTertiaryContainer", R.attr.colorOnTertiaryContainer));
+        attributes.add(new Attribute("colorSurfaceVariant", R.attr.colorSurfaceVariant));
+        attributes.add(new Attribute("colorOnSurfaceVariant", R.attr.colorOnSurfaceVariant));
+        attributes.add(new Attribute("colorSurfaceInverse", R.attr.colorSurfaceInverse));
+        attributes.add(new Attribute("colorOnSurfaceInverse", R.attr.colorOnSurfaceInverse));
+        attributes.add(new Attribute("colorError", R.attr.colorError));
+        attributes.add(new Attribute("colorOnError", R.attr.colorOnError));
+        attributes.add(new Attribute("colorErrorContainer", R.attr.colorErrorContainer));
+        attributes.add(new Attribute("colorOnErrorContainer", R.attr.colorOnErrorContainer));
     }
 
     public class AttrAdapter extends RecyclerView.Adapter<AttrAdapter.AttrViewHolder> {
 
         private final ArrayList<Attribute> attributeList;
-        private boolean isDarkThemeEnabled;
+        private final Context themedDarkContext;
+        private final Context themedLightContext;
 
         public AttrAdapter(ArrayList<Attribute> attributeList) {
             this.attributeList = attributeList;
-            isDarkThemeEnabled = ThemeUtils.isDarkThemeEnabled(activity);
+            if (material3LibraryManager.isDynamicColorsEnabled()) {
+                themedDarkContext = new ContextThemeWrapper(activity, R.style.ThemeOverlay_SketchwarePro_ViewEditor_Material3_Dark);
+                themedLightContext = new ContextThemeWrapper(activity, R.style.ThemeOverlay_SketchwarePro_ViewEditor_Material3_Light);
+            } else {
+                themedDarkContext = new ContextThemeWrapper(activity, R.style.ThemeOverlay_SketchwarePro_ViewEditor_Material3_NON_DYNAMIC_Dark);
+                themedLightContext = new ContextThemeWrapper(activity, R.style.ThemeOverlay_SketchwarePro_ViewEditor_Material3_NON_DYNAMIC_Light);
+            }
         }
 
         @NonNull
@@ -593,15 +601,9 @@ public class Zx extends PopupWindow {
             Attribute attribute = attributeList.get(position);
             holder.binding.tvAttrName.setText(attribute.attrName());
 
-            int darkColor;
-            int lightColor;
-            if (isDarkThemeEnabled) {
-                darkColor = ThemeUtils.getColor(binding.getRoot(), attribute.attr());
-                lightColor = ThemeUtils.getColor(binding.getRoot(), attribute.reversedAttr());
-            } else {
-                darkColor = ThemeUtils.getColor(binding.getRoot(), attribute.reversedAttr());
-                lightColor = ThemeUtils.getColor(binding.getRoot(), attribute.attr());
-            }
+            int darkColor = ThemeUtils.getColor(new View(themedDarkContext), attribute.attr());
+            int lightColor = ThemeUtils.getColor(new View(themedLightContext), attribute.attr());
+
             holder.binding.darkContainer.setBackgroundColor(darkColor);
             holder.binding.lightContainer.setBackgroundColor(lightColor);
             holder.binding.darkTtl.setTextColor(lightColor);
@@ -610,9 +612,6 @@ public class Zx extends PopupWindow {
             holder.binding.getRoot().setOnClickListener(view -> {
                 if (materialColorAttr != null) {
                     materialColorAttr.selectedMaterialColorAttr(attribute.attrName(), attribute.attr());
-                }
-                if (materialLightColorAttr != null) {
-                    materialLightColorAttr.selectedMaterialLightColorAttr(attribute.attrName(), isDarkThemeEnabled ? attribute.reversedAttr() : attribute.attr());
                 }
                 dismiss();
             });
@@ -633,7 +632,7 @@ public class Zx extends PopupWindow {
         }
     }
 
-    public record Attribute(String attrName, int attr, int reversedAttr) {
+    public record Attribute(String attrName, int attr) {
     }
 
 }

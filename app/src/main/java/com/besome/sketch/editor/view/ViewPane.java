@@ -104,6 +104,7 @@ import mod.agus.jcoderz.editor.view.item.ItemTimePicker;
 import mod.agus.jcoderz.editor.view.item.ItemVideoView;
 import mod.hey.studios.util.ProjectFile;
 
+import pro.sketchware.activities.resources.editors.utils.ColorsEditorManager;
 import pro.sketchware.activities.resources.editors.utils.StringsEditorManager;
 import pro.sketchware.utility.FilePathUtil;
 import pro.sketchware.utility.FileUtil;
@@ -957,8 +958,12 @@ public class ViewPane extends RelativeLayout {
         if (height > 0) {
             height = (int) wB.a(getContext(), (float) viewBean.layout.height);
         }
-        viewBean.parentType = getActualParentType(view, viewBean.parentType);
-        view.setBackgroundColor(viewBean.layout.backgroundColor);
+        if (viewBean.layout.backgroundResColor == null) {
+            view.setBackgroundColor(viewBean.layout.backgroundColor);
+        } else {
+            view.setBackgroundColor(PropertiesUtil.parseColor(new ColorsEditorManager(view).getColorValue(context, viewBean.layout.backgroundResColor, 3)));
+        }
+
         if (viewBean.id.equals("root")) {
             LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(width, height);
             layoutParams.leftMargin = (int) wB.a(getContext(), (float) viewBean.layout.marginLeft);
@@ -1215,7 +1220,11 @@ public class ViewPane extends RelativeLayout {
         } else {
             textView.setTypeface(null, viewBean.text.textType);
         }
-        textView.setTextColor(viewBean.text.textColor);
+        if (viewBean.text.resTextColor == null) {
+            textView.setTextColor(viewBean.text.textColor);
+        } else {
+            textView.setTextColor(PropertiesUtil.parseColor(new ColorsEditorManager(textView).getColorValue(context, viewBean.text.resTextColor, 3)));
+        }
         textView.setTextSize(viewBean.text.textSize);
         textView.setLines(viewBean.text.line);
         textView.setSingleLine(viewBean.text.singleLine != 0);
@@ -1249,7 +1258,11 @@ public class ViewPane extends RelativeLayout {
     private void updateEditText(EditText editText, ViewBean viewBean) {
         String str = viewBean.text.hint;
         editText.setHint(str.startsWith(stringsStart) ? getXmlString(str) : str);
-        editText.setHintTextColor(viewBean.text.hintColor);
+        if (viewBean.text.resHintColor == null) {
+            editText.setHintTextColor(viewBean.text.hintColor);
+        } else {
+            editText.setHintTextColor(PropertiesUtil.parseColor(new ColorsEditorManager(editText).getColorValue(context, viewBean.text.resHintColor, 3)));
+        }
     }
 
     private void updateCardView(ItemCardView cardView, InjectAttributeHandler handler) {
@@ -1261,7 +1274,11 @@ public class ViewPane extends RelativeLayout {
         String strokeColor = handler.getAttributeValueOf("strokeColor");
         String strokeWidth = handler.getAttributeValueOf("strokeWidth");
 
-        cardView.setBackgroundColor(PropertiesUtil.isHexColor(cardBackgroundColor) ? PropertiesUtil.parseColor(cardBackgroundColor) : bean.layout.backgroundColor);
+        if (PropertiesUtil.isHexColor(cardBackgroundColor)) {
+            cardView.setBackgroundColor(PropertiesUtil.parseColor(cardBackgroundColor));
+        } else {
+            cardView.setBackgroundColor(PropertiesUtil.parseColor(new ColorsEditorManager(cardView).getColorValue(context, bean.layout.backgroundResColor, 3)));
+        }
         cardView.setCardElevation(PropertiesUtil.resolveSize(cardElevation, 4));
         cardView.setRadius(PropertiesUtil.resolveSize(cardCornerRadius, 8));
         cardView.setUseCompatPadding(Boolean.parseBoolean(TextUtils.isEmpty(compatPadding) ? "false" : compatPadding));
