@@ -58,6 +58,12 @@
 
     <style name="ThemeOverlay.SketchwarePro.ViewEditor" parent="Base.Theme.MaterialComponents.Light" />
 
+    <style name="ThemeOverlay.SketchwarePro.ViewEditor.Material3.Light" parent="Base.Theme.Material3.Light" />
+
+    <style name="ThemeOverlay.SketchwarePro.ViewEditor.Material3.NON_DYNAMIC.Light" parent="Base.Theme.Material3.Light">
+
+    </style>
+
     <style name="Preference.SketchwarePro.SwitchPreferenceCompat" parent="@style/Preference.SwitchPreferenceCompat.Material">
         <item name="widgetLayout">@layout/preference_widget_layout_m3_switch</item>
     </style>
