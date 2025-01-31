@@ -43,7 +43,6 @@ public class ColorsEditor extends Fragment {
     private final ResourcesEditorActivity activity;
 
     public ColorsAdapter adapter;
-    private Zx colorpicker;
 
     public boolean hasUnsavedChanges;
     public static String contentPath;
@@ -129,8 +128,6 @@ public class ColorsEditor extends Fragment {
     }
 
     private void initialize() {
-
-        colorpicker = new Zx(activity, 0xFFFFFFFF, false, false, activity.sc_id);
 
         defaultColors.put("colorAccent", ProjectFile.COLOR_ACCENT);
         defaultColors.put("colorPrimary", ProjectFile.COLOR_PRIMARY);
@@ -241,7 +238,8 @@ public class ColorsEditor extends Fragment {
         });
 
         dialogBinding.colorPreviewCard.setOnClickListener(v -> {
-            colorpicker.a(new Zx.b() {
+            Zx colorPicker = new Zx(activity, Objects.requireNonNull(dialogBinding.colorValueInput.getText()).toString(), false, false, activity.sc_id);
+            colorPicker.a(new Zx.b() {
                 @Override
                 public void a(int colorInt) {
                     String selectedColorHex = String.format("#%06X", colorInt & 0x00FFFFFF);
@@ -253,8 +251,8 @@ public class ColorsEditor extends Fragment {
                 public void a(String var1, int var2) {
                 }
             });
-            colorpicker.materialColorAttr((attr, attrId) -> dialogBinding.colorValueInput.setText("?" + attr));
-            colorpicker.showAtLocation(v, Gravity.CENTER, 0, 0);
+            colorPicker.materialColorAttr((attr, attrId) -> dialogBinding.colorValueInput.setText("?" + attr));
+            colorPicker.showAtLocation(v, Gravity.CENTER, 0, 0);
         });
 
         if (colorModel != null && !defaultColors.containsKey(colorModel.getColorName())) {

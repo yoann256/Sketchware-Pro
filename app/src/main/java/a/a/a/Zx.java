@@ -63,16 +63,20 @@ public class Zx extends PopupWindow {
     public Zx(Activity activity, int var3, boolean isTransparentColor, boolean isNoneColor) {
         super(activity);
         binding = ColorPickerBinding.inflate(activity.getLayoutInflater());
-        initialize(activity, var3, isTransparentColor, isNoneColor);
+        initialize(activity, getHexColor(var3), isTransparentColor, isNoneColor);
     }
 
-    public Zx(Activity activity, int var3, boolean isTransparentColor, boolean isNoneColor, String scId) {
+    public Zx(Activity activity, String color, boolean isTransparentColor, boolean isNoneColor, String scId) {
         super(activity);
         binding = ColorPickerBinding.inflate(activity.getLayoutInflater());
         sc_id = scId;
         material3LibraryManager = new Material3LibraryManager(scId);
         hasMaterialColors = true;
-        initialize(activity, var3, isTransparentColor, isNoneColor);
+        initialize(activity, color, isTransparentColor, isNoneColor);
+    }
+
+    private String getHexColor(int color) {
+        return String.format("#%06X", color);
     }
 
     private void deleteAllSavedColors() {
@@ -98,20 +102,47 @@ public class Zx extends PopupWindow {
         materialColorAttr = callback;
     }
 
-    public void initialize(Activity activity, int var3, boolean isTransparentColor, boolean isNoneColor) {
+    public void initialize(Activity activity, String color, boolean isTransparentColor, boolean isNoneColor) {
         this.activity = activity;
         colorPref = new DB(activity, "P24");
         initializeColorData(isTransparentColor, isNoneColor);
+        initializeAttrsList();
 
-        for (int groupIndex = 0; groupIndex < colorGroups.size(); ++groupIndex) {
-            ColorBean[] colorBeans = colorGroups.get(groupIndex);
+        if (color.equals("NONE")) {
+            k = colorGroups.size() - 1;
+            l = k;
+            m = 0;
+        } if (color.equals("TRANSPARENT")) {
+            k = colorGroups.size() - 2;
+            l = k;
+            m = 0;
+        } else {
+            if (color.startsWith("#")) {
+                int colorInt = Color.parseColor(color);
+                for (int groupIndex = 0; groupIndex < colorGroups.size(); ++groupIndex) {
+                    ColorBean[] colorBeans = colorGroups.get(groupIndex);
 
-            for (int colorIndex = 0; colorIndex < colorBeans.length; ++colorIndex) {
-                if (colorBeans[colorIndex].colorCode == var3) {
-                    k = groupIndex;
-                    l = groupIndex;
-                    m = colorIndex;
-                    break;
+                    for (int colorIndex = 0; colorIndex < colorBeans.length; ++colorIndex) {
+                        if (colorBeans[colorIndex].colorCode == colorInt) {
+                            k = groupIndex;
+                            l = groupIndex;
+                            m = colorIndex;
+                            break;
+                        }
+                    }
+                }
+            } else {
+                if (color.startsWith("?")) {
+                    k = 2;
+                    l = 2;
+                    for (int i = 0; i < attributes.size(); i++) {
+                        Attribute attribute = attributes.get(i);
+                        if (("?" + attribute.attrName()).equals(color) || ("?attr/" + attribute.attrName()).equals(color)) {
+                            m = i;
+                        }
+                    }
+                    binding.colorList.setAdapter(new AttrAdapter(attributes, m));
+                    binding.colorList.post(() -> binding.colorList.scrollToPosition(m));
                 }
             }
         }
@@ -125,7 +156,8 @@ public class Zx extends PopupWindow {
         super.setHeight(widthAndHeight[1]);
         binding.colorList.setHasFixedSize(true);
         binding.colorList.setLayoutManager(new LinearLayoutManager(activity.getApplicationContext()));
-        binding.colorList.setAdapter(colorsAdapter);
+        if (binding.colorList.getAdapter() == null)
+            binding.colorList.setAdapter(colorsAdapter);
         binding.colorList.setItemAnimator(new DefaultItemAnimator());
 
         binding.tiCustomColor.setHint(xB.b().a(activity, R.string.picker_color_hint_enter_hex_color_code));
@@ -165,7 +197,7 @@ public class Zx extends PopupWindow {
                     if (binding.colorList.getAdapter() instanceof AttrAdapter && finalJ != 2) {
                         binding.colorList.setAdapter(colorsAdapter);
                     } else if (finalJ == 2) {
-                        binding.colorList.setAdapter(new AttrAdapter(attributes));
+                        binding.colorList.setAdapter(new AttrAdapter(attributes, -1));
                     } else {
                         colorsAdapter.notifyDataSetChanged();
                     }
@@ -207,7 +239,6 @@ public class Zx extends PopupWindow {
                 }
             });
         }
-        initializeAttrsList();
 
     }
 
@@ -465,10 +496,6 @@ public class Zx extends PopupWindow {
         void selectedMaterialColorAttr(String attr, int attrId);
     }
 
-    public interface materialLightColorAttr {
-        void selectedMaterialLightColorAttr(String attr, int attrId);
-    }
-
     private class ColorsAdapter extends RecyclerView.Adapter<ColorsAdapter.ColorViewHolder> {
 
         public ColorsAdapter() {
@@ -577,8 +604,11 @@ public class Zx extends PopupWindow {
         private final Context themedDarkContext;
         private final Context themedLightContext;
 
-        public AttrAdapter(ArrayList<Attribute> attributeList) {
+        private int selectedPosition;
+
+        public AttrAdapter(ArrayList<Attribute> attributeList, int selectedPosition) {
             this.attributeList = attributeList;
+            this.selectedPosition = selectedPosition; // todo: need to scroll to this position
             if (material3LibraryManager.isDynamicColorsEnabled()) {
                 themedDarkContext = new ContextThemeWrapper(activity, R.style.ThemeOverlay_SketchwarePro_ViewEditor_Material3_Dark);
                 themedLightContext = new ContextThemeWrapper(activity, R.style.ThemeOverlay_SketchwarePro_ViewEditor_Material3_Light);

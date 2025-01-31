@@ -9,6 +9,10 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+
+import java.util.Objects;
+
 import pro.sketchware.R;
 
 import a.a.a.Kw;
@@ -147,7 +151,18 @@ public class PropertyColorItem extends RelativeLayout implements View.OnClickLis
             colorTransparentAvailable = false;
             colorNoneAvailable = false;
         }
-        Zx colorPicker = new Zx((Activity) context, value, colorTransparentAvailable, colorNoneAvailable, sc_id);
+        String color;
+        String tvValueStr = tvValue.getText().toString();
+        if (tvValueStr.equals("NONE") || tvValueStr.equals("TRANSPARENT")) {
+            color = tvValueStr;
+        } else
+            color = Objects.requireNonNullElseGet(resValue, () -> String.format("#%06X", value));
+        Zx colorPicker = getZx(color, colorTransparentAvailable, colorNoneAvailable);
+        colorPicker.showAtLocation(anchorView, Gravity.CENTER, 0, 0);
+    }
+
+    private @NonNull Zx getZx(String color, boolean colorTransparentAvailable, boolean colorNoneAvailable) {
+        Zx colorPicker = new Zx((Activity) context, color, colorTransparentAvailable, colorNoneAvailable, sc_id);
         colorPicker.a(new Zx.b() {
             @Override
             public void a(int var1) {
@@ -171,6 +186,6 @@ public class PropertyColorItem extends RelativeLayout implements View.OnClickLis
                 valueChangeListener.a(key, value);
             }
         });
-        colorPicker.showAtLocation(anchorView, Gravity.CENTER, 0, 0);
+        return colorPicker;
     }
 }
