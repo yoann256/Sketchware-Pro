@@ -198,6 +198,11 @@ public class yq {
     public final String resDirectoryPath;
 
     /**
+     * Example content: /storage/emulated/0/.sketchware/mysc/605/app/src/main/proguard-rules.pro
+     */
+    public final String proguardFilePath;
+
+    /**
      * Example content: /storage/emulated/0/.sketchware/mysc/605/app/src/main/res/layout
      */
     public final String layoutFilesPath;
@@ -256,6 +261,7 @@ public class yq {
         generatedFilesPath = projectMyscPath + "app" + File.separator + "src" + File.separator + "main";
         javaFilesPath = generatedFilesPath + File.separator + "java";
         resDirectoryPath = generatedFilesPath + File.separator + "res";
+        proguardFilePath = projectMyscPath + "app" + File.separator + "proguard-rules.pro";
         layoutFilesPath = resDirectoryPath + File.separator + "layout";
         importedSoundsPath = resDirectoryPath + File.separator + "raw";
         assetsPath = generatedFilesPath + File.separator + "assets";
@@ -807,10 +813,10 @@ public class yq {
             }
         }
         
-        ArrayList<ProjectFileBean> drawerLayouts = projectFileManager.c();
-        for (ProjectFileBean drawerFile : drawerLayouts) {
-            String xmlName = drawerFile.getXmlName();
-            Ox ox = new Ox(N, drawerFile);
+        ArrayList<ProjectFileBean> customViewFiles = projectFileManager.c();
+        for (ProjectFileBean customViewFile : customViewFiles) {
+            String xmlName = customViewFile.getXmlName();
+            Ox ox = new Ox(N, customViewFile);
             ox.a(eC.a(projectDataManager.d(xmlName)));
             var ogFile = new File(layoutDir + xmlName);
             if (!layoutFiles.contains(ogFile)) {
@@ -820,7 +826,10 @@ public class yq {
                     var privFile = new File(context.getCacheDir(), xmlName);
                     FileUtil.writeFile(privFile.getAbsolutePath(), CommandBlock.applyCommands(xmlName, ox.b()));
                     var code = viewBindingBuilder.generateBindingForLayout(privFile);
-                    srcCodeBeans.add(new SrcCodeBean(xmlName, CommandBlock.applyCommands(xmlName, code)));
+                    srcCodeBeans.add(new SrcCodeBean(
+                        ViewBindingBuilder.generateFileNameForLayout(xmlName.replace(".xml", "")) + ".java", 
+                        CommandBlock.applyCommands(xmlName, code)
+                    ));
                 }
             }
         }
