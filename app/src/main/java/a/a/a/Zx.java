@@ -35,7 +35,6 @@ import mod.hey.studios.util.Helper;
 import pro.sketchware.utility.PropertiesUtil;
 import pro.sketchware.utility.SketchwareUtil;
 import pro.sketchware.utility.ThemeUtils;
-import pro.sketchware.utility.UI;
 
 public class Zx extends PopupWindow {
 
@@ -197,13 +196,13 @@ public class Zx extends PopupWindow {
                     bB.b(activity, xB.b().a(activity, R.string.picker_color_xml_is_empty), 1).show();
                     return;
                 }
-                if (finalJ == 2 && !material3LibraryManager.isMaterial3Enabled()) {
+                if (sc_id != null && finalJ == 2 && !material3LibraryManager.isMaterial3Enabled()) {
                     SketchwareUtil.toastError("Please enable Material3 in the Library Manager first");
                     return;
                 }
-                if (finalJ == 1) {
+                if (sc_id != null && finalJ == 1) {
                     binding.colorList.setAdapter(new resColorsAdapter(resColors, -1));
-                } else if (finalJ == 2) {
+                } else if (sc_id != null && finalJ == 2) {
                     binding.colorList.setAdapter(new AttrAdapter(attributes, -1));
                 } else {
                     binding.colorList.setAdapter(colorsAdapter);
@@ -515,6 +514,8 @@ public class Zx extends PopupWindow {
     }
 
     private void initializeResColors() {
+        if (sc_id == null)
+            return;
         ColorsEditorManager colorsEditorManager = new ColorsEditorManager();
         String filePath = wq.b(sc_id) + "/files/resource/values/colors.xml";
         String fileNightPath = wq.b(sc_id) + "/files/resource/values-night/colors.xml";
