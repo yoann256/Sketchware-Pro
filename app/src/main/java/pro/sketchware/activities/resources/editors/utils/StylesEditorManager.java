@@ -95,7 +95,7 @@ public class StylesEditorManager {
         return styles;
     }
 
-    private static @NonNull LinkedHashMap<String, String> getAttributes(Element element) {
+    private @NonNull LinkedHashMap<String, String> getAttributes(Element element) {
         LinkedHashMap<String, String> attributes = new LinkedHashMap<>();
         NodeList childNodes = element.getChildNodes();
         for (int j = 0; j < childNodes.getLength(); j++) {
@@ -109,4 +109,13 @@ public class StylesEditorManager {
         }
         return attributes;
     }
+
+    public boolean isStyleExist(ArrayList<StyleModel> styles, String styleName) {
+        for (StyleModel styleModel : styles) {
+            if (styleModel.getStyleName().equals(styleName))
+                return true;
+        }
+        return false;
+    }
+
 }

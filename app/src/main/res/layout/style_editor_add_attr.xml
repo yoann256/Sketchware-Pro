@@ -13,10 +13,9 @@
         android:hint="Enter Attribute Name">
 
         <com.google.android.material.textfield.MaterialAutoCompleteTextView
-            android:id="@+id/style_name"
+            android:id="@+id/attr_name"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:digits="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_"
             android:imeOptions="actionNext"
             android:inputType="text"
             android:singleLine="true"
@@ -32,10 +31,9 @@
         android:hint="Enter Attribute Value">
 
         <com.google.android.material.textfield.MaterialAutoCompleteTextView
-            android:id="@+id/style_parent"
+            android:id="@+id/attr_value"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:digits="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_"
             android:imeOptions="actionNext"
             android:inputType="text"
             android:singleLine="true"

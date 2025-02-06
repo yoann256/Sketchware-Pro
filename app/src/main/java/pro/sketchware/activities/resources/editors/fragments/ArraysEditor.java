@@ -116,7 +116,7 @@ public class ArraysEditor extends Fragment {
         if (arraysList.isEmpty()) {
             binding.noContentLayout.setVisibility(View.VISIBLE);
             binding.noContentTitle.setText(String.format(Helper.getResString(R.string.resource_manager_no_list_title), "Arrays"));
-            binding.noContentBody.setText(String.format(Helper.getResString(R.string.resource_manager_no_list_body), "Arrays"));
+            binding.noContentBody.setText(String.format(Helper.getResString(R.string.resource_manager_no_list_body), "arrays"));
         } else {
             binding.noContentLayout.setVisibility(View.GONE);
         }
@@ -323,7 +323,7 @@ public class ArraysEditor extends Fragment {
         dialog.show();
     }
     public void saveArraysFile() {
-        if (hasUnsavedChanges && FileUtil.isExistFile(filePath) || !arraysList.isEmpty()) {
+        if (hasUnsavedChanges) {
             FileUtil.writeFile(filePath, arraysEditorManager.convertArraysToXML(arraysList, notesMap));
             hasUnsavedChanges = false;
         }

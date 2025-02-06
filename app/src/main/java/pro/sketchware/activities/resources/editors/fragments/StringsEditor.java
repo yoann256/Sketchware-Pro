@@ -143,12 +143,12 @@ public class StringsEditor extends Fragment {
             String value = Objects.requireNonNull(binding.stringValueInput.getText()).toString();
 
             if (key.isEmpty() || value.isEmpty()) {
-                SketchwareUtil.toast("Please fill in all fields");
+                SketchwareUtil.toastError("Please fill in all fields");
                 return;
             }
 
             if (stringsEditorManager.isXmlStringsExist(listmap, key)) {
-                SketchwareUtil.toast("\"" + key + "\" is already exist");
+                SketchwareUtil.toastError("\"" + key + "\" is already exist");
                 return;
             }
             addString(key, value, Objects.requireNonNull(binding.stringHeaderInput.getText()).toString().trim());
@@ -181,7 +181,7 @@ public class StringsEditor extends Fragment {
     }
 
     public void saveStringsFile() {
-        if (hasUnsavedChanges && FileUtil.isExistFile(filePath) || !listmap.isEmpty()) {
+        if (hasUnsavedChanges) {
             XmlUtil.saveXml(filePath, stringsEditorManager.convertListMapToXmlStrings(listmap, notesMap));
             hasUnsavedChanges = false;
         }

@@ -122,7 +122,7 @@ public class StylesEditor extends Fragment {
         if (stylesList.isEmpty()) {
             binding.noContentLayout.setVisibility(View.VISIBLE);
             binding.noContentTitle.setText(String.format(Helper.getResString(R.string.resource_manager_no_list_title), "Styles"));
-            binding.noContentBody.setText(String.format(Helper.getResString(R.string.resource_manager_no_list_body), "Styles"));
+            binding.noContentBody.setText(String.format(Helper.getResString(R.string.resource_manager_no_list_body), "styles"));
         } else {
             binding.noContentLayout.setVisibility(View.GONE);
         }
@@ -139,6 +139,11 @@ public class StylesEditor extends Fragment {
 
             if (styleName.isEmpty()) {
                 SketchwareUtil.toastError("Style name Input is Empty");
+                return;
+            }
+
+            if (stylesEditorManager.isStyleExist(stylesList, styleName)) {
+                SketchwareUtil.toastError("\"" + styleName + "\" is already exist");
                 return;
             }
 
@@ -261,18 +266,18 @@ public class StylesEditor extends Fragment {
 
         aB dialog = new aB(requireActivity());
         StyleEditorAddAttrBinding binding = StyleEditorAddAttrBinding.inflate(getLayoutInflater());
-        setupAutoComplete(binding.styleName, binding.styleParent);
+        setupAutoComplete(binding.attrName, binding.attrValue);
 
         if (isEditing) {
-            binding.styleName.setText(attr);
-            binding.styleParent.setText(style.getAttribute(attr));
+            binding.attrName.setText(attr);
+            binding.attrValue.setText(style.getAttribute(attr));
         }
 
         dialog.b(isEditing ? "Edit attribute" : "Create new attribute");
 
         dialog.b(Helper.getResString(R.string.common_word_save), v1 -> {
-            String attribute = Objects.requireNonNull(binding.styleName.getText()).toString();
-            String value = Objects.requireNonNull(binding.styleParent.getText()).toString();
+            String attribute = Objects.requireNonNull(binding.attrName.getText()).toString();
+            String value = Objects.requireNonNull(binding.attrName.getText()).toString();
 
             if (attribute.isEmpty() || value.isEmpty()) {
                 SketchwareUtil.toastError("Please fill in all fields");
@@ -293,7 +298,7 @@ public class StylesEditor extends Fragment {
     }
 
     public void saveStylesFile() {
-        if (hasUnsavedChanges && FileUtil.isExistFile(filePath) || !stylesList.isEmpty()) {
+        if (hasUnsavedChanges) {
             FileUtil.writeFile(filePath, stylesEditorManager.convertStylesToXML(stylesList, notesMap));
             hasUnsavedChanges = false;
         }

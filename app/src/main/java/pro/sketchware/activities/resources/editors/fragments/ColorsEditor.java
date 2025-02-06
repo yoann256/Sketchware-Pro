@@ -207,13 +207,13 @@ public class ColorsEditor extends Fragment {
             String value = Objects.requireNonNull(dialogBinding.colorValueInput.getText()).toString();
 
             if (key.isEmpty() || value.isEmpty()) {
-                SketchwareUtil.toast("Please fill in all fields", Toast.LENGTH_SHORT);
+                SketchwareUtil.toastError("Please fill in all fields", Toast.LENGTH_SHORT);
                 return;
             }
 
             if (value.startsWith("#")) {
                 if (!PropertiesUtil.isHexColor(value)) {
-                    SketchwareUtil.toast("Please enter a valid HEX color");
+                    SketchwareUtil.toastError("Please enter a valid HEX color");
                     return;
                 }
             }
@@ -275,9 +275,7 @@ public class ColorsEditor extends Fragment {
         ColorModel newItem = new ColorModel(name, value);
         for (int i = 0; i < colorList.size(); i++) {
             if (colorList.get(i).getColorName().equals(name)) {
-                colorList.set(i, newItem);
-                adapter.notifyItemChanged(i);
-                notesMap.put(i, note);
+                SketchwareUtil.toastError("\"" + name + "\" is already exist");
                 return;
             }
         }
@@ -287,10 +285,11 @@ public class ColorsEditor extends Fragment {
             notesMap.put(notifyPosition, note);
         }
         adapter.notifyItemInserted(notifyPosition);
+        SketchwareUtil.toast(Helper.getResString(R.string.common_word_saved));
     }
 
     public void saveColorsFile() {
-        if (hasUnsavedChanges && FileUtil.isExistFile(contentPath) || !colorList.isEmpty()) {
+        if (hasUnsavedChanges) {
             XmlUtil.saveXml(contentPath, colorsEditorManager.convertListToXml(colorList, notesMap));
             hasUnsavedChanges = false;
         }

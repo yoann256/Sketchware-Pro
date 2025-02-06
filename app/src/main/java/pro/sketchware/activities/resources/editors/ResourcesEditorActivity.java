@@ -107,7 +107,7 @@ public class ResourcesEditorActivity extends BaseAppCompatActivity {
         stringsEditor = new StringsEditor(this);
         colorsEditor = new ColorsEditor(this);
         stylesEditor = new StylesEditor(this);
-        themesEditor = new ThemesEditor();
+        themesEditor = new ThemesEditor(this);
         arraysEditor = new ArraysEditor(this);
     }
 
@@ -171,6 +171,7 @@ public class ResourcesEditorActivity extends BaseAppCompatActivity {
         }
         if (themesEditor.themesEditorManager.isDataLoadingFailed) {
             showLoadFailedDialog("themes.xml", themesFilePath);
+            return;
         }
 
         if (arraysEditor.arraysEditorManager.isDataLoadingFailed) {
@@ -343,21 +344,27 @@ public class ResourcesEditorActivity extends BaseAppCompatActivity {
             importFromDefaultVariant();
         } else if (id != R.id.action_search) {
             int currentItem = binding.viewPager.getCurrentItem();
-            if (currentItem == 0) {
-                stringsEditor.saveStringsFile();
-                goToCodeEditor("strings.xml", stringsFilePath);
-            } else if (currentItem == 1) {
-                colorsEditor.saveColorsFile();
-                goToCodeEditor("colors.xml", colorsFilePath);
-            } else if (currentItem == 2) {
-                stylesEditor.saveStylesFile();
-                goToCodeEditor("styles.xml", stylesFilePath);
-            } else if (currentItem == 3) {
-                themesEditor.saveThemesFile();
-                goToCodeEditor("themes.xml", themesFilePath);
-            } else if (currentItem == 4) {
-                arraysEditor.saveArraysFile();
-                goToCodeEditor("arrays.xml", arrayFilePath);
+            switch (currentItem) {
+                case 0 -> {
+                    stringsEditor.saveStringsFile();
+                    goToCodeEditor("strings.xml", stringsFilePath);
+                }
+                case 1 -> {
+                    colorsEditor.saveColorsFile();
+                    goToCodeEditor("colors.xml", colorsFilePath);
+                }
+                case 2 -> {
+                    stylesEditor.saveStylesFile();
+                    goToCodeEditor("styles.xml", stylesFilePath);
+                }
+                case 3 -> {
+                    themesEditor.saveThemesFile();
+                    goToCodeEditor("themes.xml", themesFilePath);
+                }
+                case 4 -> {
+                    arraysEditor.saveArraysFile();
+                    goToCodeEditor("arrays.xml", arrayFilePath);
+                }
             }
         }
         return super.onOptionsItemSelected(item);
@@ -419,6 +426,25 @@ public class ResourcesEditorActivity extends BaseAppCompatActivity {
     }
 
     private void changeTheVariantDialog() {
+        ArrayList<String> unsavedFiles = getUnsavedFilesList();
+
+        if (!unsavedFiles.isEmpty()) {
+            String files = formatUnsavedFilesList(unsavedFiles);
+            String message = String.format(Helper.getResString(R.string.resources_editor_unsaved_changes_message_variant_change), files);
+
+            new MaterialAlertDialogBuilder(ResourcesEditorActivity.this)
+                    .setTitle(Helper.getResString(R.string.common_word_warning))
+                    .setMessage(message)
+                    .setPositiveButton(Helper.getResString(R.string.common_word_save), (dialog, which) -> {
+                        saveEditorsChanges();
+                        changeTheVariantDialog();
+                    })
+                    .setNegativeButton(Helper.getResString(R.string.common_word_cancel), null)
+                    .create()
+                    .show();
+            return;
+        }
+
         ArrayList<String> resourcesDir = new ArrayList<>();
         FileUtil.listDir(wq.b(sc_id) + "/files/resource/", resourcesDir);
 
@@ -546,16 +572,13 @@ public class ResourcesEditorActivity extends BaseAppCompatActivity {
             int updateMode = isMergeAndReplace ? 2 : isSkippingMode ? 1 : 0;
             for (int i = 0; i < resourcesFileNames.size(); i++) {
                 if (selectedItems.get(i)) {
-                    if (i == 0)
-                        stringsEditor.updateStringsList(stringsFilePath.replace(variant, ""), updateMode, true);
-                    if (i == 1)
-                        colorsEditor.updateColorsList(colorsFilePath.replace(variant, ""), updateMode, true);
-                    if (i == 2)
-                        stylesEditor.updateStylesList(stylesFilePath.replace(variant, ""), updateMode, true);
-                    if (i == 3)
-                        themesEditor.updateThemesList(themesFilePath.replace(variant, ""), updateMode, true);
-                    if (i == 4)
-                        arraysEditor.updateArraysList(arrayFilePath.replace(variant, ""), updateMode, true);
+                    switch (i) {
+                        case 0 -> stringsEditor.updateStringsList(stringsFilePath.replace(variant, ""), updateMode, true);
+                        case 1 -> colorsEditor.updateColorsList(colorsFilePath.replace(variant, ""), updateMode, true);
+                        case 2 -> stylesEditor.updateStylesList(stylesFilePath.replace(variant, ""), updateMode, true);
+                        case 3 -> themesEditor.updateThemesList(themesFilePath.replace(variant, ""), updateMode, true);
+                        case 4 -> arraysEditor.updateArraysList(arrayFilePath.replace(variant, ""), updateMode, true);
+                    }
                 }
             }
         });

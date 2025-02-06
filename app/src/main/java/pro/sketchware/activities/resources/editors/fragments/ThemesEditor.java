@@ -45,6 +45,7 @@ import java.util.Objects;
 public class ThemesEditor extends Fragment {
 
     private ResourcesEditorFragmentBinding binding;
+    private final ResourcesEditorActivity activity;
 
     public StylesAdapter adapter;
     private PropertyInputItem.AttributesAdapter attributesAdapter;
@@ -56,6 +57,10 @@ public class ThemesEditor extends Fragment {
 
     public boolean hasUnsavedChanges;
     private String filePath;
+    
+    public ThemesEditor(ResourcesEditorActivity activity) {
+        this.activity = activity;
+    }
 
     @Nullable
     @Override
@@ -97,11 +102,11 @@ public class ThemesEditor extends Fragment {
             themesList.addAll(defaultStyles);
         }
 
-        requireActivity().runOnUiThread(() -> {
+        activity.runOnUiThread(() -> {
             notesMap = new HashMap<>(themesEditorManager.notesMap);
             adapter = new StylesAdapter(themesList, this, notesMap);
             binding.recyclerView.setAdapter(adapter);
-            ((ResourcesEditorActivity) requireActivity()).checkForInvalidResources();
+            activity.checkForInvalidResources();
             updateNoContentLayout();
         });
     }
@@ -117,7 +122,7 @@ public class ThemesEditor extends Fragment {
     }
 
     public void showAddThemeDialog() {
-        aB dialog = new aB(requireActivity());
+        aB dialog = new aB(activity);
         StyleEditorAddBinding binding = StyleEditorAddBinding.inflate(getLayoutInflater());
         dialog.b("Create new theme");
         dialog.b("Create", v1 -> {
@@ -147,7 +152,7 @@ public class ThemesEditor extends Fragment {
 
     public void showEditThemeDialog(int position) {
         StyleModel theme = themesList.get(position);
-        aB dialog = new aB(requireActivity());
+        aB dialog = new aB(activity);
         StyleEditorAddBinding binding = StyleEditorAddBinding.inflate(getLayoutInflater());
 
         binding.styleName.setText(theme.getStyleName());
@@ -248,20 +253,20 @@ public class ThemesEditor extends Fragment {
     private void showAttributeDialog(StyleModel theme, String attr) {
         boolean isEditing = !attr.isEmpty();
 
-        aB dialog = new aB(requireActivity());
+        aB dialog = new aB(activity);
         StyleEditorAddAttrBinding binding = StyleEditorAddAttrBinding.inflate(getLayoutInflater());
-        setupAutoComplete(binding.styleName, binding.styleParent);
+        setupAutoComplete(binding.attrName, binding.attrValue);
 
         if (isEditing) {
-            binding.styleName.setText(attr);
-            binding.styleParent.setText(theme.getAttribute(attr));
+            binding.attrName.setText(attr);
+            binding.attrValue.setText(theme.getAttribute(attr));
         }
 
         dialog.b(isEditing ? "Edit attribute " : "Create new attribute");
 
         dialog.b(Helper.getResString(R.string.common_word_save), v1 -> {
-            String attribute = Objects.requireNonNull(binding.styleName.getText()).toString();
-            String value = Objects.requireNonNull(binding.styleParent.getText()).toString();
+            String attribute = Objects.requireNonNull(binding.attrName.getText()).toString();
+            String value = Objects.requireNonNull(binding.attrValue.getText()).toString();
 
             if (attribute.isEmpty() || value.isEmpty()) {
                 SketchwareUtil.toastError("Please fill in all fields");
@@ -282,7 +287,7 @@ public class ThemesEditor extends Fragment {
     }
 
     public void saveThemesFile() {
-        if (hasUnsavedChanges && FileUtil.isExistFile(filePath) || !themesList.isEmpty()) {
+        if (hasUnsavedChanges) {
             FileUtil.writeFile(filePath, themesEditorManager.convertStylesToXML(themesList, notesMap));
             hasUnsavedChanges = false;
         }
@@ -292,10 +297,10 @@ public class ThemesEditor extends Fragment {
         AttributeSuggestions attributeSuggestions = new AttributeSuggestions(binding.getRoot());
         String[] attributes = attributeSuggestions.ATTRIBUTE_SUGGESTIONS.toArray(new String[0]);
 
-        ArrayAdapter<String> attrAdapter = new ArrayAdapter<>(requireActivity(), android.R.layout.simple_dropdown_item_1line, attributes);
+        ArrayAdapter<String> attrAdapter = new ArrayAdapter<>(activity, android.R.layout.simple_dropdown_item_1line, attributes);
         attrView.setAdapter(attrAdapter);
 
-        ArrayAdapter<String> valueAdapter = new ArrayAdapter<>(requireActivity(), android.R.layout.simple_dropdown_item_1line, new ArrayList<>());
+        ArrayAdapter<String> valueAdapter = new ArrayAdapter<>(activity, android.R.layout.simple_dropdown_item_1line, new ArrayList<>());
         valueView.setAdapter(valueAdapter);
 
         attrView.addTextChangedListener(new TextWatcher() {
@@ -306,7 +311,7 @@ public class ThemesEditor extends Fragment {
                 List<String> suggestions = attributeSuggestions.getSuggestions(attribute);
 
                 if (suggestions != null && !suggestions.isEmpty()) {
-                    ArrayAdapter<String> newValueAdapter = new ArrayAdapter<>(requireActivity(), android.R.layout.simple_dropdown_item_1line, suggestions);
+                    ArrayAdapter<String> newValueAdapter = new ArrayAdapter<>(activity, android.R.layout.simple_dropdown_item_1line, suggestions);
                     valueView.setAdapter(newValueAdapter);
                 }
             }
