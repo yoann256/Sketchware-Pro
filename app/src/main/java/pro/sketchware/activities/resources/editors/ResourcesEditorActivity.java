@@ -346,22 +346,27 @@ public class ResourcesEditorActivity extends BaseAppCompatActivity {
             int currentItem = binding.viewPager.getCurrentItem();
             switch (currentItem) {
                 case 0 -> {
+                    stringsEditor.hasUnsavedChanges = true;
                     stringsEditor.saveStringsFile();
                     goToCodeEditor("strings.xml", stringsFilePath);
                 }
                 case 1 -> {
+                    colorsEditor.hasUnsavedChanges = true;
                     colorsEditor.saveColorsFile();
                     goToCodeEditor("colors.xml", colorsFilePath);
                 }
                 case 2 -> {
+                    stylesEditor.hasUnsavedChanges = true;
                     stylesEditor.saveStylesFile();
                     goToCodeEditor("styles.xml", stylesFilePath);
                 }
                 case 3 -> {
+                    themesEditor.hasUnsavedChanges = true;
                     themesEditor.saveThemesFile();
                     goToCodeEditor("themes.xml", themesFilePath);
                 }
                 case 4 -> {
+                    arraysEditor.hasUnsavedChanges = true;
                     arraysEditor.saveArraysFile();
                     goToCodeEditor("arrays.xml", arrayFilePath);
                 }

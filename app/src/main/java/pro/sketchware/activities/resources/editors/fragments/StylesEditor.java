@@ -277,7 +277,7 @@ public class StylesEditor extends Fragment {
 
         dialog.b(Helper.getResString(R.string.common_word_save), v1 -> {
             String attribute = Objects.requireNonNull(binding.attrName.getText()).toString();
-            String value = Objects.requireNonNull(binding.attrName.getText()).toString();
+            String value = Objects.requireNonNull(binding.attrValue.getText()).toString();
 
             if (attribute.isEmpty() || value.isEmpty()) {
                 SketchwareUtil.toastError("Please fill in all fields");
