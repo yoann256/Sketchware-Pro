@@ -46,10 +46,6 @@ public class Material3LibraryManager {
         FileUtil.writeFile(configFile.getAbsolutePath(), new Gson().toJson(configData));
     }
 
-    public ConfigData getConfigData() {
-        return configData;
-    }
-
     public void setConfigData(ConfigData configData) {
         this.configData = configData;
         saveConfigData(configData);

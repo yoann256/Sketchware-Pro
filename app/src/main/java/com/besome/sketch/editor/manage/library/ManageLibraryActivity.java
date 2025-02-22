@@ -111,6 +111,7 @@ public class ManageLibraryActivity extends BaseAppCompatActivity implements View
     private void toCompatActivity(ProjectLibraryBean compatLibraryBean, ProjectLibraryBean firebaseLibraryBean) {
         Intent intent = new Intent(getApplicationContext(), ManageCompatActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        intent.putExtra("sc_id", sc_id);
         intent.putExtra("compat", compatLibraryBean);
         intent.putExtra("firebase", firebaseLibraryBean);
         startActivityForResult(intent, REQUEST_CODE_APPCOMPAT_ACTIVITY);
@@ -174,6 +175,7 @@ public class ManageLibraryActivity extends BaseAppCompatActivity implements View
         Intent intent = new Intent(getApplicationContext(), toLaunch);
         intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
         intent.putExtra("sc_id", sc_id);
+        intent.putExtra("is_app_compat_enabled", compatLibraryBean.useYn.equals("Y"));
         startActivityForResult(intent, REQUEST_CODE_CUSTOM_ITEM_LIBRARY_ACTIVITY);
     }
 

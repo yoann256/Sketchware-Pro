@@ -6,7 +6,10 @@ import android.widget.CompoundButton;
 import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+
 import mod.hey.studios.util.Helper;
+import pro.sketchware.R;
 import pro.sketchware.databinding.ManageLibraryMaterial3Binding;
 
 public class Material3LibraryActivity extends AppCompatActivity {
@@ -28,12 +31,20 @@ public class Material3LibraryActivity extends AppCompatActivity {
 
         String sc_id = getIntent().getStringExtra("sc_id");
         material3LibraryManager = new Material3LibraryManager(sc_id);
-        Material3LibraryManager.ConfigData configData = material3LibraryManager.getConfigData();
+        if (!getIntent().getBooleanExtra("is_app_compat_enabled", false)) {
+            new MaterialAlertDialogBuilder(this)
+                    .setIcon(R.drawable.ic_mtrl_warning)
+                    .setTitle("AppCompat is disabled!")
+                    .setMessage("Please enable AppCompat first to use this feature")
+                    .setPositiveButton("OK", (dialog, which) -> finish())
+                    .setCancelable(false)
+                    .show();
+        }
 
-        binding.libSwitch.setChecked(configData.isMaterial3Enabled());
-        binding.dynamicColorsSwitch.setChecked(configData.isDynamicColorsEnabled());
+        binding.libSwitch.setChecked(material3LibraryManager.isMaterial3Enabled());
+        binding.dynamicColorsSwitch.setChecked(material3LibraryManager.isDynamicColorsEnabled());
 
-        if (!configData.isMaterial3Enabled()) {
+        if (!material3LibraryManager.isMaterial3Enabled()) {
             binding.dynamicColorsSwitch.setEnabled(false);
         }
 
@@ -42,7 +53,7 @@ public class Material3LibraryActivity extends AppCompatActivity {
 
         binding.layoutSwitchLib.setOnClickListener(view -> binding.libSwitch.setChecked(!binding.libSwitch.isChecked()));
         binding.layoutSwitchDynamicColors.setOnClickListener(view -> {
-            if (configData.isMaterial3Enabled())
+            if (binding.libSwitch.isChecked())
                 binding.dynamicColorsSwitch.setChecked(!binding.dynamicColorsSwitch.isChecked());
         });
 
