@@ -36,7 +36,7 @@
                 android:layout_height="wrap_content"
                 android:text="Connect a Git Provider"
                 android:layout_marginBottom="8dp"
-                android:textAppearance="?attr/textAppearanceTitleMedium"/>
+                android:textAppearance="?attr/textAppearanceTitleMedium" />
 
             <com.google.android.material.card.MaterialCardView
                 style="?attr/materialCardViewElevatedStyle"
@@ -114,8 +114,8 @@
                             android:layout_marginTop="16dp"
                             android:textAlignment="center"
                             android:textAppearance="?attr/textAppearanceBodyMedium"
-                            android:background="@drawable/bg_round_light_grey"/>
-                        
+                            android:background="@drawable/bg_round_light_grey" />
+
                         <com.google.android.material.textfield.TextInputLayout
                             android:id="@+id/menu_layout_repos"
                             style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
@@ -128,7 +128,7 @@
                                 android:id="@+id/auto_complete_repos"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:inputType="none"/>
+                                android:inputType="none" />
 
                         </com.google.android.material.textfield.TextInputLayout>
 
@@ -201,7 +201,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
                             android:text="Remember Token"
-                            android:layout_gravity="start"/>
+                            android:layout_gravity="start" />
 
                     </LinearLayout>
 
@@ -218,12 +218,12 @@
                             android:layout_width="wrap_content"
                             android:visibility="gone"
                             android:layout_height="wrap_content"
-                            android:text="Forget Token"/>
+                            android:text="Forget Token" />
 
                         <View
                             android:layout_width="0dp"
                             android:layout_height="0dp"
-                            android:layout_weight="1"/>
+                            android:layout_weight="1" />
 
                         <Button
                             android:id="@+id/button_authorize"
@@ -264,7 +264,7 @@
                         android:layout_marginStart="16dp"
                         android:text="GitLab (Coming Soon)"
                         android:textAppearance="?attr/textAppearanceTitleMedium"
-                        android:textColor="?attr/colorOnSurfaceVariant"/>
+                        android:textColor="?attr/colorOnSurfaceVariant" />
 
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>

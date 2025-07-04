@@ -260,7 +260,8 @@ public class ExportProjectActivity extends BaseAppCompatActivity implements GitC
                     git.pull().setCredentialsProvider(credentialsProvider).setRemote("origin").setRemoteBranchName(branch).call();
                 } else {
                     runOnUiThread(() -> updateGitProgressDialog("Cloning repository..."));
-                    if (localRepoPath.exists()) FileUtil.deleteFile(localRepoPath.getAbsolutePath());
+                    if (localRepoPath.exists())
+                        FileUtil.deleteFile(localRepoPath.getAbsolutePath());
                     localRepoPath.mkdirs();
                     git = Git.cloneRepository()
                             .setURI(repoUrl)

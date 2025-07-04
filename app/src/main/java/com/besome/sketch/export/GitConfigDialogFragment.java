@@ -199,10 +199,10 @@ public class GitConfigDialogFragment extends DialogFragment {
                         JSONArray branches = new JSONArray(readResponse(conn));
                         handler.post(() -> onBranchesFetched(branches));
                     } else {
-                         handler.post(() -> showError("Failed to fetch branches."));
+                        handler.post(() -> showError("Failed to fetch branches."));
                     }
                 } catch (Exception e) {
-                     handler.post(() -> showError("An error occurred: " + e.getMessage()));
+                    handler.post(() -> showError("An error occurred: " + e.getMessage()));
                 }
             });
         } catch (JSONException e) {
@@ -279,12 +279,12 @@ public class GitConfigDialogFragment extends DialogFragment {
         }
 
         SharedPreferences.Editor editor = prefs.edit();
-        if(rememberTokenCheckbox.isChecked()) {
-             editor.putString("github_pat", token);
-             editor.putBoolean("remember_token", true);
+        if (rememberTokenCheckbox.isChecked()) {
+            editor.putString("github_pat", token);
+            editor.putBoolean("remember_token", true);
         } else {
-             editor.remove("github_pat");
-             editor.remove("remember_token");
+            editor.remove("github_pat");
+            editor.remove("remember_token");
         }
         editor.putString("git_repo", "https://github.com/" + repoFullName);
         editor.putString("git_branch", branchName);
@@ -323,7 +323,7 @@ public class GitConfigDialogFragment extends DialogFragment {
 
         forgetButton.setVisibility(View.GONE);
         rememberTokenCheckbox.setChecked(false);
-        
+
         mainActionButton.setText(R.string.common_word_continue);
         saveMenuItem.setVisible(false);
 
@@ -377,7 +377,7 @@ public class GitConfigDialogFragment extends DialogFragment {
         } else if (getActivity() instanceof GitConfigListener) {
             listener = (GitConfigListener) getActivity();
         } else {
-             throw new ClassCastException(context + " must implement GitConfigListener");
+            throw new ClassCastException(context + " must implement GitConfigListener");
         }
     }
 
