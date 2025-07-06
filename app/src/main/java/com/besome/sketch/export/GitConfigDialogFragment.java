@@ -111,9 +111,15 @@ public class GitConfigDialogFragment extends DialogFragment {
             Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-personal-access-token-classic"));
             startActivity(intent);
         });
+
+        view.findViewById(R.id.text_ssh_helper).setOnClickListener(v -> {
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-personal-access-token-classic"));
+            startActivity(intent);
+        });
     }
 
     private void initializeViews(View view) {
+        // GitHub
         patEditText = view.findViewById(R.id.edit_text_pat);
         repoMenuLayout = view.findViewById(R.id.menu_layout_repos);
         repoAutoComplete = view.findViewById(R.id.auto_complete_repos);
@@ -127,6 +133,18 @@ public class GitConfigDialogFragment extends DialogFragment {
         usernameEditText = view.findViewById(R.id.edit_text_username);
         emailEditText = view.findViewById(R.id.edit_text_email);
         commitMsgEditText = view.findViewById(R.id.edit_text_commit_msg);
+        // Git SSH
+        sshEditText = view.findViewById(R.id.edit_text_ssh);
+        repoMenuLayoutSsh = view.findViewById(R.id.menu_layout_repos_ssh);
+        repoAutoCompleteSsh = view.findViewById(R.id.auto_complete_repos_ssh);
+        branchMenuLayoutSsh = view.findViewById(R.id.menu_layout_branches_ssh);
+        branchAutoCompleteSsh = view.findViewById(R.id.auto_complete_branches_ssh);
+        mainActionButtonSsh = view.findViewById(R.id.button_authorize_ssh);
+        authorizedSectionSsh = view.findViewById(R.id.github_authorized_section);
+        userInfoTextSsh = view.findViewById(R.id.text_user_info);
+        usernameEditTextSsh = view.findViewById(R.id.edit_text_username);
+        emailEditTextSsh = view.findViewById(R.id.edit_text_email);
+        commitMsgEditTextSsh = view.findViewById(R.id.edit_text_commit_msg);
     }
 
     private void setupToolbar(View view) {
@@ -158,6 +176,7 @@ public class GitConfigDialogFragment extends DialogFragment {
     }
 
     private void authorize() {
+        String gitSshPath = sshEditText.getText().toString().trim();
         String token = patEditText.getText().toString().trim();
         if (!isPatValid(token)) {
             showError("Invalid Personal Access Token format.");
