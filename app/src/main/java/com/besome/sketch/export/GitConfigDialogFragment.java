@@ -128,19 +128,19 @@ public class GitConfigDialogFragment extends DialogFragment {
         mainActionButton = view.findViewById(R.id.button_authorize);
         forgetButton = view.findViewById(R.id.button_forget_token);
         rememberTokenCheckbox = view.findViewById(R.id.checkbox_remember_token);
-        authorizedSection = view.findViewById(R.id.github_authorized_section);
+        authorizedSection = view.findViewById(R.id.ssh_authorized_section);
         userInfoText = view.findViewById(R.id.text_user_info);
         usernameEditText = view.findViewById(R.id.edit_text_username);
         emailEditText = view.findViewById(R.id.edit_text_email);
         commitMsgEditText = view.findViewById(R.id.edit_text_commit_msg);
         // Git SSH
-        sshEditText = view.findViewById(R.id.edit_text_ssh);
+        sshEditText = view.findViewById(R.id.edit_text_ssh_pat);
         repoMenuLayoutSsh = view.findViewById(R.id.menu_layout_repos_ssh);
         repoAutoCompleteSsh = view.findViewById(R.id.auto_complete_repos_ssh);
         branchMenuLayoutSsh = view.findViewById(R.id.menu_layout_branches_ssh);
         branchAutoCompleteSsh = view.findViewById(R.id.auto_complete_branches_ssh);
         mainActionButtonSsh = view.findViewById(R.id.button_authorize_ssh);
-        authorizedSectionSsh = view.findViewById(R.id.github_authorized_section);
+        authorizedSectionSsh = view.findViewById(R.id.ssh_authorized_section);
         userInfoTextSsh = view.findViewById(R.id.text_user_info);
         usernameEditTextSsh = view.findViewById(R.id.edit_text_username);
         emailEditTextSsh = view.findViewById(R.id.edit_text_email);
@@ -175,35 +175,58 @@ public class GitConfigDialogFragment extends DialogFragment {
         return false;
     }
 
+    private boolean isSSHPathValid(String ssh) {
+        if (TextUtils.isEmpty(ssh)) {
+            return false;
+        }
+        if (token.startsWith("git@")) {
+            return true;
+        }
+
+        return false;
+    }
+
     private void authorize() {
         String gitSshPath = sshEditText.getText().toString().trim();
         String token = patEditText.getText().toString().trim();
+
+        boolean isGitSSH;
         if (!isPatValid(token)) {
             showError("Invalid Personal Access Token format.");
             return;
+        } else if (!isSSHPathValid(gitSshPath)) {
+            showError("Invalid Git SSH format.");
+            return;
+        } else if (isSSHPathValid(gitSshPath)) {
+            isGitSSH = true;
         }
 
-        showLoading(true);
-        executor.execute(() -> {
-            try {
-                HttpURLConnection userConn = createConnection("https://api.github.com/user", token);
-                if (userConn.getResponseCode() != HttpURLConnection.HTTP_OK) {
-                    handler.post(() -> showError("Authorization failed. Check your token and permissions."));
-                    return;
-                }
-                JSONObject user = new JSONObject(readResponse(userConn));
+        if (!isGitSSH) {
+            showLoading(true);
+            executor.execute(() -> {
+                try {
+                    HttpURLConnection userConn = createConnection("https://api.github.com/user", token);
+                    if (userConn.getResponseCode() != HttpURLConnection.HTTP_OK) {
+                        handler.post(() -> showError("Authorization failed. Check your token and permissions."));
+                        return;
+                    }
+                    JSONObject user = new JSONObject(readResponse(userConn));
 
-                HttpURLConnection repoConn = createConnection("https://api.github.com/user/repos?type=owner&sort=updated&per_page=100", token);
-                if (repoConn.getResponseCode() == HttpURLConnection.HTTP_OK) {
-                    JSONArray repos = new JSONArray(readResponse(repoConn));
-                    handler.post(() -> onUserAndReposFetched(user, repos));
-                } else {
-                    handler.post(() -> showError("Failed to fetch repositories."));
+                    HttpURLConnection repoConn = createConnection("https://api.github.com/user/repos?type=owner&sort=updated&per_page=100", token);
+                    if (repoConn.getResponseCode() == HttpURLConnection.HTTP_OK) {
+                        JSONArray repos = new JSONArray(readResponse(repoConn));
+                        handler.post(() -> onUserAndReposFetched(user, repos));
+                    } else {
+                        handler.post(() -> showError("Failed to fetch repositories."));
+                    }
+                } catch (Exception e) {
+                    handler.post(() -> showError("An error occurred: " + e.getMessage()));
                 }
-            } catch (Exception e) {
-                handler.post(() -> showError("An error occurred: " + e.getMessage()));
-            }
-        });
+            });
+        } else {
+
+        }
+
     }
 
     private void fetchBranches(JSONObject repo) {

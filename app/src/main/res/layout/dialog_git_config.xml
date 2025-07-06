@@ -100,7 +100,7 @@
                         android:textAppearance="?attr/textAppearanceLabelLarge" />
 
                     <LinearLayout
-                        android:id="@+id/github_authorized_section"
+                        android:id="@+id/ssh_authorized_section"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:visibility="gone"
@@ -302,23 +302,6 @@
                             android:textAppearance="?attr/textAppearanceTitleMedium" />
                     </LinearLayout>
 
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/input_layout_ssh"
-                        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="24dp"
-                        android:hint="SSH (e.g. git@github.com:Sketchware-Pro/Sketchware-Pro.git)"
-                        app:endIconMode="password_toggle">
-
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/edit_text_ssh"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:inputType="textPassword"
-                            android:maxLines="1" />
-                    </com.google.android.material.textfield.TextInputLayout>
-
                     <TextView
                         android:id="@+id/text_ssh_helper"
                         android:layout_width="wrap_content"
@@ -330,8 +313,25 @@
                         android:background="?android:attr/selectableItemBackground"
                         android:textAppearance="?attr/textAppearanceLabelLarge" />
 
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/input_layout_ssh_pat"
+                        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginTop="24dp"
+                        android:hint="PAT or SSH key"
+                        app:endIconMode="password_toggle">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/edit_text_ssh_pat"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="textPassword"
+                            android:maxLines="1" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
                     <LinearLayout
-                        android:id="@+id/github_authorized_section"
+                        android:id="@+id/ssh_authorized_section"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:visibility="gone"
